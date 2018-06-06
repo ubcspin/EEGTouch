@@ -1,5 +1,7 @@
-// var app = require('express')();
-// var http = require('http').Server(app);
+////////////////////////////////////////////////////////////////////////////////
+// Imports
+//
+////////////////////////////////////////////////////////////////////////////////
 var five = require("johnny-five");
 var path = require('path');
 
@@ -9,7 +11,10 @@ var io = require('socket.io')(server);
 
 server.listen(3000);
 
+////////////////////////////////////////////////////////////////////////////////
 // Server code
+//
+////////////////////////////////////////////////////////////////////////////////
 app.get('/', function(req, res) {
     res.sendFile(path.join(__dirname + '/index.html'));
 });
@@ -17,12 +22,13 @@ app.get('/', function(req, res) {
 app.get('/js/bundle.js', function(req, res) {
     res.sendFile(path.join(__dirname + '/js/bundle.js'));
 });
-
-// app.use(express.static('/js/')) // not working
-
+// app.use(express.static('/js/')) // not working, supposedly sends folders
 
 
+////////////////////////////////////////////////////////////////////////////////
 // Socket code
+//
+////////////////////////////////////////////////////////////////////////////////
 io.on('connection', (client) => {
   client.on('subscribeToTimer', (interval) => {
     console.log('client is subscribing to timer with interval ', interval);
@@ -32,7 +38,10 @@ io.on('connection', (client) => {
   });
 });
 
+////////////////////////////////////////////////////////////////////////////////
 // Arduino code
+//
+////////////////////////////////////////////////////////////////////////////////
 var board = new five.Board();
 board.on("ready", function() {
   	var led = new five.Led(13);
