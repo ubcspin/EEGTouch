@@ -12,7 +12,7 @@ module.exports = {
   entry: './src/index.jsx',
   output: {
     path: path.resolve('dist'),
-    filename: 'bundle.js'
+    filename: 'js/bundle.js'
   },
   module: {
     rules: [
