@@ -6,8 +6,10 @@ import { Player, ControlBar, ReplayControl,
 
 export default (props) => {
   return (
+    <div>
+    <p>It renderd</p>
     <Player
-      poster="/assets/poster.png"
+      poster="/assets/hack-this-poster.png"
     >
       <source src="http://peach.themazzone.com/durian/movies/sintel-1024-surround.mp4" />
       <source src="http://mirrorblender.top-ix.org/movies/sintel-1024-surround.mp4" />
@@ -24,5 +26,6 @@ export default (props) => {
         <VolumeMenuButton disabled />
       </ControlBar>
     </Player>
+    </div>
   );
 };
