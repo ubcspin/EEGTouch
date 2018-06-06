@@ -42,7 +42,17 @@ io.on('connection', (client) => {
 // Arduino code
 //
 ////////////////////////////////////////////////////////////////////////////////
-var board = new five.Board();
+
+function message(msg) {
+	if (msg.voltage > 0) {
+		console.log("A" + msg.sensor + ": \t" + msg.voltage);
+		io.emit('sensor', msg)
+	}
+}
+var board = new five.Board({
+		repl: false,
+	});
+
 board.on("ready", function() {
   	var led = new five.Led(13);
  	led.blink(500);
@@ -54,18 +64,19 @@ board.on("ready", function() {
 	this.pinMode(4, five.Pin.ANALOG);
 
 	this.analogRead(0, function(voltage) {
-		console.log(voltage);
+		message({sensor: 0, voltage: voltage});
 	});
 	this.analogRead(1, function(voltage) {
-		console.log(voltage);
+		message({sensor: 1, voltage: voltage});
 	});
 	this.analogRead(2, function(voltage) {
-		console.log(voltage);
+		message({sensor: 2, voltage: voltage});
 	});
 	this.analogRead(3, function(voltage) {
-		console.log(voltage);
+		message({sensor: 3, voltage: voltage});
 	});
 	this.analogRead(4, function(voltage) {
-		console.log(voltage);
+		message({sensor: 4, voltage: voltage});
 	});
+	io.emit("ready","the board is ready");
 });
