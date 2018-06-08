@@ -7,5 +7,5 @@ outfile = open("recording_" + time + ".txt", 'w')
 while True:
 	data = ser.readline()
 	outfile.write(str(data, 'utf-8'))
+	outfile.flush()
 	print(data)
-outfile.close()
