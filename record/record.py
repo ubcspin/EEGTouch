@@ -1,10 +1,11 @@
 import serial
 import time
 
-ser = serial.Serial('/dev/tty.usbserial', 9600)
+ser = serial.Serial('COM3', 9600)
 time = str(int(time.time()))
-outfile = open("recording_" + time + ".txt")
+outfile = open("recording_" + time + ".txt", 'w')
 while True:
 	data = ser.readline()
-	outfile.println(data)
+	outfile.write(str(data, 'utf-8'))
 	print(data)
+outfile.close()
