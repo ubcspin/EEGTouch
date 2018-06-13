@@ -38,7 +38,7 @@ app.get('/assets/hypnotoad.mp4', function(req, res) {
 // IO code
 //
 ////////////////////////////////////////////////////////////////////////////////
-var header = ["A0", "A1", "A2", "A3", "A4", "D5", "videoPlaying", "timestamp"];
+var header = ["A0", "A1", "A2", "A3", "A4", "D5", "videoPlaying", "videoTimestamp", "timestamp"];
 var state = {
 	A0: -1,
 	A1: -1,
@@ -46,7 +46,8 @@ var state = {
 	A3: -1,
 	A4: -1,
 	D5: -1,
-	playing: false
+	playing: false,
+	videoTimestamp: -1,
 }
 
 var logTimer;
@@ -66,7 +67,7 @@ fs.open(filepath, 'w', (err, fd) => {
 	log(header.join(delimiter));
 	logTimer = setInterval(function(){
 		var now = Date.now();
-		var arr = [state.A0, state.A1, state.A2, state.A3, state.A4, state.D5, state.playing, now];
+		var arr = [state.A0, state.A1, state.A2, state.A3, state.A4, state.D5, state.playing, state.videoTimestamp, now];
 		var msg = arr.join(delimiter);
 		log(msg);
 	}, 1);
@@ -106,8 +107,7 @@ io.on('connection', (client) => {
   });
 
   client.on('videoStart', function(){state.playing = true});
-  client.on('videoEnd', function(){state.playing = false});
-  
+  client.on('videoTimestamp', function(ts){state.videoTimestamp = ts});
 });
 
 ////////////////////////////////////////////////////////////////////////////////
