@@ -73,12 +73,9 @@ fs.open(filepath, 'w', (err, fd) => {
 	}, 1);
 });
 
-function message(msg) {
-	if (msg.voltage > 0) {
-		console.log("A" + msg.sensor + ": \t" + msg.voltage);
+function handleMessage(msg) {
 		updateSensors(msg);
 		io.emit('sensor', msg)
-	}
 }
 
 // Unpack message to update the message state
@@ -130,25 +127,26 @@ board.on("ready", function() {
 	this.pinMode(2, five.Pin.ANALOG);
 	this.pinMode(3, five.Pin.ANALOG);
 	this.pinMode(4, five.Pin.ANALOG);
-	this.pinMode(5, five.Pin.DIGITAL);
+	var sensor = new five.Sensor.Digital(5);
 
 	this.analogRead(0, function(voltage) {
-		handleMessage({sensor: 0, voltage: voltage});
+		handleMessage({sensor: "A0", voltage: voltage});
 	});
 	this.analogRead(1, function(voltage) {
-		handleMessage({sensor: 1, voltage: voltage});
+		handleMessage({sensor: "A1", voltage: voltage});
 	});
 	this.analogRead(2, function(voltage) {
-		handleMessage({sensor: 2, voltage: voltage});
+		handleMessage({sensor: "A2", voltage: voltage});
 	});
 	this.analogRead(3, function(voltage) {
-		handleMessage({sensor: 3, voltage: voltage});
+		handleMessage({sensor: "A3", voltage: voltage});
 	});
 	this.analogRead(4, function(voltage) {
-		handleMessage({sensor: 4, voltage: voltage});
+		handleMessage({sensor: "A4", voltage: voltage});
 	});
-	this.digitalRead(5, function(voltage) {
-		handleMessage({sensor: 5, voltage: voltage})
+	sensor.on("change", function() {
+		handleMessage({sensor: "D5", voltage: this.value})
+		console.log("digitalRead success " + this.value)
 	})
 
 	io.emit("ready","the board is ready");
