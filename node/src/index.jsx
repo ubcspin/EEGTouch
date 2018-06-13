@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Video from "./Video.jsx"
-import { subscribeToTimer, subscribeToSensor } from './api';
+import { subscribeToTimer, subscribeToSensor, emit } from './api';
 
 
 class Hello extends React.Component {

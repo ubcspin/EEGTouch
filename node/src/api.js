@@ -6,11 +6,13 @@ function subscribeToTimer(cb) {
   socket.emit('subscribeToTimer', 1000); 
 }
 
-
-
 function subscribeToSensor(cb)  {
   socket.on('sensor', sensor => cb(null, sensor));
   // socket.emit('subscribeToTimer', 1000);  
+}
+
+function emit(header, msg) {
+	socket.emit(header, msg);
 }
 
 export { subscribeToTimer, subscribeToSensor };
