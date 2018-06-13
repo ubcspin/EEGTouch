@@ -38,13 +38,14 @@ app.get('/assets/hypnotoad.mp4', function(req, res) {
 // IO code
 //
 ////////////////////////////////////////////////////////////////////////////////
-var header = ["A0", "A1", "A2", "A3", "A4", "D5", "videoPlaying", "videoTimestamp", "timestamp"];
+var header = ["A0", "A1", "A2", "A3", "A4", "A5", "D5", "videoPlaying", "videoTimestamp", "timestamp"];
 var state = {
 	A0: -1,
 	A1: -1,
 	A2: -1,
 	A3: -1,
 	A4: -1,
+	A5: -1,
 	D5: -1,
 	playing: false,
 	videoTimestamp: -1,
@@ -127,6 +128,7 @@ board.on("ready", function() {
 	this.pinMode(2, five.Pin.ANALOG);
 	this.pinMode(3, five.Pin.ANALOG);
 	this.pinMode(4, five.Pin.ANALOG);
+	this.pinMode(5, five.Pin.ANALOG);
 	var sensor = new five.Sensor.Digital(5);
 
 	this.analogRead(0, function(voltage) {
@@ -142,6 +144,9 @@ board.on("ready", function() {
 		handleMessage({sensor: "A3", voltage: voltage});
 	});
 	this.analogRead(4, function(voltage) {
+		handleMessage({sensor: "A4", voltage: voltage});
+	});
+	this.analogRead(5, function(voltage) {
 		handleMessage({sensor: "A4", voltage: voltage});
 	});
 	sensor.on("change", function() {
