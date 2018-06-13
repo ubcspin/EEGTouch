@@ -28,6 +28,65 @@ app.get('/js/bundle.js', function(req, res) {
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// IO code
+//
+////////////////////////////////////////////////////////////////////////////////
+var header = ["A0", "A1", "A2", "A3", "A4", "D5", "videoPlaying", "timestamp"];
+var state = {
+	A0: -1,
+	A1: -1,
+	A2: -1,
+	A3: -1,
+	A4: -1,
+	D5: -1,
+	playing: false
+}
+
+var logTimer;
+var session = Date.now();
+var filepath = './logs/log_' + session + '.txt';
+var delimiter = ",";
+
+
+fs.open(filepath, 'w', (err, fd) => {
+	if (err) {
+		return console.error(err);
+	}
+	fs.close(fd, (err) => {
+		if (err) throw err;
+	});
+	console.log("Opened " + filepath + " successfully!");
+	log(header.join(delimiter));
+	logTimer = setInterval(function(){
+		var now = Date.now();
+		var arr = [state.A0, state.A1, state.A2, state.A3, state.A4, state.D5, state.playing, now];
+		var msg = arr.join(delimiter);
+		log(msg);
+	}, 1);
+});
+
+function message(msg) {
+	if (msg.voltage > 0) {
+		console.log("A" + msg.sensor + ": \t" + msg.voltage);
+		updateSensors(msg);
+		io.emit('sensor', msg)
+	}
+}
+
+// Unpack message to update the message state
+function updateSensors(msg) {
+	state[msg.sensor] = msg.voltage;
+}
+
+// MSG is a string???
+function log(msg) {
+	fs.appendFile(filepath, msg + "\n", function (err) {
+	  if (err) throw err;
+	  // console.log('Saved!');
+	});
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Socket code
 //
 ////////////////////////////////////////////////////////////////////////////////
@@ -38,6 +97,10 @@ io.on('connection', (client) => {
       client.emit('timer', new Date());
     }, interval);
   });
+
+  client.on('videoStart', state.playing = true);
+  client.on('videoEnd', state.playing = false);
+  
 });
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -81,60 +144,4 @@ board.on("ready", function() {
 	io.emit("ready","the board is ready");
 });
 
-////////////////////////////////////////////////////////////////////////////////
-// IO code
-//
-////////////////////////////////////////////////////////////////////////////////
-var state = {
-	A0: -1,
-	A1: -1,
-	A2: -1,
-	A3: -1,
-	A4: -1,
-	D5: -1
-}
-
-var logTimer;
-var session = Date.now();
-var filepath = './logs/log_' + session + '.txt';
-var delimiter = ",";
-
-fs.open(filepath, 'w', (err, fd) => {
-	if (err) {
-		return console.error(err);
-	}
-	fs.close(fd, (err) => {
-		if (err) throw err;
-	});
-	console.log("Opened " + filepath + " successfully!");
-	var header = ["A0", "A1", "A2", "A3", "A4", "D5", "timestamp"];
-	log(header.join(delimiter));
-	logTimer = setInterval(function(){
-		var now = Date.now();
-		var arr = [state.A0, state.A1, state.A2, state.A3, state.A4, state.D5, now];
-		var msg = arr.join(delimiter);
-		log(msg);
-	}, 1);
-});
-
-function message(msg) {
-	if (msg.voltage > 0) {
-		console.log("A" + msg.sensor + ": \t" + msg.voltage);
-		updateSensors(msg);
-		io.emit('sensor', msg)
-	}
-}
-
-// Unpack message to update the message state
-function updateSensors(msg) {
-	state[msg.sensor] = msg.voltage;
-}
-
-// MSG is a string???
-function log(msg) {
-	fs.appendFile(filepath, msg + "\n", function (err) {
-	  if (err) throw err;
-	  // console.log('Saved!');
-	});
-}
 
