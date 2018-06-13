@@ -15,4 +15,4 @@ function emit(header, msg) {
 	socket.emit(header, msg);
 }
 
-export { subscribeToTimer, subscribeToSensor };
+export { subscribeToTimer, subscribeToSensor, emit };
