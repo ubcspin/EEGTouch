@@ -26,6 +26,13 @@ app.get('/js/bundle.js', function(req, res) {
 });
 // app.use(express.static('/js/')) // not working, supposedly sends folders
 
+app.get('/assets/hack-this-poster.png', function(req, res) {
+    res.sendFile(path.join(__dirname + '/assets/hack-this-poster.png'));
+});
+
+app.get('/assets/hypnotoad.mp4', function(req, res) {
+    res.sendFile(path.join(__dirname + '/assets/hypnotoad.mp4'));
+});
 
 ////////////////////////////////////////////////////////////////////////////////
 // IO code
@@ -98,8 +105,8 @@ io.on('connection', (client) => {
     }, interval);
   });
 
-  client.on('videoStart', state.playing = true);
-  client.on('videoEnd', state.playing = false);
+  client.on('videoStart', function(){state.playing = true});
+  client.on('videoEnd', function(){state.playing = false});
   
 });
 
