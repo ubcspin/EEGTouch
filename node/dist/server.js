@@ -52,7 +52,7 @@ var state = {
 
 var logTimer;
 var session = Date.now();
-var filepath = './logs/log_' + session + '.txt';
+var filepath = './logs/log_' + session + '.csv';
 var delimiter = ",";
 
 
