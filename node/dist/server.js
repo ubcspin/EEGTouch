@@ -107,7 +107,10 @@ io.on('connection', (client) => {
   });
 
   client.on('videoStart', function(){state.playing = true});
-  client.on('videoTimestamp', function(ts){state.videoTimestamp = ts});
+  client.on('videoTimestamp', function(ts) {
+  	state.videoTimestamp = ts;
+  	client.emit('joystickUpdate', state.A4);
+  });
 });
 
 ////////////////////////////////////////////////////////////////////////////////

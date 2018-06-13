@@ -14,5 +14,8 @@ function subscribeToSensor(cb)  {
 function emit(header, msg) {
 	socket.emit(header, msg);
 }
+function subscribeToJoystick(cb) {
+	socket.on('joystickUpdate', joystickVal => cb(null, joystickVal));
+}
 
-export { subscribeToTimer, subscribeToSensor, emit };
+export { subscribeToTimer, subscribeToSensor, emit, subscribeToJoystick };

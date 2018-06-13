@@ -1,14 +1,16 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Video from "./Video.jsx"
-import { subscribeToTimer, subscribeToSensor, emit } from './api';
+import { subscribeToTimer, subscribeToSensor, subscribeToJoystick, emit } from './api';
 
 
 class Hello extends React.Component {
 	constructor(props) {
   		super(props);
-  		subscribeToTimer((err, timestamp) => this.setState({timestamp}));
+  		
+      subscribeToTimer((err, timestamp) => this.setState({timestamp}));
   		subscribeToSensor((err, sensor) => this.setState({sensor: sensor.sensor, voltage: sensor.voltage}));
+      subscribeToJoystick((err, joystickval) => this.handleJoystick(joystickval));
 
       this.myVideo = React.createRef();
 
@@ -16,10 +18,18 @@ class Hello extends React.Component {
   			timestamp: 'no timestamp yet',
   			sensor: -1,
   			voltage: -1,
-        playback: false
+        playback: false,
+        joystickVals: []
 
 		}
 	}
+
+  handleJoystick(jv) {
+    var arr = this.state.joystickVals;
+    arr.push(jv);
+    this.setState({joystickVals: arr});
+    // console.log(this.state.joystickVals);
+  }
 
 	getPlaybackMessage() {
     if (!this.state.playback) {
