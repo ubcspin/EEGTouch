@@ -17,6 +17,7 @@ const parseDate = timeParse('%Y%m%d');
 // const sf = d => d['San Francisco'];
 const i = d => d.i;
 const v = d => d.v;
+
 export default class Thresholds extends React.Component {
   render() {
     const { width, height, margin, events } = this.props;
@@ -27,9 +28,7 @@ export default class Thresholds extends React.Component {
     }
     var data = rawdata.map( function (cv, i, arr) {
         return {i:i, v:cv};
-    });
-
-    
+    });    
 
     if (width < 10) return null;
     // bounds
