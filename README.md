@@ -20,6 +20,10 @@ To *rebuild* the the package for production-ready
 
 `npm run build`
 
+
+To run during session
+---------------------
+
 To run at `http://localhost:3000/` (note the different localhost port) for the gaming session, AFTER building, run:
 
 `npm run server`
