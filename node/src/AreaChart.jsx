@@ -21,11 +21,15 @@ export default class Thresholds extends React.Component {
   render() {
     const { width, height, margin, events } = this.props;
     
-    var data = this.props.joystickVals.map( function (cv, i, arr) {
+    var rawdata = this.props.joystickVals;
+    if (rawdata.length > width) {
+      rawdata = rawdata.slice(rawdata.length - width, rawdata.length);
+    }
+    var data = rawdata.map( function (cv, i, arr) {
         return {i:i, v:cv};
     });
 
-    console.log(data)
+    
 
     if (width < 10) return null;
     // bounds
