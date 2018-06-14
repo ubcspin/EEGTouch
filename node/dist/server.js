@@ -68,7 +68,7 @@ fs.open(filepath, 'w', (err, fd) => {
 	log(header.join(delimiter));
 	logTimer = setInterval(function(){
 		var now = Date.now();
-		var arr = [state.A0, state.A1, state.A2, state.A3, state.A4, state.D5, state.playing, state.videoTimestamp, now];
+		var arr = [state.A0, state.A1, state.A2, state.A3, state.A4, state.A5, state.D5, state.playing, state.videoTimestamp, now];
 		var msg = arr.join(delimiter);
 		log(msg);
 	}, 1);
@@ -107,7 +107,7 @@ io.on('connection', (client) => {
   client.on('videoStart', function(){state.playing = true});
   client.on('videoTimestamp', function(ts) {
   	state.videoTimestamp = ts;
-  	client.emit('joystickUpdate', state.A4);
+  	client.emit('joystickUpdate', state.A5);
   });
 });
 

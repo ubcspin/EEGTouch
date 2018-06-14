@@ -1,11 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import BarGraph from "./BarGraph.jsx"
+// import BarGraph from "./BarGraph.jsx"
+import AreaChart from "./AreaChart.jsx"
 
 import { subscribeToTimer, subscribeToSensor, subscribeToJoystick, emit } from './api';
-
-
-
 
 class Hello extends React.Component {
 	constructor(props) {
@@ -77,15 +75,24 @@ class Hello extends React.Component {
             This is the Sensor A{this.state.sensor} value: {this.state.voltage}
           </p>
         </div>
-        <BarGraph 
+    <AreaChart 
           width={this.state.width}
           height={this.state.height}
           joystickVals={this.state.joystickVals}
+          margin={{ top: 20, bottom: 20, left: 20, right: 20 }}
+          
         />
-        
       </div>
 		)
 	};
 }
+
+
+        // <BarGraph 
+        //   width={this.state.width}
+        //   height={this.state.height}
+        //   joystickVals={this.state.joystickVals}
+        // />
+
  
 ReactDOM.render(<Hello/>, document.getElementById('hello'));
