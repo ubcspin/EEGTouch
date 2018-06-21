@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 // import BarGraph from "./BarGraph.jsx"
-import AreaChart from "./AreaChart.jsx"
+//import AreaChart from "./AreaChart.jsx"
 
 import { subscribeToTimer, subscribeToSensor, emit } from './api';
 
@@ -20,12 +20,13 @@ class Hello extends React.Component {
 					this.setState({joystickLatest: sensor.voltage});
 					var jH = Math.min(200, Math.max(0, sensor.voltage - 400))/2 + "vh";
 					this.setState({jSt: {
-						width: '30px',
+						width: '100vw',
 						height: jH,
-						backgroundColor: 'red',
+						backgroundColor: '#f44336',
 						bottom:0,
 						right:0,
-					 	position: 'absolute'}
+					 	position: 'absolute',
+					  zIndex: -1}
 			  })
 					// var arr = this.state.joystickVals;
 					// var w = 340;
@@ -53,9 +54,9 @@ class Hello extends React.Component {
         //width: 340,
         //height: 240,
 				jSt: {
-					width: '30px',
+					width: '100vw',
 					height: '10px',
-					backgroundColor: 'red',
+					backgroundColor: '#f44336',
 					bottom: 0,
 					right: 0,
 					position: 'absolute'}
@@ -96,6 +97,25 @@ class Hello extends React.Component {
     this.videoTimeCollect();
   }
 
+	playButton() {
+		const but = {backgroundColor: '#555555',
+								border: 'none',
+								color: 'white',
+								padding: '15px 32px',
+								textAlign: 'center',
+								display: 'inline-block',
+								fontSize: '16px',
+								fontFamily: 'Helvetica, Verdana, sans-serif'
+								}
+
+		if (this.state.playback == false) {
+			return (<button style={but} onClick={this.play.bind(this)}>Begin video playback...</button>);
+		}
+		else {
+			return(<div />);
+		}
+	}
+
 	render() {
 			const aleft = {float:'left'};
 			const aright = {float:'right', height: '100vh'};
@@ -110,23 +130,27 @@ class Hello extends React.Component {
 										left: '50%',
 										transform: 'translate(-50%, 0)'
 										}
+			const acentb = {position: 'fixed',
+											top: '75%',
+											left: '50%',
+											transform: 'translate(-50%, -50%)'
+											}
 
       return (
       <div style={aall}>
 				<div style={aleft}>
-				<div style={acent}>
 				<div>
+				<div style={acent}>
         <video width="320" height="240" ref="myVideo">
           <source src="assets/hypnotoad.mp4" type="video/mp4" />
         </video>
 			</div>
-			<div>
-        <button onClick={this.play.bind(this)}>{this.getPlaybackMessage()}</button>
+			<div style={acentb}>
+        {this.playButton()}
 			</div>
 			</div>
         <div className="App" style={abot}>
           <p className="App-intro">
-            Timer: {this.state.timestamp} Joystick: {this.state.joystickLatest}
 					</p>
 				</div>
 			</div>
@@ -141,6 +165,7 @@ class Hello extends React.Component {
 	};
 }
 
+            //Timer: {this.state.timestamp} Joystick: {this.state.joystickLatest}
 
         // <BarGraph
         //   width={this.state.width}
