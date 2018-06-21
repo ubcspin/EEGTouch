@@ -19,8 +19,8 @@ class Hello extends React.Component {
 				if (sensor.sensor == "A5") {
 					this.setState({joystickLatest: sensor.voltage});
 					this.setState({jSt: {
-						width: sensor.voltage,
-						height: '200px',
+						width: '30px',
+						height: sensor.voltage,
 						backgroundColor: 'red'}
 			  })
 					// var arr = this.state.joystickVals;
@@ -43,14 +43,14 @@ class Hello extends React.Component {
   			sensor: -1,
   			voltage: -1,
         playback: false,
-        joystickVals: [],
+        //joystickVals: [],
 				joystickLatest: -1,
 				//joystickLatent: -1,
-        width: 340,
-        height: 240,
+        //width: 340,
+        //height: 240,
 				jSt: {
-					width: '10px',
-					height: '200px',
+					width: '30px',
+					height: '10px',
 					backgroundColor: 'red'}
 		  }
 	}
@@ -90,9 +90,13 @@ class Hello extends React.Component {
   }
 
 	render() {
+			const aleft = {float:'left'};
+			const aright = {float:'right'};
+			const aall = {width:'650px'};
 
       return (
-      <div>
+      <div style={aall}>
+				<div style={aleft}>
         <video width="320" height="240" ref="myVideo">
           <source src="assets/hypnotoad.mp4" type="video/mp4" />
         </video>
@@ -107,9 +111,18 @@ class Hello extends React.Component {
 					<p>
 						This is the joystick: {this.state.joystickLatest}
 					</p>
+				</div>
+			</div>
+			<div style={aright}>
+				<div>
+					<p>
+						COOLNESS LEVEL:
+					</p>
 					<div style={this.state.jSt} />
         </div>
       </div>
+			<div class="clear"></div>
+		</div>
 		)
 	};
 }

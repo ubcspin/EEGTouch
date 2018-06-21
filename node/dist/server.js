@@ -119,7 +119,8 @@ io.on('connection', (client) => {
 //
 ////////////////////////////////////////////////////////////////////////////////
 var board = new five.Board({
-    port: "COM5",
+    //UNCOMMENT THE LINE BELOW AND PUT YOUR CORRECT PORT NAME IN TO MAKE THIS WORK ON WINDOWS
+    //port: "COM5",
 		repl: false,
 	});
 
