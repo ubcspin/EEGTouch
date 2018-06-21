@@ -3,15 +3,38 @@ import ReactDOM from 'react-dom';
 // import BarGraph from "./BarGraph.jsx"
 import AreaChart from "./AreaChart.jsx"
 
-import { subscribeToTimer, subscribeToSensor, subscribeToJoystick, emit } from './api';
+import { subscribeToTimer, subscribeToSensor, emit } from './api';
 
 class Hello extends React.Component {
 	constructor(props) {
   		super(props);
-  		
-      subscribeToTimer((err, timestamp) => this.setState({timestamp}));
-  		subscribeToSensor((err, sensor) => this.setState({sensor: sensor.sensor, voltage: sensor.voltage}));
-      subscribeToJoystick((err, joystickval) => this.handleJoystick(joystickval));
+
+      subscribeToTimer((err, timestamp) => {
+				this.setState({timestamp});
+				//var jv = this.state.joystickLatest;
+				//this.setState({joystickLatent: jv});
+			});
+
+  		subscribeToSensor((err, sensor) => {
+				if (sensor.sensor == "A5") {
+					this.setState({joystickLatest: sensor.voltage});
+					this.setState({jSt: {
+						width: sensor.voltage,
+						height: '200px',
+						backgroundColor: 'red'}
+			  })
+					// var arr = this.state.joystickVals;
+					// var w = 340;
+					// arr.push(sensor.voltage);
+					// if (arr.length > w) {
+			    //   arr = arr.slice(arr.length - w, arr.length);
+			    // }
+					// this.setState({joystickVals: arr});
+
+					//this.handleJoystick(sensor.voltage);
+				}
+				this.setState({sensor: sensor.sensor, voltage: sensor.voltage});});
+      //subscribeToJoystick((err, joystickval) => this.handleJoystick(joystickval));
 
       this.myVideo = React.createRef();
 
@@ -21,22 +44,29 @@ class Hello extends React.Component {
   			voltage: -1,
         playback: false,
         joystickVals: [],
+				joystickLatest: -1,
+				//joystickLatent: -1,
         width: 340,
-        height: 240, 
+        height: 240,
+				jSt: {
+					width: '10px',
+					height: '200px',
+					backgroundColor: 'red'}
 		  }
 	}
 
-  getData() {
-    var data = this.state.joystickVals.map((cv, i, arr)=> {i: cv});
-    return data;
-  }
+  // getData() {
+  //   var data = this.state.joystickVals.map((cv, i, arr)=> {i: cv});
+  //   return data;
+  // }
 
-  handleJoystick(jv) {
-    var arr = this.state.joystickVals;
-    arr.push(jv);
-    this.setState({joystickVals: arr});
-    // console.log(this.state.joystickVals);
-  }
+  // handleJoystick(jv) {
+  //   var arr = this.state.joystickVals;
+  //   arr.push(jv);
+  //   this.setState({joystickVals: arr});
+	// 	this.setState({joystickLatest: jv});
+  //   // console.log(this.state.joystickVals);
+  // }
 
 	getPlaybackMessage() {
     if (!this.state.playback) {
@@ -74,25 +104,30 @@ class Hello extends React.Component {
           <p>
             This is the Sensor A{this.state.sensor} value: {this.state.voltage}
           </p>
+					<p>
+						This is the joystick: {this.state.joystickLatest}
+					</p>
+					<div style={this.state.jSt} />
         </div>
-    <AreaChart 
-          width={this.state.width}
-          height={this.state.height}
-          joystickVals={this.state.joystickVals}
-          margin={{ top: 20, bottom: 20, left: 20, right: 20 }}
-          
-        />
       </div>
 		)
 	};
 }
 
 
-        // <BarGraph 
+        // <BarGraph
         //   width={this.state.width}
         //   height={this.state.height}
         //   joystickVals={this.state.joystickVals}
         // />
 
- 
+				//		<div >
+		    // <AreaChart
+		    //       width={this.state.width}
+		    //       height={this.state.height}
+		    //       joystickVals={this.state.joystickVals}
+				// 			joystickLatest={this.state.joystickLatest}
+		    //       margin={{ top: 20, bottom: 20, left: 20, right: 20 }}
+		    //     />
+
 ReactDOM.render(<Hello/>, document.getElementById('hello'));
