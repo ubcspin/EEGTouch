@@ -18,10 +18,14 @@ class Hello extends React.Component {
   		subscribeToSensor((err, sensor) => {
 				if (sensor.sensor == "A5") {
 					this.setState({joystickLatest: sensor.voltage});
+					var jH = Math.min(200, Math.max(0, sensor.voltage - 400))/2 + "vh";
 					this.setState({jSt: {
 						width: '30px',
-						height: sensor.voltage,
-						backgroundColor: 'red'}
+						height: jH,
+						backgroundColor: 'red',
+						bottom:0,
+						right:0,
+					 	position: 'absolute'}
 			  })
 					// var arr = this.state.joystickVals;
 					// var w = 340;
@@ -51,7 +55,10 @@ class Hello extends React.Component {
 				jSt: {
 					width: '30px',
 					height: '10px',
-					backgroundColor: 'red'}
+					backgroundColor: 'red',
+					bottom: 0,
+					right: 0,
+					position: 'absolute'}
 		  }
 	}
 
@@ -72,7 +79,7 @@ class Hello extends React.Component {
     if (!this.state.playback) {
       return "Begin video playback...";
     }
-    return "Playing...";
+    return "";
   }
 
   videoTimeCollect() {
@@ -91,33 +98,40 @@ class Hello extends React.Component {
 
 	render() {
 			const aleft = {float:'left'};
-			const aright = {float:'right'};
+			const aright = {float:'right', height: '100vh'};
 			const aall = {width:'650px'};
+			const acent = {position: 'fixed',
+  									top: '50%',
+  									left: '50%',
+  									/* bring your own prefixes */
+  									transform: 'translate(-50%, -50%)'}
+			const abot = {position: 'fixed',
+										bottom: 0,
+										left: '50%',
+										transform: 'translate(-50%, 0)'
+										}
 
       return (
       <div style={aall}>
 				<div style={aleft}>
+				<div style={acent}>
+				<div>
         <video width="320" height="240" ref="myVideo">
           <source src="assets/hypnotoad.mp4" type="video/mp4" />
         </video>
+			</div>
+			<div>
         <button onClick={this.play.bind(this)}>{this.getPlaybackMessage()}</button>
-        <div className="App">
+			</div>
+			</div>
+        <div className="App" style={abot}>
           <p className="App-intro">
-            This is the timer value: {this.state.timestamp}
-          </p>
-          <p>
-            This is the Sensor A{this.state.sensor} value: {this.state.voltage}
-          </p>
-					<p>
-						This is the joystick: {this.state.joystickLatest}
+            Timer: {this.state.timestamp} Joystick: {this.state.joystickLatest}
 					</p>
 				</div>
 			</div>
 			<div style={aright}>
 				<div>
-					<p>
-						COOLNESS LEVEL:
-					</p>
 					<div style={this.state.jSt} />
         </div>
       </div>
