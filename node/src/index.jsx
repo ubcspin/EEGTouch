@@ -6,62 +6,72 @@ import ReactDOM from 'react-dom';
 import { subscribeToTimer, subscribeToSensor, emit } from './api';
 
 class Hello extends React.Component {
-	constructor(props) {
-  		super(props);
+  constructor(props) {
+      super(props);
 
       subscribeToTimer((err, timestamp) => {
-				this.setState({timestamp});
-				//var jv = this.state.joystickLatest;
-				//this.setState({joystickLatent: jv});
-			});
+        this.setState({timestamp});
+        //var jv = this.state.joystickLatest;
+        //this.setState({joystickLatent: jv});
+      });
 
-  		subscribeToSensor((err, sensor) => {
-				if (sensor.sensor == "A5") {
-					this.setState({joystickLatest: sensor.voltage});
-					var jH = Math.min(200, Math.max(0, sensor.voltage - 400))/2 + "vh";
-					this.setState({jSt: {
-						width: '100vw',
-						height: jH,
-						backgroundColor: '#f44336',
-						bottom:0,
-						right:0,
-					 	position: 'absolute',
-					  zIndex: -1}
-			  })
-					// var arr = this.state.joystickVals;
-					// var w = 340;
-					// arr.push(sensor.voltage);
-					// if (arr.length > w) {
-			    //   arr = arr.slice(arr.length - w, arr.length);
-			    // }
-					// this.setState({joystickVals: arr});
+      //backgroundColor: 'f44336';
 
-					//this.handleJoystick(sensor.voltage);
-				}
-				this.setState({sensor: sensor.sensor, voltage: sensor.voltage});});
+      subscribeToSensor((err, sensor) => {
+        if (sensor.sensor == "A5" && sensor.voltage > 400 && sensor.voltage < 700) {
+          this.setState({joystickLatest: sensor.voltage});
+          var jH = Math.min(188, Math.max(0, sensor.voltage - 428))/1.88;
+
+        var jHue = 0;
+        if (jH < 50) {jHue = 200}
+        var jSat = Math.abs(jH - 50)*2 *0.7;
+        var jLi = 50 - (100 - jSat/0.8)*0.1;
+        var jHSL = "hsl(" + jHue + "," + jSat + "%," + jLi + "%)";
+
+          this.setState({jSt: {
+            width: '100vw',
+            height: '100vh',
+            backgroundColor: jHSL,
+            bottom:0,
+            right:0,
+            position: 'absolute',
+            zIndex: -1}
+        })
+          // var arr = this.state.joystickVals;
+          // var w = 340;
+          // arr.push(sensor.voltage);
+          // if (arr.length > w) {
+          //   arr = arr.slice(arr.length - w, arr.length);
+          // }
+          // this.setState({joystickVals: arr});
+
+          //this.handleJoystick(sensor.voltage);
+        }
+        this.setState({sensor: sensor.sensor, voltage: sensor.voltage});});
       //subscribeToJoystick((err, joystickval) => this.handleJoystick(joystickval));
 
       this.myVideo = React.createRef();
 
-  		this.state = {
-  			timestamp: 'no timestamp yet',
-  			sensor: -1,
-  			voltage: -1,
+      this.state = {
+        timestamp: 'no timestamp yet',
+        sensor: -1,
+        voltage: -1,
         playback: false,
         //joystickVals: [],
-				joystickLatest: -1,
-				//joystickLatent: -1,
+        joystickLatest: -1,
+        //joystickLatent: -1,
         //width: 340,
         //height: 240,
-				jSt: {
-					width: '100vw',
-					height: '10px',
-					backgroundColor: '#f44336',
-					bottom: 0,
-					right: 0,
-					position: 'absolute'}
-		  }
-	}
+        jSt: {
+          width: '100vw',
+          height: '100vh',
+          backgroundColor: 'hsl(0,0%,50%)',
+          bottom: 0,
+          right: 0,
+          position: 'absolute',
+          zIndex: -1}
+      }
+  }
 
   // getData() {
   //   var data = this.state.joystickVals.map((cv, i, arr)=> {i: cv});
@@ -72,11 +82,11 @@ class Hello extends React.Component {
   //   var arr = this.state.joystickVals;
   //   arr.push(jv);
   //   this.setState({joystickVals: arr});
-	// 	this.setState({joystickLatest: jv});
+  //  this.setState({joystickLatest: jv});
   //   // console.log(this.state.joystickVals);
   // }
 
-	getPlaybackMessage() {
+  getPlaybackMessage() {
     if (!this.state.playback) {
       return "Begin video playback...";
     }
@@ -84,9 +94,9 @@ class Hello extends React.Component {
   }
 
   videoTimeCollect() {
-    setInterval( function(){
-      emit("videoTimestamp", this.refs.myVideo.currentTime);
-    }.bind(this), 1000 / 30);
+     setInterval( function(){
+       emit("videoTimestamp", this.refs.myVideo.currentTime);
+     }.bind(this), 1000 / 30); //was 30
   }
 
   play() {
@@ -97,72 +107,75 @@ class Hello extends React.Component {
     this.videoTimeCollect();
   }
 
-	playButton() {
-		const but = {backgroundColor: '#555555',
-								border: 'none',
-								color: 'white',
-								padding: '15px 32px',
-								textAlign: 'center',
-								display: 'inline-block',
-								fontSize: '16px',
-								fontFamily: 'Helvetica, Verdana, sans-serif'
-								}
+  playButton() {
+    const but = {backgroundColor: '#555555',
+                border: 'none',
+                color: 'white',
+                padding: '15px 32px',
+                textAlign: 'center',
+                display: 'inline-block',
+                fontSize: '16px',
+                fontFamily: 'Helvetica, Verdana, sans-serif'
+                }
 
-		if (this.state.playback == false) {
-			return (<button style={but} onClick={this.play.bind(this)}>Begin video playback...</button>);
-		}
-		else {
-			return(<div />);
-		}
-	}
+    if (this.state.playback == false) {
+      return (<button style={but} onClick={this.play.bind(this)}>Begin video playback...</button>);
+    }
+    else {
+      return(<div />);
+    }
+  }
 
-	render() {
-			const aleft = {float:'left'};
-			const aright = {float:'right', height: '100vh'};
-			const aall = {width:'650px'};
-			const acent = {position: 'fixed',
-  									top: '50%',
-  									left: '50%',
-  									/* bring your own prefixes */
-  									transform: 'translate(-50%, -50%)'}
-			const abot = {position: 'fixed',
-										bottom: 0,
-										left: '50%',
-										transform: 'translate(-50%, 0)'
-										}
-			const acentb = {position: 'fixed',
-											top: '75%',
-											left: '50%',
-											transform: 'translate(-50%, -50%)'
-											}
+  render() {
+      const aleft = {float:'left'};
+      const aright = {float:'right', height: '100vh'};
+      const aall = {width:'650px'};
+      const acent = {position: 'fixed',
+                    top: '50%',
+                    left: '50%',
+                    /* bring your own prefixes */
+                    transform: 'translate(-50%, -50%)'}
+      const abot = {position: 'fixed',
+                    bottom: 0,
+                    left: '50%',
+                    transform: 'translate(-50%, 0)'
+                    }
+      const acentb = {position: 'fixed',
+                      top: '75%',
+                      left: '50%',
+                      transform: 'translate(-50%, -50%)'
+                      }
 
       return (
       <div style={aall}>
-				<div style={aleft}>
-				<div>
-				<div style={acent}>
-        <video width="320" height="240" ref="myVideo">
-          <source src="assets/hypnotoad.mp4" type="video/mp4" />
+        <div style={aleft}>
+        <div>
+        <div style={acent}>
+        <video width="1096" height="616" ref="myVideo">
+          <source src="assets\testmovie.mov" type="video/mp4" />
         </video>
-			</div>
-			<div style={acentb}>
+      </div>
+      <div style={acentb}>
         {this.playButton()}
-			</div>
-			</div>
+      </div>
+      </div>
         <div className="App" style={abot}>
           <p className="App-intro">
-					</p>
-				</div>
-			</div>
-			<div style={aright}>
-				<div>
-					<div style={this.state.jSt} />
+          </p>
         </div>
       </div>
-			<div class="clear"></div>
-		</div>
-		)
-	};
+      <div style={aright}>
+        <div>
+          <div style={this.state.jSt} />
+        </div>
+        <div style={abot}>
+        <p> Joystick: {this.state.joystickLatest} backgroundColor: {this.state.jSt.backgroundColor} </p>
+        </div>
+      </div>
+      <div class="clear"></div>
+    </div>
+    )
+  };
 }
 
             //Timer: {this.state.timestamp} Joystick: {this.state.joystickLatest}
@@ -173,13 +186,13 @@ class Hello extends React.Component {
         //   joystickVals={this.state.joystickVals}
         // />
 
-				//		<div >
-		    // <AreaChart
-		    //       width={this.state.width}
-		    //       height={this.state.height}
-		    //       joystickVals={this.state.joystickVals}
-				// 			joystickLatest={this.state.joystickLatest}
-		    //       margin={{ top: 20, bottom: 20, left: 20, right: 20 }}
-		    //     />
+        //    <div >
+        // <AreaChart
+        //       width={this.state.width}
+        //       height={this.state.height}
+        //       joystickVals={this.state.joystickVals}
+        //      joystickLatest={this.state.joystickLatest}
+        //       margin={{ top: 20, bottom: 20, left: 20, right: 20 }}
+        //     />
 
 ReactDOM.render(<Hello/>, document.getElementById('hello'));
