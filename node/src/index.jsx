@@ -29,11 +29,11 @@ class Hello extends React.Component {
         var jHSL = "hsl(" + jHue + "," + jSat + "%," + jLi + "%)";
 
           this.setState({jSt: {
-            width: '100vw',
-            height: '100vh',
+            width: '8vw',
+            height: jH + 'vh',
             backgroundColor: jHSL,
             bottom:0,
-            right:0,
+            right:'15%',
             position: 'absolute',
             zIndex: -1}
         })
@@ -63,11 +63,11 @@ class Hello extends React.Component {
         //width: 340,
         //height: 240,
         jSt: {
-          width: '100vw',
+          width: '8vw',
           height: '100vh',
           backgroundColor: 'hsl(0,0%,50%)',
           bottom: 0,
-          right: 0,
+          right:'15%',
           position: 'absolute',
           zIndex: -1}
       }
@@ -135,6 +135,16 @@ class Hello extends React.Component {
                     left: '50%',
                     /* bring your own prefixes */
                     transform: 'translate(-50%, -50%)'}
+      const aoff = {position: 'fixed',
+                    top: '50%',
+                    left: '40%',
+                    /* bring your own prefixes */
+                    transform: 'translate(-50%, -50%)'}
+      const aoffb = {position: 'fixed',
+                    top: '75%',
+                    left: '40%',
+                    /* bring your own prefixes */
+                    transform: 'translate(-50%, -50%)'}
       const abot = {position: 'fixed',
                     bottom: 0,
                     left: '50%',
@@ -150,12 +160,12 @@ class Hello extends React.Component {
       <div style={aall}>
         <div style={aleft}>
         <div>
-        <div style={acent}>
+        <div style={aoff}>
         <video width="1096" height="616" ref="myVideo">
           <source src="assets\testmovie.mov" type="video/mp4" />
         </video>
       </div>
-      <div style={acentb}>
+      <div style={aoffb}>
         {this.playButton()}
       </div>
       </div>
