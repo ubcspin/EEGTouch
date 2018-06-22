@@ -30,8 +30,8 @@ app.get('/assets/hack-this-poster.png', function(req, res) {
     res.sendFile(path.join(__dirname + '/assets/hack-this-poster.png'));
 });
 
-app.get('/assets/hypnotoad.mp4', function(req, res) {
-    res.sendFile(path.join(__dirname + '/assets/hypnotoad.mp4'));
+app.get('/assets/testmovie.mov', function(req, res) {
+    res.sendFile(path.join(__dirname + '/assets/testmovie.mov'));
 });
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -76,10 +76,10 @@ fs.open(filepath, 'w', (err, fd) => {
 
 function handleMessage(msg) {
 		updateSensors(msg);
-		io.emit('sensor', msg)
-     // if (msg.sensor == "A5") {
-     //   io.emit('joystickUpdate', msg.voltage);
-     // }
+		if (msg.sensor == "A5") {
+		io.emit('sensor', msg);
+		//console.log("Emitting joystick reading: " + msg.voltage);
+	}
 }
 
 // Unpack message to update the message state
@@ -93,6 +93,7 @@ function log(msg) {
 	  if (err) throw err;
 	  // console.log('Saved!');
 	});
+	//console.log("Logging data");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -104,12 +105,14 @@ io.on('connection', (client) => {
     console.log('client is subscribing to timer with interval ', interval);
     setInterval(() => {
       client.emit('timer', new Date());
+      //console.log("Emitting timer");
     }, interval);
   });
 
-  client.on('videoStart', function(){state.playing = true});
+  client.on('videoStart', function(){state.playing = true; console.log("Received client request to start video");});
   client.on('videoTimestamp', function(ts) {
   	state.videoTimestamp = ts;
+  	//console.log("Received client video timestamp: " + ts);
   	//client.emit('joystickUpdate', state.A5);
   });
 });
@@ -119,9 +122,8 @@ io.on('connection', (client) => {
 //
 ////////////////////////////////////////////////////////////////////////////////
 var board = new five.Board({
-    //UNCOMMENT THE LINE BELOW AND PUT YOUR CORRECT PORT NAME IN TO MAKE THIS WORK ON WINDOWS
-    port: "COM5",
-		repl: false,
+		port: "COM3",
+		repl: false
 	});
 
 board.on("ready", function() {
@@ -160,4 +162,7 @@ board.on("ready", function() {
 	})
 
 	io.emit("ready","the board is ready");
+	//console.log("Emitting ready signal for J5");
 });
+
+
