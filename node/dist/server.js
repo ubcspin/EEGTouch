@@ -77,6 +77,9 @@ fs.open(filepath, 'w', (err, fd) => {
 function handleMessage(msg) {
 		updateSensors(msg);
 		io.emit('sensor', msg)
+     // if (msg.sensor == "A5") {
+     //   io.emit('joystickUpdate', msg.voltage);
+     // }
 }
 
 // Unpack message to update the message state
@@ -86,7 +89,7 @@ function updateSensors(msg) {
 
 // MSG is a string???
 function log(msg) {
-	fs.appendFile(filepath, msg + "\n", function (err) {
+	fs.appendFileSync(filepath, msg + "\n", function (err) {
 	  if (err) throw err;
 	  // console.log('Saved!');
 	});
@@ -107,7 +110,7 @@ io.on('connection', (client) => {
   client.on('videoStart', function(){state.playing = true});
   client.on('videoTimestamp', function(ts) {
   	state.videoTimestamp = ts;
-  	client.emit('joystickUpdate', state.A5);
+  	//client.emit('joystickUpdate', state.A5);
   });
 });
 
@@ -116,6 +119,8 @@ io.on('connection', (client) => {
 //
 ////////////////////////////////////////////////////////////////////////////////
 var board = new five.Board({
+    //UNCOMMENT THE LINE BELOW AND PUT YOUR CORRECT PORT NAME IN TO MAKE THIS WORK ON WINDOWS
+    port: "COM5",
 		repl: false,
 	});
 
@@ -147,7 +152,7 @@ board.on("ready", function() {
 		handleMessage({sensor: "A4", voltage: voltage});
 	});
 	this.analogRead(5, function(voltage) {
-		handleMessage({sensor: "A4", voltage: voltage});
+		handleMessage({sensor: "A5", voltage: voltage});
 	});
 	sensor.on("change", function() {
 		handleMessage({sensor: "D5", voltage: this.value})
@@ -156,5 +161,3 @@ board.on("ready", function() {
 
 	io.emit("ready","the board is ready");
 });
-
-
