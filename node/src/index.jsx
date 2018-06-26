@@ -28,15 +28,38 @@ class Hello extends React.Component {
         var jLi = 50 - (100 - jSat/0.8)*0.1;
         var jHSL = "hsl(" + jHue + "," + jSat + "%," + jLi + "%)";
 
+        if (jH < 50) {
           this.setState({jSt: {
             width: '8vw',
-            height: jH + 'vh',
+            height: (50-jH) + 'vh',
             backgroundColor: jHSL,
-            bottom:0,
+            top: '50%',
+            right: '15%',
+            position: 'absolute',
+            zIndex: -1
+          }
+          })
+        }
+        else {
+          this.setState({jSt: {
+            width: '8vw',
+            height: (jH-50) + 'vh',
+            backgroundColor: jHSL,
+            bottom: '50%',
             right:'15%',
             position: 'absolute',
-            zIndex: -1}
-        })
+            zIndex: -1
+          }})
+        }
+        //   this.setState({jSt: {
+        //     width: '100vw',
+        //     height: '100vh',
+        //     backgroundColor: jHSL,
+        //     bottom:0,
+        //     right:0,
+        //     position: 'absolute',
+        //     zIndex: -1}
+        // })
           // var arr = this.state.joystickVals;
           // var w = 340;
           // arr.push(sensor.voltage);
@@ -63,11 +86,11 @@ class Hello extends React.Component {
         //width: 340,
         //height: 240,
         jSt: {
-          width: '8vw',
+          width: '100vw',
           height: '100vh',
           backgroundColor: 'hsl(0,0%,50%)',
           bottom: 0,
-          right:'15%',
+          right: 0,
           position: 'absolute',
           zIndex: -1}
       }
@@ -135,16 +158,6 @@ class Hello extends React.Component {
                     left: '50%',
                     /* bring your own prefixes */
                     transform: 'translate(-50%, -50%)'}
-      const aoff = {position: 'fixed',
-                    top: '50%',
-                    left: '40%',
-                    /* bring your own prefixes */
-                    transform: 'translate(-50%, -50%)'}
-      const aoffb = {position: 'fixed',
-                    top: '75%',
-                    left: '40%',
-                    /* bring your own prefixes */
-                    transform: 'translate(-50%, -50%)'}
       const abot = {position: 'fixed',
                     bottom: 0,
                     left: '50%',
@@ -160,12 +173,12 @@ class Hello extends React.Component {
       <div style={aall}>
         <div style={aleft}>
         <div>
-        <div style={aoff}>
+        <div style={acent}>
         <video width="1096" height="616" ref="myVideo">
           <source src="assets\testmovie.mov" type="video/mp4" />
         </video>
       </div>
-      <div style={aoffb}>
+      <div style={acentb}>
         {this.playButton()}
       </div>
       </div>
@@ -206,3 +219,4 @@ class Hello extends React.Component {
         //     />
 
 ReactDOM.render(<Hello/>, document.getElementById('hello'));
+
