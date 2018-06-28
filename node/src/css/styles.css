@@ -1,0 +1,78 @@
+.CoverButtonStyle {
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+  top: 0;
+  left: 0;
+  background-color: #D3D3D3;
+  margin: auto;
+  border: none;
+  color: #333333;
+  text-align: center;
+  font-size: 30px;
+  font-family: Helvetica, Verdana, sans-serif;
+  z-index: 10
+}
+
+.CoverButtonStyle:hover {
+  background-color: #DDDDDD;
+  cursor: pointer
+}
+
+.CoverButtonStyle:focus {
+  outline: 0
+}
+
+.VidBox {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%)}
+
+.JoystickBg {
+  position: fixed;
+  top: 0px;
+  right: 15%;
+  height: 100vh;
+  width: 8vw;
+  position: absolute;
+  background-color: #D3D3D3;
+  z-index: 2}
+
+.Background {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  background-color: #EDEDED;
+  z-index: -2}
+
+.PlayButton {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  color: #FFFFFF;
+  font-size: 100px;
+  font-family: Helvetica, Verdana, sans-serif;
+  background-color: transparent;
+  border: none;
+  -webkit-transition-duration: 0.1s;
+  transition-duration: 0.1s;
+  zIndex: 2}
+
+.PlayButton:hover {
+  opacity: 0.5;
+  cursor: pointer
+}
+
+.PlayButton:focus {
+  outline: 0;
+}
+
+.CentreBottomPosition {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translate(-50%, 0)}
