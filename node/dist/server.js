@@ -26,13 +26,11 @@ app.get('/js/bundle.js', function(req, res) {
 });
 // app.use(express.static('/js/')) // not working, supposedly sends folders
 
-app.get('/assets/hack-this-poster.png', function(req, res) {
-    res.sendFile(path.join(__dirname + '/assets/hack-this-poster.png'));
+app.get('/assets/video.mov', function(req, res) {
+    res.sendFile(path.join(__dirname + '/assets/video.mov'));
 });
 
-app.get('/assets/testmovie.mov', function(req, res) {
-    res.sendFile(path.join(__dirname + '/assets/testmovie.mov'));
-});
+// not serving stylesheet server-side because react packs it up for us
 
 ////////////////////////////////////////////////////////////////////////////////
 // IO code
@@ -77,7 +75,7 @@ fs.open(filepath, 'w', (err, fd) => {
 function handleMessage(msg) {
 		updateSensors(msg);
 		if (msg.sensor == "A5") {
-		io.emit('sensor', msg);
+		io.emit('joystick', msg.voltage);
 		//console.log("Emitting joystick reading: " + msg.voltage);
 	}
 }
@@ -88,12 +86,19 @@ function updateSensors(msg) {
 }
 
 // MSG is a string???
+// MSG is a seasoning
 function log(msg) {
+  // using synchronous append file
+  // because otherwise it tries to open and append the same file
+  // >2000 times simultaneously
+  // this crashes the server on windows
+  // behaviour which is generally frowned upon
+  //
 	fs.appendFileSync(filepath, msg + "\n", function (err) {
 	  if (err) throw err;
 	  // console.log('Saved!');
 	});
-	//console.log("Logging data");
+	// console.log("Logging data");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -101,19 +106,12 @@ function log(msg) {
 //
 ////////////////////////////////////////////////////////////////////////////////
 io.on('connection', (client) => {
-  client.on('subscribeToTimer', (interval) => {
-    console.log('client is subscribing to timer with interval ', interval);
-    setInterval(() => {
-      client.emit('timer', new Date());
-      //console.log("Emitting timer");
-    }, interval);
-  });
 
-  client.on('videoStart', function(){state.playing = true; console.log("Received client request to start video");});
+  client.on('videoStart', function(){state.playing = true;
+    console.log("Received client request to start video");});
   client.on('videoTimestamp', function(ts) {
   	state.videoTimestamp = ts;
   	//console.log("Received client video timestamp: " + ts);
-  	//client.emit('joystickUpdate', state.A5);
   });
 });
 
@@ -122,7 +120,11 @@ io.on('connection', (client) => {
 //
 ////////////////////////////////////////////////////////////////////////////////
 var board = new five.Board({
-		port: "COM3",
+    // port must be explicitly named on windows for some reason
+    // please replace the following with
+    // whichever port ur board finds itself mounting to
+    // or comment out if your OS is smart enough to know where things are
+		port: "COM5",
 		repl: false
 	});
 
@@ -164,5 +166,3 @@ board.on("ready", function() {
 	io.emit("ready","the board is ready");
 	//console.log("Emitting ready signal for J5");
 });
-
-
