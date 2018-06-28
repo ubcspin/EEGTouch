@@ -1,125 +1,112 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-// import BarGraph from "./BarGraph.jsx"
-//import AreaChart from "./AreaChart.jsx"
+import './css/styles.css';
+import { subscribeToJoystick, emit } from './api';
 
-import { subscribeToTimer, subscribeToSensor, emit } from './api';
-
-class Hello extends React.Component {
+class ReplayPage extends React.Component {
   constructor(props) {
       super(props);
 
-      subscribeToTimer((err, timestamp) => {
-        this.setState({timestamp});
-        //var jv = this.state.joystickLatest;
-        //this.setState({joystickLatent: jv});
-      });
+      subscribeToJoystick((err, joystickReading) => {
+        // sanity check omits values outside of reasonable hardware range
+        // shoudl be recalibrated on each hardware change
+        if (joystickReading > 400 && joystickReading < 700) {
+          this.setState({joystickPosition: joystickReading});
 
-      //backgroundColor: 'f44336';
+          // joyRelHeight: relative position of joystick from ~(1 to 100)
+          // used to calculate height, color of visualization
+          // calculated based on min/max positions for analog input
+          // should be recalibrated on each hardware change
+          var joyRelPosition =
+            Math.min(188, Math.max(0, joystickReading - 428))/1.88;
 
-      subscribeToSensor((err, sensor) => {
-        if (sensor.sensor == "A5" && sensor.voltage > 400 && sensor.voltage < 700) {
-          this.setState({joystickLatest: sensor.voltage});
-          var jH = Math.min(188, Math.max(0, sensor.voltage - 428))/1.88;
+          // calculate hue, saturation, lightnesss based on joystick position
+          var joyHue = 0;
+          if (joyRelPosition < 50) {joyHue = 200}
+          var joySat = Math.abs(joyRelPosition - 50)*2 *0.7;
+          var joyLight = 50 - (100 - joySat/0.8)*0.1;
+          var joyHSL = "hsl(" + joyHue + "," + joySat + "%," + joyLight + "%)";
 
-        var jHue = 0;
-        if (jH < 50) {jHue = 200}
-        var jSat = Math.abs(jH - 50)*2 *0.7;
-        var jLi = 50 - (100 - jSat/0.8)*0.1;
-        var jHSL = "hsl(" + jHue + "," + jSat + "%," + jLi + "%)";
-
-        if (jH < 50) {
-          this.setState({jSt: {
-            width: '8vw',
-            height: (50-jH) + 'vh',
-            backgroundColor: jHSL,
-            top: '50%',
-            right: '15%',
-            position: 'absolute',
-            zIndex: -1
+          // extend below centre and turn blue
+          if (joyRelPosition < 50) {
+            this.setState({joyBar: {
+              width: '8vw',
+              height: Math.max(0.5, (50-joyRelPosition)) + 'vh',
+              backgroundColor: joyHSL,
+              top: '50%',
+              right: '15%',
+              position: 'absolute',
+              zIndex: 3
+            }})
           }
-          })
-        }
-        else {
-          this.setState({jSt: {
-            width: '8vw',
-            height: (jH-50) + 'vh',
-            backgroundColor: jHSL,
-            bottom: '50%',
-            right:'15%',
-            position: 'absolute',
-            zIndex: -1
-          }})
-        }
-        //   this.setState({jSt: {
-        //     width: '100vw',
-        //     height: '100vh',
-        //     backgroundColor: jHSL,
-        //     bottom:0,
-        //     right:0,
-        //     position: 'absolute',
-        //     zIndex: -1}
-        // })
-          // var arr = this.state.joystickVals;
-          // var w = 340;
-          // arr.push(sensor.voltage);
-          // if (arr.length > w) {
-          //   arr = arr.slice(arr.length - w, arr.length);
-          // }
-          // this.setState({joystickVals: arr});
 
-          //this.handleJoystick(sensor.voltage);
-        }
-        this.setState({sensor: sensor.sensor, voltage: sensor.voltage});});
-      //subscribeToJoystick((err, joystickval) => this.handleJoystick(joystickval));
+          // extend above centre and turn red
+          else {
+            this.setState({joyBar: {
+              width: '8vw',
+              height: Math.max(0.5,(joyRelPosition-50)) + 'vh',
+              backgroundColor: joyHSL,
+              bottom: '50%',
+              right:'15%',
+              position: 'absolute',
+              zIndex: 3}})}}});
 
-      this.myVideo = React.createRef();
+    // persistent reference so video timestamps can be sent to server
+    this.myVideo = React.createRef();
 
-      this.state = {
-        timestamp: 'no timestamp yet',
-        sensor: -1,
-        voltage: -1,
-        playback: false,
-        //joystickVals: [],
-        joystickLatest: -1,
-        //joystickLatent: -1,
-        //width: 340,
-        //height: 240,
-        jSt: {
-          width: '100vw',
-          height: '100vh',
-          backgroundColor: 'hsl(0,0%,50%)',
-          bottom: 0,
-          right: 0,
-          position: 'absolute',
-          zIndex: -1}
+    this.state = {
+      revealVideo: false,
+      playback: false,
+
+      // raw joystick and video data kept for debugging
+      joystickPosition: -1,
+      videoTime: -1,
+      // width/height kept in one place for dev purposes
+      // ensure these match video properties
+      videoWidth: 1096,
+      videoHeight: 616,
+
+      // initialize default style for joystick bar
+      joyBar: {
+        width: '8vw',
+        height: 1,
+        backgroundColor: 'hsl(0, 0, 40)',
+        bottom: '50%',
+        right: '15%',
+        position: 'absolute',
+        zIndex: 3
+      },
+      // initialize default style for progress bar
+      progressBar : {
+        width: 0,
+        height: 10,
+        backgroundColor: '#000000'
       }
-  }
-
-  // getData() {
-  //   var data = this.state.joystickVals.map((cv, i, arr)=> {i: cv});
-  //   return data;
-  // }
-
-  // handleJoystick(jv) {
-  //   var arr = this.state.joystickVals;
-  //   arr.push(jv);
-  //   this.setState({joystickVals: arr});
-  //  this.setState({joystickLatest: jv});
-  //   // console.log(this.state.joystickVals);
-  // }
-
-  getPlaybackMessage() {
-    if (!this.state.playback) {
-      return "Begin video playback...";
     }
-    return "";
   }
 
   videoTimeCollect() {
      setInterval( function(){
-       emit("videoTimestamp", this.refs.myVideo.currentTime);
-     }.bind(this), 1000 / 30); //was 30
+       var vidTimeNow = this.refs.myVideo.currentTime;
+       this.setState({
+         videoTime: vidTimeNow,
+         // dynamically resize progress bar as video progresses
+         progressBar : {
+           width: this.state.videoWidth * vidTimeNow
+            / this.refs.myVideo.duration,
+           height: 10,
+           backgroundColor: '#000000',
+           left: '50%',
+           top: '50%',
+           transform: 'translate(-' + (this.state.videoWidth/2)  + 'px,'
+            + ((this.state.videoHeight/2)+3) + 'px)',
+           position: 'absolute',
+           zIndex: 2
+         }
+      });
+       // send video timestamp to server to sync with joystick input
+       emit("videoTimestamp", vidTimeNow);
+     }.bind(this), 1000 / 30);
   }
 
   play() {
@@ -130,93 +117,107 @@ class Hello extends React.Component {
     this.videoTimeCollect();
   }
 
+  // Button covers screen
+  // For using logger even when correct video isn't loaded
+  // and you don't want to run a video anyway.
+
+  revealVid() {
+    this.setState({revealVideo: true});
+  }
+  coverButton() {
+    if (this.state.revealVideo == false) {
+      console.log("Cover button initialed");
+      return (
+          <button className='CoverButtonStyle'
+            onClick={() => {this.setState({revealVideo: true})}}>
+            Logging sensors only. <br/><br/>
+            If correct video was in source directory when server was run,<br/>
+            click to enter video/logging interface.</button>
+      );}
+
+    else {
+      return (<div />);}
+  }
+
+  // play button disappears on click because video cannot be paused
+  // play button is actually two buttons:
+  //  one invisible button dynamically styled to video dimensions
+  //    (so clicking anywhere on the video starts the video)
+  //  another using stylesheet in order to use hover property
+  //    (so play symbol opacity changes on mouse over, to show it's clickable)
+  //  the play symbol button is on top
+  //  yes, you can only ever click one of the buttons
   playButton() {
-    const but = {backgroundColor: '#555555',
-                border: 'none',
-                color: 'white',
-                padding: '15px 32px',
-                textAlign: 'center',
-                display: 'inline-block',
-                fontSize: '16px',
-                fontFamily: 'Helvetica, Verdana, sans-serif'
-                }
+    const buttonStyle = {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%,-50%)',
+        width: this.state.videoWidth,
+        height: this.state.videoHeight,
+        backgroundColor: 'transparent',
+        margin: 'auto',
+        border: 'none',
+        color: 'white',
+        textAlign: 'center',
+        fontSize: '100px',
+        fontFamily: 'Helvetica, Verdana, sans-serif'}
 
     if (this.state.playback == false) {
-      return (<button style={but} onClick={this.play.bind(this)}>Begin video playback...</button>);
+      return (<div>
+                <button style={buttonStyle}
+                  onClick={this.play.bind(this)} />
+                <button className='PlayButton'
+                  onClick={this.play.bind(this)}>►</button>
+              </div>);
     }
     else {
-      return(<div />);
+      return(<div/>);
     }
   }
 
   render() {
-      const aleft = {float:'left'};
-      const aright = {float:'right', height: '100vh'};
-      const aall = {width:'650px'};
-      const acent = {position: 'fixed',
-                    top: '50%',
-                    left: '50%',
-                    /* bring your own prefixes */
-                    transform: 'translate(-50%, -50%)'}
-      const abot = {position: 'fixed',
-                    bottom: 0,
-                    left: '50%',
-                    transform: 'translate(-50%, 0)'
-                    }
-      const acentb = {position: 'fixed',
-                      top: '75%',
-                      left: '50%',
-                      transform: 'translate(-50%, -50%)'
-                      }
+    // progress bar background is styled dynamically to use video width value
+    const progressBg = {
+        width: this.state.videoWidth,
+        height: 10,
+        backgroundColor: '#D3D3D3',
+        left: '50%',
+        top: '50%',
+        transform: 'translate(-50%,' + ((this.state.videoHeight/2)+3) + 'px)',
+        position: 'absolute'};
 
-      return (
-      <div style={aall}>
-        <div style={aleft}>
-        <div>
-        <div style={acent}>
-        <video width="1096" height="616" ref="myVideo">
-          <source src="assets\testmovie.mov" type="video/mp4" />
-        </video>
-      </div>
-      <div style={acentb}>
+    return (
+      <div>
+        {this.coverButton()}
+
+        <div className='Background' />
+
+        <div className='VidBox'>
+          <video width={this.state.videoWidth}
+            height={this.state.videoHeight} ref="myVideo">
+            <source src="assets\video.mov" type="video/mp4" />
+          </video>
+        </div>
+
+        <div style={progressBg} />
+        <div style={this.state.progressBar} />
+
         {this.playButton()}
+
+        <div className='JoystickBg' />
+        <div className='JoyBar' style={this.state.joyBar} />
       </div>
-      </div>
-        <div className="App" style={abot}>
-          <p className="App-intro">
-          </p>
-        </div>
-      </div>
-      <div style={aright}>
-        <div>
-          <div style={this.state.jSt} />
-        </div>
-        <div style={abot}>
-        <p> Joystick: {this.state.joystickLatest} backgroundColor: {this.state.jSt.backgroundColor} </p>
-        </div>
-      </div>
-      <div class="clear"></div>
-    </div>
     )
   };
 }
 
-            //Timer: {this.state.timestamp} Joystick: {this.state.joystickLatest}
+ReactDOM.render(<ReplayPage/>, document.getElementById('replayPage'));
 
-        // <BarGraph
-        //   width={this.state.width}
-        //   height={this.state.height}
-        //   joystickVals={this.state.joystickVals}
-        // />
 
-        //    <div >
-        // <AreaChart
-        //       width={this.state.width}
-        //       height={this.state.height}
-        //       joystickVals={this.state.joystickVals}
-        //      joystickLatest={this.state.joystickLatest}
-        //       margin={{ top: 20, bottom: 20, left: 20, right: 20 }}
-        //     />
-
-ReactDOM.render(<Hello/>, document.getElementById('hello'));
+// code to explicitly render joystick, video time values for debugging:
+// <div className='CentreBottomPosition'>
+//   <p> Joystick: {this.state.joystickPosition}
+//   vidTime: {this.state.videoTime} </p>
+// </div>
 
