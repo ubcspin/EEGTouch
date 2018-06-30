@@ -10,15 +10,16 @@ class ReplayPage extends React.Component {
       subscribeToJoystick((err, joystickReading) => {
         // sanity check omits values outside of reasonable hardware range
         // shoudl be recalibrated on each hardware change
-        if (joystickReading > 400 && joystickReading < 700) {
+        if (joystickReading > 300 && joystickReading < 700) {
           this.setState({joystickPosition: joystickReading});
 
           // joyRelHeight: relative position of joystick from ~(1 to 100)
           // used to calculate height, color of visualization
           // calculated based on min/max positions for analog input
           // should be recalibrated on each hardware change
+          // 402 to 611
           var joyRelPosition =
-            Math.min(188, Math.max(0, joystickReading - 428))/1.88;
+            Math.min(206, Math.max(0, joystickReading - 419))/2.06;
 
           // calculate hue, saturation, lightnesss based on joystick position
           var joyHue = 0;
@@ -34,7 +35,7 @@ class ReplayPage extends React.Component {
               height: Math.max(0.5, (50-joyRelPosition)) + 'vh',
               backgroundColor: joyHSL,
               top: '50%',
-              right: '15%',
+              right: '10%',
               position: 'absolute',
               zIndex: 3
             }})
@@ -47,7 +48,7 @@ class ReplayPage extends React.Component {
               height: Math.max(0.5,(joyRelPosition-50)) + 'vh',
               backgroundColor: joyHSL,
               bottom: '50%',
-              right:'15%',
+              right:'10%',
               position: 'absolute',
               zIndex: 3}})}}});
 
@@ -72,14 +73,14 @@ class ReplayPage extends React.Component {
         height: 1,
         backgroundColor: 'hsl(0, 0, 40)',
         bottom: '50%',
-        right: '15%',
+        right: '10%',
         position: 'absolute',
         zIndex: 3
       },
       // initialize default style for progress bar
       progressBar : {
         width: 0,
-        height: 10,
+        height: 25,
         backgroundColor: '#000000'
       }
     }
@@ -94,12 +95,12 @@ class ReplayPage extends React.Component {
          progressBar : {
            width: this.state.videoWidth * vidTimeNow
             / this.refs.myVideo.duration,
-           height: 10,
+           height: 25,
            backgroundColor: '#000000',
            left: '50%',
            top: '50%',
            transform: 'translate(-' + (this.state.videoWidth/2)  + 'px,'
-            + ((this.state.videoHeight/2)+3) + 'px)',
+            + ((this.state.videoHeight/2)+6) + 'px)',
            position: 'absolute',
            zIndex: 2
          }
@@ -126,12 +127,12 @@ class ReplayPage extends React.Component {
   }
   coverButton() {
     if (this.state.revealVideo == false) {
-      console.log("Cover button initialed");
+      // console.log("Cover button initialized");
       return (
           <button className='CoverButtonStyle'
             onClick={() => {this.setState({revealVideo: true})}}>
             Logging sensors only. <br/><br/>
-            If correct video was in source directory when server was run,<br/>
+            If correct video was in asset directory when server was run,<br/>
             click to enter video/logging interface.</button>
       );}
 
@@ -156,12 +157,7 @@ class ReplayPage extends React.Component {
         width: this.state.videoWidth,
         height: this.state.videoHeight,
         backgroundColor: 'transparent',
-        margin: 'auto',
-        border: 'none',
-        color: 'white',
-        textAlign: 'center',
-        fontSize: '100px',
-        fontFamily: 'Helvetica, Verdana, sans-serif'}
+        border: 'none'}
 
     if (this.state.playback == false) {
       return (<div>
@@ -176,19 +172,25 @@ class ReplayPage extends React.Component {
     }
   }
 
+  syncButton() {
+    return (<button className='SyncButton' onClick={() => {emit("sync", "sync")}}> Sync </button>);
+  }
+
   render() {
     // progress bar background is styled dynamically to use video width value
     const progressBg = {
         width: this.state.videoWidth,
-        height: 10,
+        height: 25,
         backgroundColor: '#D3D3D3',
         left: '50%',
         top: '50%',
-        transform: 'translate(-50%,' + ((this.state.videoHeight/2)+3) + 'px)',
+        transform: 'translate(-50%,' + ((this.state.videoHeight/2)+6) + 'px)',
         position: 'absolute'};
 
     return (
       <div>
+        {this.syncButton()}
+
         {this.coverButton()}
 
         <div className='Background' />
@@ -207,6 +209,9 @@ class ReplayPage extends React.Component {
 
         <div className='JoystickBg' />
         <div className='JoyBar' style={this.state.joyBar} />
+
+
+
       </div>
     )
   };
@@ -220,4 +225,3 @@ ReactDOM.render(<ReplayPage/>, document.getElementById('replayPage'));
 //   <p> Joystick: {this.state.joystickPosition}
 //   vidTime: {this.state.videoTime} </p>
 // </div>
-
