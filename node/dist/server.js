@@ -102,20 +102,6 @@ function log(msg) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Socket code
-//
-////////////////////////////////////////////////////////////////////////////////
-io.on('connection', (client) => {
-
-  client.on('videoStart', function(){state.playing = true;
-    console.log("Received client request to start video");});
-  client.on('videoTimestamp', function(ts) {
-  	state.videoTimestamp = ts;
-  	//console.log("Received client video timestamp: " + ts);
-  });
-});
-
-////////////////////////////////////////////////////////////////////////////////
 // Arduino code
 //
 ////////////////////////////////////////////////////////////////////////////////
@@ -124,7 +110,7 @@ var board = new five.Board({
     // please replace the following with
     // whichever port ur board finds itself mounting to
     // or comment out if your OS is smart enough to know where things are
-		port: "COM5",
+		port: "COM3",
 		repl: false
 	});
 
@@ -139,6 +125,32 @@ board.on("ready", function() {
 	this.pinMode(4, five.Pin.ANALOG);
 	this.pinMode(5, five.Pin.ANALOG);
 	var sensor = new five.Sensor.Digital(5);
+
+	var outputPin = new five.Pin({pin:6, mode:1});
+	var lowPin1 = new five.Pin({pin:2, mode:1});
+	var lowPin2 = new five.Pin({pin:3, mode:1});
+	var lowPin3 = new five.Pin({pin:4, mode:1});
+
+	outputPin.low();
+	lowPin1.low();
+	lowPin2.low();
+	lowPin3.low();
+
+	// io.on('connection', (client) => {
+ //  		client.on('sync', () => {
+ //  			console.log("sending signal");
+ //  			outputPin.high();
+ //  			setTimeout(()=>{outputPin.low();}, 2000);
+ //  		});
+	// });
+
+	// //tester code switch to trigger signal)
+	// var inputPin = new five.Pin({pin:7, mode:0});
+	// var highPin = new five.Pin({pin:8, mode:1});
+	// highPin.high();
+	// inputPin.on("high", ()=>{console.log("Input pin high");});
+
+
 
 	this.analogRead(0, function(voltage) {
 		handleMessage({sensor: "A0", voltage: voltage});
@@ -161,8 +173,43 @@ board.on("ready", function() {
 	sensor.on("change", function() {
 		handleMessage({sensor: "D5", voltage: this.value})
 		console.log("digitalRead success " + this.value)
+		if(this.value == 1) {
+			//console.log("sending signal to pin!");
+			//outputPin.high();
+			//outputPin.low();
+			//setTimeout(()=>{outputPin.low();}, 2000);
+		}
 	})
+
+	//test code for test signal
+	// sensor2.on("change", function() {
+	// 	if (this.value == 1) {
+	// 		console.log("sending signal to pin!");
+	// 		//outputPin.write(1);
+	// 		//outputPin.high();
+	// 		//outputPin.low()
+	// 	}
+	// })
 
 	io.emit("ready","the board is ready");
 	//console.log("Emitting ready signal for J5");
 });
+
+////////////////////////////////////////////////////////////////////////////////
+// Socket code
+//
+////////////////////////////////////////////////////////////////////////////////
+io.on('connection', (client) => {
+
+  client.on('videoStart', function(){state.playing = true;
+    console.log("Received client request to start video");});
+  client.on('videoTimestamp', function(ts) {
+  	state.videoTimestamp = ts;
+  	//console.log("Received client video timestamp: " + ts);
+  });
+  client.on('sync', () => {
+  	console.log("sync request sent");
+  	board.digitalWrite(6,1);
+  	board.digitalWrite(6,0);
+  	//setTimeout(()=>{board.digitalWrite(6,0);}, 2000);
+}); });
