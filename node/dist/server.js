@@ -126,15 +126,15 @@ board.on("ready", function() {
 	this.pinMode(5, five.Pin.ANALOG);
 	var sensor = new five.Sensor.Digital(5);
 
-	var outputPin = new five.Pin({pin:6, mode:1});
-	var lowPin1 = new five.Pin({pin:2, mode:1});
-	var lowPin2 = new five.Pin({pin:3, mode:1});
-	var lowPin3 = new five.Pin({pin:4, mode:1});
+	var outputPin = new five.Pin({pin:9, mode:1});
+	var dumPin1 = new five.Pin({pin:7, mode:1});
+	var dumPin2 = new five.Pin({pin:8, mode:1});
+	var dumPin3 = new five.Pin({pin:6, mode:1});
 
-	outputPin.low();
-	lowPin1.low();
-	lowPin2.low();
-	lowPin3.low();
+	outputPin.high();
+	dumPin1.high();
+	dumPin2.high();
+	dumPin3.high();
 
 	// io.on('connection', (client) => {
  //  		client.on('sync', () => {
@@ -170,16 +170,16 @@ board.on("ready", function() {
 	this.analogRead(5, function(voltage) {
 		handleMessage({sensor: "A5", voltage: voltage});
 	});
-	sensor.on("change", function() {
-		handleMessage({sensor: "D5", voltage: this.value})
-		console.log("digitalRead success " + this.value)
-		if(this.value == 1) {
-			//console.log("sending signal to pin!");
-			//outputPin.high();
-			//outputPin.low();
-			//setTimeout(()=>{outputPin.low();}, 2000);
-		}
-	})
+	// sensor.on("change", function() {
+	// 	handleMessage({sensor: "D5", voltage: this.value})
+	// 	console.log("digitalRead success " + this.value)
+	// 	if(this.value == 1) {
+	// 		//console.log("sending signal to pin!");
+	// 		//outputPin.high();
+	// 		//outputPin.low();
+	// 		//setTimeout(()=>{outputPin.low();}, 2000);
+	// 	}
+	// })
 
 	//test code for test signal
 	// sensor2.on("change", function() {
@@ -209,7 +209,9 @@ io.on('connection', (client) => {
   });
   client.on('sync', () => {
   	console.log("sync request sent");
-  	board.digitalWrite(6,1);
-  	board.digitalWrite(6,0);
-  	//setTimeout(()=>{board.digitalWrite(6,0);}, 2000);
+  	board.digitalWrite(9,0);
+  	log("Sync at" + Date.now());
+  	board.digitalWrite(9,1);
+  	//setTimeout(()=>{board.digitalWrite(9,1);}, 2000);
+
 }); });
