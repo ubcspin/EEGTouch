@@ -10,17 +10,17 @@ class ReplayPage extends React.Component {
       subscribeToJoystick((err, joystickReading) => {
         // sanity check omits values outside of reasonable hardware range
         // shoudl be recalibrated on each hardware change
-        if (true) { //(joystickReading > 300 && joystickReading < 700) {
+        if (true) { //(joystickReading > 100 && joystickReading < 500) {
           this.setState({joystickPosition: joystickReading});
           var arr = this.state.joystickVals;
           arr.push(joystickReading);
           this.setState({joystickVals: arr});
           if (this.state.joystickVals.length >= 10) {
             var total = 0;
-            for (var i = 1; i <= 10; i++) {
+            for (var i = 1; i <= 5; i++) {
               total += this.state.joystickVals[this.state.joystickVals.length - i];
             }
-            this.setState({joystickStabReading:  Math.trunc(total/10)});
+            this.setState({joystickStabReading:  Math.trunc(total/5)});
           }
           else {
             this.setState({joystickStabReading: this.state.joystickPosition});
@@ -33,7 +33,7 @@ class ReplayPage extends React.Component {
           // should be recalibrated on each hardware change
           // 402 to 611
           var joyRelPosition =
-            Math.min(206, Math.max(0, this.state.joystickStabReading - 419))/2.06;
+            Math.min(206, Math.max(0, this.state.joystickStabReading - 188))/2.06;
 
           // calculate hue, saturation, lightnesss based on joystick position
           var joyHue = 0;
@@ -83,6 +83,8 @@ class ReplayPage extends React.Component {
       videoWidth: 1096,
       videoHeight: 616,
 
+      whichButton: false,
+
       // initialize default style for joystick bar
       joyBar: {
         width: '8vw',
@@ -128,6 +130,7 @@ class ReplayPage extends React.Component {
 
   play() {
     var video = this.refs.myVideo;
+    video.currentTime = 300;
     this.setState({playback: true});
     emit("videoStart", "videoStart");
     video.play();
@@ -143,13 +146,34 @@ class ReplayPage extends React.Component {
   }
 
   syncButton() {
+
     if (this.state.revealVideo == false) {
-      return (<button className='SyncButton' onClick={() => {emit("sync", "sync")}}> Sync <br/> Click outside button to enter video log interface. </button>);
+      if (this.state.whichButton == false) {
+        return (<button className='SyncButton' onClick={() => {
+           this.setState({whichButton: true})
+          emit("sync", "sync");}}> Sync <br/> Click outside button to enter video log interface. </button>);
+     }
+     else {
+      return (<button className='SyncButton2' onClick={() => {
+           this.setState({whichButton: false})
+          emit("sync", "sync");}}> Sync <br/> Click outside button to enter video log interface. </button>);
+     }
     }
     else {
-      return (<div />);
+      return (<div/>);
     }
   }
+
+ // flashScreen() {
+ //   if (this.state.isFlash) {
+ //     return (<button className='Flash' onClick={() =>  {this.setState({isFlash: false})}} />)
+ //   }
+ //   else {
+ //   return (<div />)
+ //   }
+ // }
+
+
 
   coverButton() {
     if (this.state.revealVideo == false) {
@@ -232,6 +256,9 @@ class ReplayPage extends React.Component {
 
         <div className='JoystickBg' />
         <div className='JoyBar' style={this.state.joyBar} />
+
+        <div className='CentreBottomPosition'>
+        <p> Joystick: {this.state.joystickPosition}</p></div>
 
       </div>
     )
