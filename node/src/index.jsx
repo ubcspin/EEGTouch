@@ -15,7 +15,7 @@ class ReplayPage extends React.Component {
           var arr = this.state.joystickVals;
           arr.push(joystickReading);
           this.setState({joystickVals: arr});
-          if (this.state.joystickVals.length >= 10) {
+          if (this.state.joystickVals.length >= 5) {
             var total = 0;
             for (var i = 1; i <= 5; i++) {
               total += this.state.joystickVals[this.state.joystickVals.length - i];
@@ -130,6 +130,8 @@ class ReplayPage extends React.Component {
 
   play() {
     var video = this.refs.myVideo;
+    
+    //video currently starts 5 minutes in. pending fix for this.
     video.currentTime = 300;
     this.setState({playback: true});
     emit("videoStart", "videoStart");
