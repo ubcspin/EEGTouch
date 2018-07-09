@@ -4,7 +4,7 @@
   height: 33vh;
   top: 33%;
   left: 33%;
-  background-color: #FF4444;
+  background-color: #44CC44;
   margin: auto;
   text-align: center;
   border: none;
@@ -12,6 +12,40 @@
   font-size: 15px;
   font-family: Helvetica, Verdana, sans-serif;
   z-index: 20;
+}
+
+.SyncButton2 {
+  position: absolute;
+  width: 33vw;
+  height: 33vh;
+  top: 33%;
+  left: 33%;
+  background-color: #4444CC;
+  margin: auto;
+  text-align: center;
+  border: none;
+  color: #FFFFFF;
+  font-size: 15px;
+  font-family: Helvetica, Verdana, sans-serif;
+  z-index: 20;
+}
+
+.SyncButton:hover {
+  background-color: #44AA44;
+  cursor: pointer;
+}
+
+.SyncButton:focus {
+  outline: 0;
+}
+
+.SyncButton2:hover {
+  background-color: #4444AA;
+  cursor: pointer;
+}
+
+.SyncButton2:focus {
+  outline: 0;
 }
 
 .CoverButtonStyle {
@@ -37,6 +71,31 @@
 
 .CoverButtonStyle:focus {
   outline: 0
+}
+
+.Flash {
+  position:absolute;
+  top:0;
+  left:0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #000000;
+  z-index: 30;
+  font-family: Helvetica, Arial, Verdana, sans-serif;
+  font-color: #333333;
+  text-align: center;
+  font-size: 30px;
+  margin: auto;
+  border: none;
+}
+
+.Flash:hover {
+  font-color: #303030;
+  cursor: pointer;
+}
+
+.Flash:focus {
+  outline: 0;
 }
 
 .VidBox {
