@@ -15,7 +15,7 @@ class ReplayPage extends React.Component {
           var arr = this.state.joystickVals;
           arr.push(joystickReading);
           this.setState({joystickVals: arr});
-          if (this.state.joystickVals.length >= 5) {
+          if (this.state.joystickVals.length >= 10) {
             var total = 0;
             for (var i = 1; i <= 5; i++) {
               total += this.state.joystickVals[this.state.joystickVals.length - i];
@@ -33,7 +33,7 @@ class ReplayPage extends React.Component {
           // should be recalibrated on each hardware change
           // 402 to 611
           var joyRelPosition =
-            Math.min(206, Math.max(0, this.state.joystickStabReading - 188))/2.06;
+            Math.min(210, Math.max(0, this.state.joystickStabReading - 775))/2.1;
 
           // calculate hue, saturation, lightnesss based on joystick position
           var joyHue = 0;
@@ -68,9 +68,13 @@ class ReplayPage extends React.Component {
 
     // persistent reference so video timestamps can be sent to server
     this.myVideo = React.createRef();
+    this.handleChangeMin = this.handleChangeMin.bind(this);
+    this.handleChangeSec = this.handleChangeSec.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
 
     this.state = {
       revealVideo: false,
+      doneJump: false,
       playback: false,
 
       // raw joystick and video data kept for debugging
@@ -84,6 +88,8 @@ class ReplayPage extends React.Component {
       videoHeight: 616,
 
       whichButton: false,
+      vidJumpMin: 0,
+      vidJumpSec: 0,
 
       // initialize default style for joystick bar
       joyBar: {
@@ -130,9 +136,7 @@ class ReplayPage extends React.Component {
 
   play() {
     var video = this.refs.myVideo;
-    
-    //video currently starts 5 minutes in. pending fix for this.
-    video.currentTime = 300;
+    video.currentTime = parseInt(this.state.vidJumpMin)*60 + parseInt(this.state.vidJumpSec);
     this.setState({playback: true});
     emit("videoStart", "videoStart");
     video.play();
@@ -153,12 +157,12 @@ class ReplayPage extends React.Component {
       if (this.state.whichButton == false) {
         return (<button className='SyncButton' onClick={() => {
            this.setState({whichButton: true})
-          emit("sync", "sync");}}> Sync <br/> Click outside button to enter video log interface. </button>);
+          emit("sync", "sync");}}> Sync </button>);
      }
      else {
       return (<button className='SyncButton2' onClick={() => {
            this.setState({whichButton: false})
-          emit("sync", "sync");}}> Sync <br/> Click outside button to enter video log interface. </button>);
+          emit("sync", "sync");}}> Sync </button>);
      }
     }
     else {
@@ -166,25 +170,14 @@ class ReplayPage extends React.Component {
     }
   }
 
- // flashScreen() {
- //   if (this.state.isFlash) {
- //     return (<button className='Flash' onClick={() =>  {this.setState({isFlash: false})}} />)
- //   }
- //   else {
- //   return (<div />)
- //   }
- // }
-
-
-
   coverButton() {
     if (this.state.revealVideo == false) {
-      // console.log("Cover button initialized");
-      return (
-          <div>
+            return (
+          <div className='Cover'>
           {this.syncButton()}
-          <button className='CoverButtonStyle'
+          <button className='CoverButton'
             onClick={() => {this.setState({revealVideo: true})}}>
+            Done syncing
              </button>
       </div>
       );}
@@ -225,6 +218,57 @@ class ReplayPage extends React.Component {
     }
   }
 
+  handleChangeMin(event) {
+    this.setState({vidJumpMin: event.target.value});
+  }
+
+    handleChangeSec(event) {
+    this.setState({vidJumpSec: event.target.value});
+  }
+
+  handleSubmit(event) {
+    //alert('Min: ' + this.state.vidJumpMin + ' Sec: ' + this.state.vidJumpSec);
+    this.setState({doneJump: true});
+    event.preventDefault();
+    var timeSet = parseInt(this.state.vidJumpMin)*60 + parseInt(this.state.vidJumpSec);
+    this.refs.myVideo.currentTime = timeSet; 
+    this.setState({progressBar : {
+           width: this.state.videoWidth * timeSet
+            / this.refs.myVideo.duration,
+           height: 25,
+           backgroundColor: '#000000',
+           left: '50%',
+           top: '50%',
+           transform: 'translate(-' + (this.state.videoWidth/2)  + 'px,'
+            + ((this.state.videoHeight/2)+6) + 'px)',
+           position: 'absolute',
+           zIndex: 2
+         }});
+  }
+
+  vidJump() {
+  if (this.state.doneJump == false) {
+    return (
+    <div>
+    <div className='VidJumpDiv'>
+      <form onSubmit={this.handleSubmit}>
+        <label>
+        Video start time:
+          <input type="number" min="0" max="99" step="1" value={this.state.vidJumpMin} onChange={this.handleChangeMin} className='VidJumpInput' />min
+          <input type="number" min="0" max="60" step="1" value={this.state.vidJumpSec} onChange={this.handleChangeSec} className='VidJumpInput' />sec
+        </label>
+        <input type="submit" value="Set" className='VidJumpButton' />
+      </form>
+    </div>
+    <div className='VidJumpCover' />
+    </div>
+    );}
+
+  else {return (<div />);}
+  }
+
+
+
   render() {
     // progress bar background is styled dynamically to use video width value
     const progressBg = {
@@ -241,6 +285,8 @@ class ReplayPage extends React.Component {
         {this.syncButton()}
 
         {this.coverButton()}
+
+        {this.vidJump()}
 
         <div className='Background' />
 
@@ -259,9 +305,6 @@ class ReplayPage extends React.Component {
         <div className='JoystickBg' />
         <div className='JoyBar' style={this.state.joyBar} />
 
-        <div className='CentreBottomPosition'>
-        <p> Joystick: {this.state.joystickPosition}</p></div>
-
       </div>
     )
   };
@@ -271,7 +314,5 @@ ReactDOM.render(<ReplayPage/>, document.getElementById('replayPage'));
 
 
 // code to explicitly render joystick, video time values for debugging:
-// <div className='CentreBottomPosition'>
-//   <p> Joystick: {this.state.joystickPosition}
-//   stab: {this.state.joystickStabReading} </p>
-// </div>
+//        <div className='CentreBottomPosition'>
+//        <p> Joystick: {this.state.joystickPosition}</p></div>
