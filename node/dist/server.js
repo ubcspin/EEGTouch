@@ -211,7 +211,7 @@ io.on('connection', (client) => {
   	console.log("sync request sent");
   	board.digitalWrite(9,0);
   	log("Sync at" + Date.now());
-  	board.digitalWrite(9,1);
-  	//setTimeout(()=>{board.digitalWrite(9,1);}, 2000);
+  	//board.digitalWrite(9,1);
+  	setTimeout(()=>{board.digitalWrite(9,1);}, 10);
 
 }); });
