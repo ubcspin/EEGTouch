@@ -96,7 +96,7 @@ class ReplayPage extends React.Component {
       whichButton: false,
       vidJumpMin: 0,
       vidJumpSec: 0,
-      debug: true,
+      debug: false,
 
       // raw joystick and video data kept for debugging
       joystickPosition: -1,
