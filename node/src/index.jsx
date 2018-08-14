@@ -83,6 +83,7 @@ class ReplayPage extends React.Component {
 
     // persistent reference so video timestamps can be sent to server
     this.myVideo = React.createRef();
+
     this.handleChangeMin = this.handleChangeMin.bind(this);
     this.handleChangeSec = this.handleChangeSec.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -97,6 +98,12 @@ class ReplayPage extends React.Component {
       vidJumpMin: 0,
       vidJumpSec: 0,
       debug: false,
+
+      checkList1: " ",
+      checkList2: " ",
+      checkList3: " ",
+      checkListDone: false,
+      checkListIncorrect: false,
 
       // raw joystick and video data kept for debugging
       joystickPosition: -1,
@@ -297,6 +304,55 @@ class ReplayPage extends React.Component {
   else {return (<div />);}
   }
 
+  checkListMsg() {
+    if (this.state.checkListIncorrect == false) {
+      return(<div className='CheckListIncorrectDiv'> </div>);}
+    else {
+      return(<div className='CheckListIncorrectDiv'>Missed one or more items. Please finish all items before continuing.</div>);
+    }
+    }
+
+  checkList() {
+    if (this.state.checkListDone == false) {
+      return (
+        <div>
+          <div className='CheckListBg'/>
+          <div className='CheckListDivCtr'>
+          <div className='CheckListDivCtrIn'>
+          <div className='CheckListDiv'>
+          Check off after doing the following:</div>
+        {this.checkListMsg()}
+          <div className='CheckListDiv'>
+          <button className='CheckButton' onClick={() => {
+              if (this.state.checkList1 == " ") {this.setState({checkList1: "✓"});}
+              else {this.setState({checkList1:" "});}}}>{this.state.checkList1}</button><div className='CheckListLabel'>
+            You have checked that OBS is able to record <strong>desktop audio</strong> </div></div>
+          <div className='CheckListDiv'>
+          <button className='CheckButton' onClick={() => {
+              if (this.state.checkList2 == " ") {this.setState({checkList2: "✓"});}
+              else {this.setState({checkList2:" "});}}}>{this.state.checkList2}</button><div className='CheckListLabel'>
+            You have started <strong>recording on OBS</strong></div></div>
+          <div className='CheckListDiv'>
+          <button className='CheckButton' onClick={() => {
+              if (this.state.checkList3 == " ") {this.setState({checkList3: "✓"});}
+              else {this.setState({checkList3:" "});}}}>{this.state.checkList3}</button><div className='CheckListLabel'>
+            You have started <strong>recording on Netstation</strong></div> <br/></div>
+          <div className='ListSubmitDiv'>
+            <button className='CheckSubmitButton' onClick={() =>
+                {if (this.state.checkList1 == "✓" && this.state.checkList2 == "✓" && this.state.checkList3 == "✓") {
+                  this.setState({checkListDone: true});}
+                else {
+                  this.setState({checkListIncorrect: true});
+                  }
+            }}>Proceed</button>
+          </div>
+        </div>
+        </div>
+        </div>);
+    }
+    else {return (<div />);}
+  }
+
   debugInfo() {
   if (this.state.debug == true) {
     return(
@@ -404,6 +460,8 @@ class ReplayPage extends React.Component {
 
     return (
       <div>
+        {this.checkList()}
+
         {this.syncButton()}
 
         {this.coverButton()}
