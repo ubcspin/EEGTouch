@@ -86,6 +86,7 @@ quality_to_export = 50; % out of 100
 frame_rate = 30; %% could move this to scalars
 
 
+f = waitbar(0.4,'Processing video','Name','Data Processing');
 
 % initialize video reader
 vid_reader = VideoReader(video_name);
@@ -126,7 +127,7 @@ writeVideo(vid_out, temp_movie);
 close(vid_out);
 
 clearvars seconds_to_process start_time quality_to_export vid_height vid_width text_offset temp_movie k vid_out;
-
+close(f);
 waitfor(helpdlg('Attempting to play the video we just processed. Please find the frame number for the FIRST FRAME WHEN THE SYNC BUTTON CHANGES COLOR (for the sync instance you want) then close the video player and return to Matlab.'));
 
 %This is only executed if you have a 64-bit Windows PC and VLC is on your
@@ -166,4 +167,4 @@ end
 
 scalars.sync_frame = sync_frame;
 waitfor(helpdlg('Sync frame saved.'));
-clearvars status isdlg frame_rate video_path start_time_sec sync_frame prompt title dims definput answer vid_name proc_vid_name prompt title dims definput answer video_file video_name isdlg frame_rate oldpath;
+clearvars vid_reader status isdlg frame_rate video_path start_time_sec sync_frame prompt title dims definput answer vid_name proc_vid_name prompt title dims definput answer video_file video_name isdlg frame_rate oldpath;

@@ -22,6 +22,7 @@ if ~contains(feeltrace_name,pathsep)
     feeltrace_name = fullfile(feeltrace_path,feeltrace_name);
 end
 
+f = waitbar(0.5,'Importing feeltrace data','Name','Data Processing');
 
 %% Initialize variables.
 filename = feeltrace_name;
@@ -97,6 +98,9 @@ feeltrace.videoTimestamp = cell2mat(raw(:, 2));
 %% Clear temporary variables
 clearvars filename delimiter formatSpec fileID dataArray ans raw col numericData rawData row regexstr result numbers invalidThousandsSeparator thousandsRegExp R;
 
+waitbar(0.6,f,'Aligning feeltrace data','Name','Data Processing');
+
+
 %copy over raw data, remove header row
 feeltrace_joystick = feeltrace.A5(2:end);
 feeltrace_videoTimestamp = feeltrace.videoTimestamp(2:end);
@@ -147,6 +151,6 @@ for k=1:length([aligned_data.timestamp_ms])
         aligned_data(k).feeltrace = [];
     end  
 end
-
+close(f);
 %clear excess variables
-clearvars feeltrace_file feeltrace_path k a isdlg feeltrace_name feeltrace feeltrace_joystick feeltrace_videoTimestamp vid_start_index feeltrace_round_times_ms feeltrace_vidTimeChanged changept_indices con_joystick con_vidTimestamp l;
+clearvars f feeltrace_condensed feeltrace_file feeltrace_path k a isdlg feeltrace_name feeltrace feeltrace_joystick feeltrace_videoTimestamp vid_start_index feeltrace_round_times_ms feeltrace_vidTimeChanged changept_indices con_joystick con_vidTimestamp l;

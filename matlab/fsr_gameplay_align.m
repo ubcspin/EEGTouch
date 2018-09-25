@@ -34,6 +34,8 @@ end
 filename = fsr_name;
 delimiter = ',';
 
+f = waitbar(0.7,'Importing FSR data','Name','Data Processing');
+
 %% Read columns of data as text:
 % For more information, see the TEXTSCAN documentation.
 formatSpec = '%s%[^\n\r]';
@@ -481,6 +483,8 @@ clearvars filename delimiter formatSpec fileID dataArray ans raw col numericData
 
 scalars.gameplay_sync_index = find(gameplay_A0.A0 > 2000,1);
 
+waitbar(0.8,f,'Aligning FSR data','Name','Data Processing');
+
 %initialize array to hold all gameplay data
 gameplay_fromsync = zeros(length(gameplay_time_epoch.timestamp), 6);
 
@@ -568,5 +572,5 @@ for k=1:length([aligned_data(:).timestamp_ms])
         l = l+1;
     end
 end
-
-clearvars a1 gameplay_A0 gameplay_A1 gameplay_A2 gameplay_A3 gameplay_A4 gameplay_time_epoch old_path fsr_file fsr_name fsr_path ind_timestamp_after_eeg_end time_diffs time_nodiffs nodiffs_vec k l m zind a b l averagel;
+close(f);
+clearvars f gameplay_fromsync a1 gameplay_A0 gameplay_A1 gameplay_A2 gameplay_A3 gameplay_A4 gameplay_time_epoch old_path fsr_file fsr_name fsr_path ind_timestamp_after_eeg_end time_diffs time_nodiffs nodiffs_vec k l m zind a b l averagel;
