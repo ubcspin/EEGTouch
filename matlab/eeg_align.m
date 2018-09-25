@@ -21,6 +21,8 @@ else
     end
 end
 
+f = waitbar(0.1,'Aligning EEG data','Name','Data Processing');
+
 load(eeg_name);
 
 % find name of eeg data variable
@@ -47,4 +49,5 @@ for k=1:length(eeg_data_synced(65,:))
     aligned_data(k).eeg = eeg_data_synced(2:66,k);
 end
 
-clearvars values varnames eeg_file eeg_name isdlg;
+close(f);
+clearvars f eeg_path values varnames eeg_file eeg_name isdlg;

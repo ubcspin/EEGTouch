@@ -1,3 +1,6 @@
+f = waitbar(0.9,'Plotting FSR and feeltrace data','Name','Data Processing');
+hold off;
+
 feeltrace_timestamps = zeros(length([aligned_data(:).feeltrace]),1);
 fsr_timestamps = zeros(length([aligned_data(:).A0_fsr]),1);
 feeltrace_data = zeros(length([aligned_data(:).feeltrace]),1);
@@ -35,13 +38,18 @@ plot(fsr_timestamps,A3_data/3.5,'Color',[0 1 1]);
 plot(fsr_timestamps,A4_data/3.5,'Color',[1 0 1]);
 plot(feeltrace_timestamps,feeltrace_data,'Color',[0 0 0],'LineWidth',0.8);
 
-legend('up key','alt (grab) key','down key','right key','left key','feeltrace');
+legend('alt (grab) key','right key','down key','left key','up key','feeltrace');
 xlabel('Time (min)');
-ylabel('Intensity');
+ylabel('Intensity of keypress');
 set(gca,'YTickLabel',[]);
-title('Keypress FSR and stress-to-relief feeltrace during gameplay');
+%yyaxis left
+%ylabel('Reported stress level');
+%set(gca,'YTickLabel',[]);
+%title('Keypress FSR and stress-to-relief feeltrace during gameplay');
 hold off;
+
 
 saveas(gcf,'fsr_and_feeltrace.png')
 
-clearvars feeltrace_timestamps feeltrace_data fsr_timestamps A0_data A1_data A2_data A3_data A4_data k a0i fti;
+close(f);
+%clearvars f feeltrace_timestamps feeltrace_data fsr_timestamps A0_data A1_data A2_data A3_data A4_data k a0i fti;

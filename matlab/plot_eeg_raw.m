@@ -1,4 +1,5 @@
 %plots 64 channels of eeg data with random colors, for some reason
+f = waitbar(0.3,'Plotting EEG data','Name','Data Processing');
 
 eeg_to_plot = eeg_data_synced(2:end,:);
 
@@ -20,4 +21,5 @@ ylabel('microvolts');
 hold off;
 saveas(gcf,'eeg.png')
 
-clearvars en ax colors k eeg_to_plot eeg_data_synced;
+close(f);
+clearvars f en ax colors k eeg_to_plot eeg_data_synced;
