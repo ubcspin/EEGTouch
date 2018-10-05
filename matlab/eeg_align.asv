@@ -1,5 +1,5 @@
 %name of eeg file
-eeg_file = dir(fullfile(trial_directory,'*2018*.mat'));
+eeg_file = dir(trial_directory,'*2018*.mat');
 if ~isempty(eeg_file)
     eeg_name = eeg_file.name;
     oldpath = path;
@@ -50,5 +50,4 @@ for k=1:length(eeg_data_synced(65,:))
 end
 
 close(f);
-
-%clearvars f eeg_path values varnames eeg_file eeg_name isdlg;
+clearvars f eeg_path values varnames eeg_file eeg_name isdlg;

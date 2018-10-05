@@ -10,7 +10,7 @@
 
 %% Initialize variables.
 
-fsr_file = dir('gameplay*.csv');
+fsr_file = dir(fullfile(trial_directory, 'gameplay*.csv'));
 if ~isempty(fsr_file)
     fsr_name = fsr_file.name;
     fsr_path = fsr_file.folder;
@@ -481,7 +481,12 @@ gameplay_time_epoch.timestamp = cell2mat(raw(:, 1));
 %% Clear temporary variables
 clearvars filename delimiter formatSpec fileID dataArray ans raw col numericData rawData row regexstr result numbers invalidThousandsSeparator thousandsRegExp R;
 
-scalars.gameplay_sync_index = find(gameplay_A0.A0 > 2000,1);
+if (scalars.which_gameplay_sync == 1) 
+    scalars.gameplay_sync_index = find(gameplay_A0.A0 > 2000,1);
+else
+    syncs = find(gameplay_A0.A0 > 2000,scalars.which_gameplay_sync);
+    scalars.gameplay_sync_index = syncs(scalars.which_gameplay_sync);
+end
 
 waitbar(0.8,f,'Aligning FSR data','Name','Data Processing');
 
@@ -506,6 +511,7 @@ gameplay_fromsync = gameplay_fromsync(scalars.gameplay_sync_index+1:end,:);
 gameplay_fromsync(:,6) = gameplay_fromsync(:,6) - gameplay_fromsync(1,6);
 
 time_diffs = diff(gameplay_fromsync(:,6));
+time_diffs(isnan(time_diffs))=0;
 time_nodiffs = ~time_diffs;
 %k = start of run where time is static
 k = 1;
@@ -573,4 +579,4 @@ for k=1:length([aligned_data(:).timestamp_ms])
     end
 end
 close(f);
-clearvars f gameplay_fromsync a1 gameplay_A0 gameplay_A1 gameplay_A2 gameplay_A3 gameplay_A4 gameplay_time_epoch old_path fsr_file fsr_name fsr_path ind_timestamp_after_eeg_end time_diffs time_nodiffs nodiffs_vec k l m zind a b l averagel;
+%clearvars f gameplay_fromsync a1 gameplay_A0 gameplay_A1 gameplay_A2 gameplay_A3 gameplay_A4 gameplay_time_epoch old_path fsr_file fsr_name fsr_path ind_timestamp_after_eeg_end time_diffs time_nodiffs nodiffs_vec k l m zind a b l averagel;

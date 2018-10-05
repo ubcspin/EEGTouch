@@ -37,5 +37,5 @@ close(vid_out);
 
 face_vid_data = final_movie;
 
-clearvars temp_movie vid_name quality_to_export vid_reader rect vid_out im2crop cropped_img dummy k vid_height vid_width final_movie cropped_frame;
+%clearvars temp_movie vid_name quality_to_export vid_reader rect vid_out im2crop cropped_img dummy k vid_height vid_width final_movie cropped_frame;
 

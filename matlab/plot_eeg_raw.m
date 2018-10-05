@@ -19,7 +19,7 @@ xlabel('Time (min)');
 ylabel('microvolts');
 %title('64-channel EEG potentials during gameplay');
 hold off;
-saveas(gcf,'eeg.png')
+saveas(gcf,fullfile(processed_directory,'eeg.png'));
 
 close(f);
 clearvars f en ax colors k eeg_to_plot eeg_data_synced;
