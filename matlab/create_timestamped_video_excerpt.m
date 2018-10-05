@@ -42,18 +42,19 @@ end
 % SET DURATION TO PROCESS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % initialize video reader
-waitfor(helpdlg('Attempting to play video with VLC. Please eyeball a start time in seconds and duration in seconds that would include the sync frame (when the sync button changes color, for the sync instance you want).'));
+waitfor(helpdlg('Attempting to play video with VLC. Please watch the video carefully to determine if the sync button was pressed multiple times, and if so, determine which of th multiple button presses corresponds with the correct DIN in the EEG data. Please eyeball a start time in seconds and duration in seconds that would include the sync frame (when the sync button changes color, for the sync instance you want).'));
 
 %Attempting to play video.
-if computer == 'PCWIN64'
+
+ if convertCharsToStrings(computer) == "PCWIN64"
     try
         status = system(['start vlc ' video_name]);
     catch ME
-        waitfor(errordlg(['Error trying to open video on VLC. Please open ' video_name '.mov manually to view video then return to Matlab.']));
+        waitfor(errordlg(['Error trying to open video on VLC. Please open ' video_name '.mov, inside the raw data directory, manually to view video then return to Matlab.']));
     end
-elseif computer == 'MACI64'
+elseif convertCharsToStrings(computer) == "MACI64"
     try
-        status = system(['open -a vlc ' fullfile(pwd,proc_vid_name) '.avi']);
+        status = system(['open -a vlc ' video_name '.avi']);
     catch ME
         waitfor(errordlg(['Error trying to open video on VLC. Please open ' video_name '.avi manually to view video then return to Matlab.']));
     end
@@ -135,20 +136,20 @@ waitfor(helpdlg('Attempting to play the video we just processed. Please find the
 
 %This is only executed if you have a 64-bit Windows PC and VLC is on your
 %path.
-if computer == 'PCWIN64'
+if convertCharsToStrings(computer) == "PCWIN64"
     try
         status = system(['start vlc ' proc_vid_name '.avi']);
     catch ME
-        waitfor(errordlg(['Error trying to open video on VLC. Please open ' fullfile(pwd,proc_vid_name) '.avi manually to view video then return to Matlab.']));
+        waitfor(errordlg(['Error trying to open video on VLC. Please open ' proc_vid_name '.avi manually to view video then return to Matlab.']));
     end
-elseif computer == 'MACI64'
+elseif convertCharsToStrings(computer) == "MACI64"
     try
         status = system(['open -a vlc ' fullfile(pwd,proc_vid_name) '.avi']);
     catch ME
-        waitfor(errordlg(['Error trying to open video on VLC. Please open ' fullfile(pwd,proc_vid_name) '.avi manually to view video then return to Matlab.']));
+        waitfor(errordlg(['Error trying to open video on VLC. Please open ' proc_vid_name '.avi manually to view video then return to Matlab.']));
     end
 else
-     disp(['Video not automatically opened on this system type. Please open ' fullfile(pwd,proc_vid_name) '.avi manually to view video then return to Matlab.']);
+     disp(['Video not automatically opened on this system type. Please open ' proc_vid_name '.avi manually to view video then return to Matlab.']);
 end
 
 %%%%
