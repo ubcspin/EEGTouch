@@ -1,6 +1,12 @@
 f = waitbar(0.9,'Plotting FSR and feeltrace data','Name','Data Processing');
 hold off;
-
+clf('reset');
+if ~exist('trial_directory') 
+    trial_directory = uigetdir(path,"Select directory containg raw data from the trial");
+end
+if ~exist('processed_director')
+    processed_directory = uigetdir(path,"Select directory to save processed data in.");
+end
 feeltrace_timestamps = zeros(length([aligned_data(:).feeltrace]),1);
 fsr_timestamps = zeros(length([aligned_data(:).A0_fsr]),1);
 feeltrace_data = zeros(length([aligned_data(:).feeltrace]),1);
