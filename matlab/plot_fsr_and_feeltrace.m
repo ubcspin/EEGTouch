@@ -49,7 +49,7 @@ set(gca,'YTickLabel',[]);
 hold off;
 
 
-saveas(gcf,'fsr_and_feeltrace.png')
+saveas(gcf,fullfile(processed_directory,'fsr_and_feeltrace.png'));
 
 close(f);
 %clearvars f feeltrace_timestamps feeltrace_data fsr_timestamps A0_data A1_data A2_data A3_data A4_data k a0i fti;

@@ -5,7 +5,7 @@
 
 din_path = '';
 %name of xml file with the din
-din_file = dir(fullfile('*mff','Events_DIN1.xml'));
+din_file = dir(fullfile(trial_directory,'*mff','Events_DIN1.xml'));
 if ~isempty(din_file)
     din_name = fullfile(din_file.folder,din_file.name);
 else
@@ -23,7 +23,7 @@ end
 
 info_path = '';
 %name of xml file with the info
-info_file = dir(fullfile('*mff','info.xml'));
+info_file = dir(fullfile(trial_directory,'*mff','info.xml'));
 if ~isempty(info_file)
     info_name = fullfile(info_file.folder, info_file.name);
 else
@@ -101,4 +101,4 @@ scalars.eeg_start_time_ms = microsecs + secs*1000000 + mins*1000000*60;
 
 close(f);
 %%%
-clearvars f info_path din_path isdlg should_open din_name info_name has_time fileID din_imp info_imp tag cplace mins secs microsecs k dins which_din din_file info_file;
+%clearvars f info_path din_path isdlg should_open din_name info_name has_time fileID din_imp info_imp tag cplace mins secs microsecs k dins which_din din_file info_file;

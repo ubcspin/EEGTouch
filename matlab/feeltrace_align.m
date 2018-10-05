@@ -1,7 +1,7 @@
 %extract unique-timestamp feeltrace data, sync feeltrace timestamps
 %and compile concise array of feeltrace data and timestamps
 %name of feeltrace file
-feeltrace_file = dir('feeltrace*.csv');
+feeltrace_file = dir(fullfile(trial_directory,'feeltrace*.csv'));
 if ~isempty(feeltrace_file)
     feeltrace_name = feeltrace_file.name;
     feeltrace_path = feeltrace_file.folder;
@@ -153,4 +153,4 @@ for k=1:length([aligned_data.timestamp_ms])
 end
 close(f);
 %clear excess variables
-clearvars f feeltrace_condensed feeltrace_file feeltrace_path k a isdlg feeltrace_name feeltrace feeltrace_joystick feeltrace_videoTimestamp vid_start_index feeltrace_round_times_ms feeltrace_vidTimeChanged changept_indices con_joystick con_vidTimestamp l;
+%clearvars f feeltrace_condensed feeltrace_file feeltrace_path k a isdlg feeltrace_name feeltrace feeltrace_joystick feeltrace_videoTimestamp vid_start_index feeltrace_round_times_ms feeltrace_vidTimeChanged changept_indices con_joystick con_vidTimestamp l;
