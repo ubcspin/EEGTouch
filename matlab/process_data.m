@@ -1,9 +1,10 @@
 function [exit_code] = process_data()
+clearvars
 exit_code = 1;
 global trial_directory;
 global processed_directory;
 global trial_number
-addpath(pwd)
+addpath(pwd);
 waitfor(warndlg("Please find the directory containing raw trial data to process."));
 trial_directory = uigetdir(path,"Select directory containg raw data from one trial");
 oldpath = path;
