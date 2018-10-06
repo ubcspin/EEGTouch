@@ -1,5 +1,6 @@
 f = waitbar(0.9,'Plotting FSR and feeltrace data','Name','Data Processing');
 clf('reset');
+clearvars fig;
 hold off;
 if ~exist('trial_directory') 
     trial_directory = uigetdir(path,"Select directory containg raw data from the trial");
@@ -44,11 +45,12 @@ for k = 1:length([aligned_data(:).timestamp_ms])
 end
 
 clearvars title;
+feeltrace_data = smooth(feeltrace_data, 101);
 
 max_ft = max(feeltrace_data);
 ratio = max([max(A0_data) max(A1_data) max(A2_data) max(A3_data) max(A4_data)])/max(feeltrace_data);
 fig = figure(1);
-pos1 = [0.1 0.1 0.57 0.8];
+pos1 = [0.1 0.1 0.7 0.8];
 subplot('Position',pos1);
 title(strcat("FSR and Feeltrace data for participant ", trial_number));
 hold on;
@@ -61,8 +63,8 @@ plot(fsr_timestamps,A4_data/ratio,'Color',[1 0.2 1]);
 ylabel('Intensity of keypress');
 yticks([])
 plot(feeltrace_timestamps,feeltrace_data,'Color',[0 0 0],'LineWidth',1);
-plot(feeltrace_timestamps,feeltrace_data,'Color',[1 1 1],'LineWidth',4);
-plot(feeltrace_timestamps,feeltrace_data,'Color',[0 0 0],'LineWidth',1.5);
+plot(feeltrace_timestamps,feeltrace_data,'Color',[1 1 1],'LineWidth',5);
+plot(feeltrace_timestamps,feeltrace_data,'Color',[0 0 0],'LineWidth',2);
 hold off;
 
 yyaxis right
@@ -82,7 +84,7 @@ plot(1,nan,'Color',[0.2 0.2 1]);
 plot(1,nan,'Color',[1 1 0.2]);
 plot(1,nan,'Color',[0.2 1 1]);
 plot(1,nan,'Color',[1 0.2 1]);
-plot(1,nan,'Color',[0 0 0], 'LineWidth', 1.5);
+plot(1,nan,'Color',[0 0 0], 'LineWidth', 2);
 hold off;
 set(hSub, 'Visible', 'off');
 legend('alt (grab) key','right key','down key','left key','up key','feeltrace');
