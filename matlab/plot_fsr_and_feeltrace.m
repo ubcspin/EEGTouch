@@ -63,8 +63,8 @@ plot(fsr_timestamps,A4_data/ratio,'Color',[1 0.2 1]);
 ylabel('Intensity of keypress');
 yticks([])
 plot(feeltrace_timestamps,feeltrace_data,'Color',[0 0 0],'LineWidth',1);
-plot(feeltrace_timestamps,feeltrace_data,'Color',[1 1 1],'LineWidth',5);
-plot(feeltrace_timestamps,feeltrace_data,'Color',[0 0 0],'LineWidth',2);
+plot(feeltrace_timestamps,feeltrace_data,'Color',[1 1 1],'LineWidth',6.5);
+plot(feeltrace_timestamps,feeltrace_data,'Color',[0 0 0],'LineWidth',3);
 hold off;
 
 yyaxis right
