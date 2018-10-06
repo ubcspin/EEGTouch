@@ -1,11 +1,18 @@
 f = waitbar(0.9,'Plotting FSR and feeltrace data','Name','Data Processing');
-hold off;
 clf('reset');
+hold off;
 if ~exist('trial_directory') 
     trial_directory = uigetdir(path,"Select directory containg raw data from the trial");
 end
-if ~exist('processed_director')
+if ~exist('processed_directory')
     processed_directory = uigetdir(path,"Select directory to save processed data in.");
+end
+if ~exist('trial_number')
+    prompt = {'Enter trial number:'};
+        title = 'Trial number';
+        dims = [1 35];
+        definput = {'0'};
+        trial_number = inputdlg(prompt,title,dims,definput);
 end
 feeltrace_timestamps = zeros(length([aligned_data(:).feeltrace]),1);
 fsr_timestamps = zeros(length([aligned_data(:).A0_fsr]),1);
@@ -36,26 +43,64 @@ for k = 1:length([aligned_data(:).timestamp_ms])
   end    
 end
 
-hold on;
-plot(fsr_timestamps,A0_data/3.5,'Color',[0 1 0]);
-plot(fsr_timestamps,A1_data/3.5,'Color',[0 0 1]);
-plot(fsr_timestamps,A2_data/3.5,'Color',[1 1 0]);
-plot(fsr_timestamps,A3_data/3.5,'Color',[0 1 1]);
-plot(fsr_timestamps,A4_data/3.5,'Color',[1 0 1]);
-plot(feeltrace_timestamps,feeltrace_data,'Color',[0 0 0],'LineWidth',0.8);
+clearvars title;
 
-legend('alt (grab) key','right key','down key','left key','up key','feeltrace');
-xlabel('Time (min)');
+max_ft = max(feeltrace_data);
+ratio = max([max(A0_data) max(A1_data) max(A2_data) max(A3_data) max(A4_data)])/max(feeltrace_data);
+fig = figure(1);
+pos1 = [0.1 0.1 0.57 0.8];
+subplot('Position',pos1);
+title(strcat("FSR and Feeltrace data for participant ", trial_number));
+hold on;
+%set(figure,'defaultAxesColorOrder',[[0 0 0]; [0 0 0]]);
+plot(fsr_timestamps,A0_data/ratio,'Color',[0.2 1 0.2]);
+plot(fsr_timestamps,A1_data/ratio,'Color',[0.2 0.2 1]);
+plot(fsr_timestamps,A2_data/ratio,'Color',[1 1 0.2]);
+plot(fsr_timestamps,A3_data/ratio,'Color',[0.2 1 1]);
+plot(fsr_timestamps,A4_data/ratio,'Color',[1 0.2 1]);
 ylabel('Intensity of keypress');
-set(gca,'YTickLabel',[]);
+yticks([])
+plot(feeltrace_timestamps,feeltrace_data,'Color',[0 0 0],'LineWidth',1);
+plot(feeltrace_timestamps,feeltrace_data,'Color',[1 1 1],'LineWidth',4);
+plot(feeltrace_timestamps,feeltrace_data,'Color',[0 0 0],'LineWidth',1.5);
+hold off;
+
+yyaxis right
+ax = get(gcf,'CurrentAxes');
+ax.YAxis(2).Color = 'black';
+yticks([0 0.5 1])
+yticklabels({'Relief','Neutral','Stress'})
+ylabel('Feeltrace from stres to relief')
+xlabel('Time (min)');
+
+pos1 = [0.8 0.1 0.2 0.8];
+hSub = subplot('Position',pos1);
+hold on;
+plot(1,nan,'Color',[0.2 1 0.2]);
+plot(1,nan,'Color',[0.2 0.2 1]);
+plot(1,nan,'Color',[1 1 0.2]);
+plot(1,nan,'Color',[0.2 1 1]);
+plot(1,nan,'Color',[1 0.2 1]);
+plot(1,nan,'Color',[0 0 0], 'LineWidth', 1.5);
+hold off;
+set(hSub, 'Visible', 'off');
+legend('alt (grab) key','right key','down key','left key','up key','feeltrace');
+t = title('FSR and Feeltrace data from Participant');
+%gca.Ycolor = [0 0 0];
+%set(gca,'YTickLabel',[]);
 %yyaxis left
 %ylabel('Reported stress level');
 %set(gca,'YTickLabel',[]);
 %title('Keypress FSR and stress-to-relief feeltrace during gameplay');
-hold off;
 
 
-saveas(gcf,fullfile(processed_directory,'fsr_and_feeltrace.png'));
+saveas(gcf,fullfile(processed_directory,['fsr_and_feeltrace' char(trial_number) '.png']));
+
+fig.PaperUnits = 'inches';
+orient(fig,'landscape')
+fig.PaperPosition = [0 0 10 8];
+print(fullfile(processed_directory,['fsr_and_feeltrace-large' char(trial_number)]),'-dpng','-r0');
 
 close(f);
+%clf('reset');
 %clearvars f feeltrace_timestamps feeltrace_data fsr_timestamps A0_data A1_data A2_data A3_data A4_data k a0i fti;
