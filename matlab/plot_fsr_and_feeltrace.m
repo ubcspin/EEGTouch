@@ -68,8 +68,9 @@ hold off;
 yyaxis right
 ax = get(gcf,'CurrentAxes');
 ax.YAxis(2).Color = 'black';
-yticks([0 0.5 1])
-yticklabels({'Relief','Neutral','Stress'})
+plot(feeltrace_timestamps,feeltrace_data,'Color',[0 0 0]);
+yticks([0 max_ft])
+yticklabels({'Relief','Stress'})
 ylabel('Feeltrace from stres to relief')
 xlabel('Time (min)');
 
