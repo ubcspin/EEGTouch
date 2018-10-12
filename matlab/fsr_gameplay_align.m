@@ -568,6 +568,9 @@ aligned_data(1).A0_fsr = 0;
 aligned_data(1).A1_fsr = 0;
 a1 = [];
 for k=1:length([aligned_data(:).timestamp_ms])
+    if (l > length(gameplay_fromsync(:,6)))
+        break;
+    end
     if gameplay_fromsync(l,6) == aligned_data(k).timestamp_ms
         aligned_data(k).A0_fsr = gameplay_fromsync(l,1);
         a1 = [a1 gameplay_fromsync(l,2)];
@@ -579,4 +582,4 @@ for k=1:length([aligned_data(:).timestamp_ms])
     end
 end
 close(f);
-%clearvars f gameplay_fromsync a1 gameplay_A0 gameplay_A1 gameplay_A2 gameplay_A3 gameplay_A4 gameplay_time_epoch old_path fsr_file fsr_name fsr_path ind_timestamp_after_eeg_end time_diffs time_nodiffs nodiffs_vec k l m zind a b l averagel;
+clearvars f gameplay_fromsync a1 gameplay_A0 gameplay_A1 gameplay_A2 gameplay_A3 gameplay_A4 gameplay_time_epoch old_path fsr_file fsr_name fsr_path ind_timestamp_after_eeg_end time_diffs time_nodiffs nodiffs_vec k l m zind a b l averagel;
