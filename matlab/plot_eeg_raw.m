@@ -4,7 +4,7 @@ f = waitbar(0.3,'Plotting EEG data','Name','Data Processing');
 eeg_to_plot = eeg_data_synced(2:end,:);
 
 en = length(eeg_to_plot(1,:))-100000;
-ax = ones(1,length(eeg_to_plot(1,:)))/1000;
+ax = ones(1,length(eeg_to_plot(1,:)))/60000;
 ax = cumsum(ax);
 colors = rand(64,3);
 hold on;
