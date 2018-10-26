@@ -1,4 +1,4 @@
-function [exit_code] = process_data()
+%function [exit_code] = process_data()
 clearvars
 exit_code = 1;
 global trial_directory;
@@ -31,12 +31,15 @@ end
 
 extract_din_time;
 eeg_align;
+save_file;
 plot_eeg_raw;
 create_timestamped_video_excerpt;
 feeltrace_align;
+save_file;
 fsr_gameplay_align;
+save_file;
 plot_fsr_and_feeltrace;
 save_file;
 %video_face_align;
-clearvars trial_directory processed_directory trial_num
+%clearvars trial_directory processed_directory trial_num
 exit_code = 0;
