@@ -106,7 +106,7 @@ feeltrace_joystick = feeltrace.A5(2:end);
 feeltrace_videoTimestamp = feeltrace.videoTimestamp(2:end);
 
 %find where video actually starts playing, remove data before
-vid_start_index = find(feeltrace_videoTimestamp ~= -1, 1)+1;
+vid_start_index = find(feeltrace_videoTimestamp >0, 1)+1;
 feeltrace_joystick = feeltrace_joystick(vid_start_index:end);
 feeltrace_videoTimestamp = feeltrace_videoTimestamp(vid_start_index:end);
 
