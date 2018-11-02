@@ -7,7 +7,7 @@ if (~exist('trial_directory'))
     waitfor(warndlg('Unknown trial directory. Please select trial directory.'));
     trial_directory = uigetdir(path,"Select directory containg raw data from the trial");
 end
-if (~exist('processed_directory') || processed_directory == 0)
+if (~exist('processed_directory'))
     waitfor(warndlg('Unknown processed data directory. Please select processed data directory.'));
     processed_directory = uigetdir(path,"Select directory to save processed data in.");
 end
