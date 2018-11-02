@@ -51,7 +51,7 @@ max_ft = max(feeltrace_data);
 max_keypress =  max([max(A0_data) max(A1_data) max(A2_data) max(A3_data) max(A4_data)]);
 ratio_max_ft_over_keypress = max_ft/max_keypress;
 ratio = max([max(A0_data) max(A1_data) max(A2_data) max(A3_data) max(A4_data)])/max(feeltrace_data);
-title(strcat("Feeltrace and keypress data for participant ", trial_number));
+%title(strcat("Feeltrace and keypress data for participant ", trial_number));
 fig = figure(1);
 
 subplot(5,1,1);
@@ -87,7 +87,7 @@ plot(feeltrace_timestamps,feeltrace_data,'Color',[0 0 0],'LineWidth',2.5);
 yticks([0 max_ft/2 max_ft]);
 yticklabels({'','A2',''});
 ytickangle(90);
-ylabel(strcat('Participant ', trial_number)); 
+ylabel(strcat("Participant ", trial_number)); 
 xticks(0 : 0.25 : ceil(fsr_timestamps(fsri-1)));
 xticklabels([]);
 set(gca,'FontSize',30);

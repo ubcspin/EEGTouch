@@ -3,7 +3,7 @@
 %extract unique-timestamp interview data and timestamps
 %and compile concise array
 %name of interview file
-if (~exist('trial_directory') || trial_directory == 0 )
+if (~exist('trial_directory'))
     waitfor(warndlg('Unknown trial directory. Please select trial directory.'));
     trial_directory = uigetdir(path,"Select directory containg raw data from the trial");
 end
