@@ -66,19 +66,22 @@ a = size(datacell{1});
 num_markers = a(1);
 interview_comments = strings(num_markers);
 interview_ms_timestamps = zeros(num_markers,1);
-for k = 1:num_markers
-    if ~(datacell{3}{k} == "")
-        interview_comments(k) = datacell{1}{k};
+k = 1
+while k <= num_markers
+    if (~isempty(datacell{3}{k}) && ~(datacell{3}{k} == ""))
         int_timestamp_strings = strsplit(datacell{3}{k}, ':');
         mins = int_timestamp_strings(2);
         secs = int_timestamp_strings(3);
         frames = int_timestamp_strings(4);
         int_timestamp = round((str2num(mins{1})*60*1000) + (str2num(secs{1})*1000) + (str2num(frames{1})*1000/30));
-        interview_ms_timestamps(k) = int_timestamp;
+        if ~(int_timestamp == 0)
+            interview_ms_timestamps(k) = int_timestamp;
+            interview_comments(k) = datacell{1}{k};
+        end
     end
 end
 
-interview_ms_timestamps = round(interview_ms_timestamps - scalars.sync_frame*1000 / scalars.frame_rate);
+%interview_ms_timestamps = round(interview_ms_timestamps - scalars.sync_frame*1000 / scalars.frame_rate);
 
 %align feeltrace data to master array
 aligned_data(1).interview = [];
