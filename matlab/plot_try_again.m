@@ -23,9 +23,11 @@ A1_data = zeros(length([aligned_data(:).A1_fsr]),1);
 A2_data = zeros(length([aligned_data(:).A2_fsr]),1);
 A3_data = zeros(length([aligned_data(:).A3_fsr]),1);
 A4_data = zeros(length([aligned_data(:).A4_fsr]),1);
+interview_times = zeros(200,1);
 
 fti = 1;
 fsri = 1;
+invui = 1;
 
 for k = 1:length([aligned_data(:).timestamp_ms])
   if ~isempty(aligned_data(k).feeltrace)
@@ -41,8 +43,22 @@ for k = 1:length([aligned_data(:).timestamp_ms])
       A3_data(fsri) = aligned_data(k).A3_fsr;
       A4_data(fsri) = aligned_data(k).A4_fsr;
       fsri = fsri + 1;
-  end    
+  end
+  if ~isempty(aligned_data(k).interview)
+      interview_times(invui) = (k-1)/60000;
+      invui = invui + 1;
+  end
 end
+
+interview_times = interview_times(2:find(interview_times==0,1,'first')-1);
+interview_ones = ones(length(interview_times),1);
+interview_nums_num = 1:length(interview_times);
+interview_nums = arrayfun(@(x) strcat(num2str(x),convertCharsToStrings(blanks(mod(x,2)*2))), interview_nums_num,'UniformOutput',false);
+
+%space_strings = (repmat(strcat("","  ","   "),1,100));
+%space_strings = space_strings(1:length(interview_times));
+%interview_num_arr = (vertcat(space_strings, arrayfun(@num2str, interview_nums_num, 'UniformOutput', false)));
+%interview
 
 clearvars title;
 %feeltrace_data = smooth(feeltrace_data, 30);
@@ -56,10 +72,14 @@ fig = figure(1);
 
 max_all = 22;
 
-subplot(5,1,1);
+subplot(29,1,[1 2 3 4 5]);
 hold on;
+grid on;
 area(fsr_timestamps,A0_data/ratio,'FaceColor',[239/255 49/255 86/255], 'EdgeColor',[239/255 49/255 86/255]);
 plot(feeltrace_timestamps,feeltrace_data,'Color',[0 0 0],'LineWidth',3.5);
+ax = gca;
+ax.XGrid = 'off';
+ylim([0 max_ft]);
 yticks([0 max_ft/2 max_ft]);
 yticklabels({'','A0','          Stress'});
 ytickangle(90);
@@ -70,10 +90,14 @@ set(gca,'FontSize',30);
 set(gca,'linewidth',1);
 hold off;
 
-subplot(5,1,2);
+subplot(29,1,[6 7 8 9 10]);
 hold on;
+grid on;
 area(fsr_timestamps,A1_data/ratio,'FaceColor',[244/255 93/255 1/255], 'EdgeColor',[244/255 93/255 1/255]);
 plot(feeltrace_timestamps,feeltrace_data,'Color',[0 0 0],'LineWidth',3.5);
+ax = gca;
+ax.XGrid = 'off';
+ylim([0 max_ft]);
 yticks([0 max_ft/2 max_ft]);
 yticklabels({'','A1',''});
 ytickangle(90);
@@ -84,10 +108,14 @@ set(gca,'FontSize',30);
 set(gca,'linewidth',1);
 hold off;
 
-subplot(5,1,3);
+subplot(29,1,[11 12 13 14 15]);
 hold on;
+grid on;
 area(fsr_timestamps,A2_data/ratio,'FaceColor',[255/255 159/255 28/255], 'EdgeColor',[255/255 159/255 28/255]);
 plot(feeltrace_timestamps,feeltrace_data,'Color',[0 0 0],'LineWidth',3.5);
+ax = gca;
+ax.XGrid = 'off';
+ylim([0 max_ft]);
 yticks([0 max_ft/2 max_ft]);
 yticklabels({'','A2',''});
 ytickangle(90);
@@ -99,10 +127,14 @@ set(gca,'FontSize',30);
 set(gca,'linewidth',1);
 hold off;
 
-subplot(5,1,4);
+subplot(29,1,[16 17 18 19 20]);
 hold on;
+grid on;
 area(fsr_timestamps,A3_data/ratio,'FaceColor',[86/255 188/255 3/255], 'EdgeColor',[86/255 188/255 3/255]);
 plot(feeltrace_timestamps,feeltrace_data,'Color',[0 0 0],'LineWidth',3.5);
+ax = gca;
+ax.XGrid = 'off';
+ylim([0 max_ft]);
 yticks([0 max_ft/2 max_ft]);
 yticklabels({'','A3',''});
 ytickangle(90);
@@ -113,10 +145,14 @@ set(gca,'FontSize',30);
 set(gca,'linewidth',1);
 hold off;
 
-subplot(5,1,5);
+subplot(29,1,[21 22 23 24 25]);
 hold on;
+grid on;
 area(fsr_timestamps,A4_data/ratio,'FaceColor',[45/255 125/255 210/255], 'EdgeColor',[45/255 125/255 210/255]);
 plot(feeltrace_timestamps,feeltrace_data,'Color',[0 0 0],'LineWidth',3.5);
+ax = gca;
+ax.XGrid = 'off';
+ylim([0 max_ft]);
 yticks([0 max_ft/2 max_ft]);
 yticklabels({'Relief          ','A4',""});
 ytickangle(90);
@@ -127,9 +163,23 @@ xticklabels(vertcat(strings(1,starttick/0.25), datestr(datetime((starttick/24/60
 xtickangle(90); 
 set(gca,'FontSize',30);
 set(gca,'linewidth',1);
-xstring = join(repmat(strcat("                                                            ", trial_number),1,33));
-xlabel(xstring,'FontSize', 11);
 hold off;
+
+subplot(29,1,29);
+scatter(interview_times,interview_ones, 17, 'black', '*');
+ylim([0 2]);
+yticks([]);
+xlim([0 max_all]);
+xticks(interview_times);
+xticklabels(interview_nums);
+xtickangle(90);
+ax = gca;
+ax.TickLength = [.001 .001];
+set(gca,'FontSize',15);
+xstring = join(repmat(strcat("                                                            P", trial_number),1,32));
+xlabel(xstring,'FontSize', 11);
+
+
 
 
 
