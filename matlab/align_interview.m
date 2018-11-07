@@ -66,7 +66,8 @@ a = size(datacell{1});
 num_markers = a(1);
 interview_comments = strings(num_markers);
 interview_ms_timestamps = zeros(num_markers,1);
-k = 1
+k = 1;
+l = 1;
 while k <= num_markers
     if (~isempty(datacell{3}{k}) && ~(datacell{3}{k} == ""))
         int_timestamp_strings = strsplit(datacell{3}{k}, ':');
@@ -75,11 +76,16 @@ while k <= num_markers
         frames = int_timestamp_strings(4);
         int_timestamp = round((str2num(mins{1})*60*1000) + (str2num(secs{1})*1000) + (str2num(frames{1})*1000/30));
         if ~(int_timestamp == 0)
-            interview_ms_timestamps(k) = int_timestamp;
-            interview_comments(k) = datacell{1}{k};
+            interview_ms_timestamps(l) = int_timestamp;
+            interview_comments(l) = datacell{1}{l};
+            l = l+1;
         end
     end
+    k = k+1;
 end
+
+interview_ms_timestamps = interview_ms_timestamps(1:find(interview_ms_timestamps,1,'last'));
+interview_comments = interview_comments(1:length(interview_ms_timestamps));
 
 %interview_ms_timestamps = round(interview_ms_timestamps - scalars.sync_frame*1000 / scalars.frame_rate);
 
