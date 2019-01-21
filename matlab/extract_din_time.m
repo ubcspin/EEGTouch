@@ -100,5 +100,4 @@ scalars.din_time_ms = dins(which_din);
 scalars.eeg_start_time_ms = microsecs + secs*1000000 + mins*1000000*60;
 
 close(f);
-%%%
-%clearvars f info_path din_path isdlg should_open din_name info_name has_time fileID din_imp info_imp tag cplace mins secs microsecs k dins which_din din_file info_file;
+clearvars f info_path din_path isdlg should_open din_name info_name has_time fileID din_imp info_imp tag cplace mins secs microsecs k dins which_din din_file info_file;

@@ -29,11 +29,12 @@ while (~status)
     end
 end
 
-extract_din_time;
-eeg_align;
-plot_eeg_raw;
-create_timestamped_video_excerpt;
-feeltrace_align;
+%extract_din_time;
+%eeg_align;
+%plot_eeg_raw;
+%create_timestamped_video_excerpt;
+%feeltrace_align;
+%align_interview;
 fsr_gameplay_align;
 plot_fsr_and_feeltrace;
 save_file;

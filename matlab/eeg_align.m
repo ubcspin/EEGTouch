@@ -50,5 +50,5 @@ for k=1:length(eeg_data_synced(65,:))
 end
 
 close(f);
-
+save(fullfile(processed_directory, 'processed_data.mat'),'aligned_data', 'scalars');
 %clearvars f eeg_path values varnames eeg_file eeg_name isdlg;
