@@ -8,18 +8,21 @@ isdiff = diff(times) ~= 0;
 %changept_indices = vertcat(1, find(time_ischanged),length(times)+1);
 changept_indices = vertcat(1, find(isdiff)+1, length(times)+1);
 
+[~,width] = size(value_matrix);
+
 % prepare array for compiled values of unique timestamps
-con_values = zeros(length(changept_indices)-1,1);
+con_values = zeros(length(changept_indices)-1,width);
 %and array of unique video timestamps
 con_times = zeros(length(changept_indices)-1,1);
 
 %populate arrays
 for k = 1:length(changept_indices)-1
-    con_values(k) = median(value_matrix(changept_indices(k):changept_indices(k+1)-1));
+    con_values(k,:) = median(value_matrix(changept_indices(k):changept_indices(k+1)-1,:),1);
     con_times(k) = times(changept_indices(k));
 end
 
-nodiff_version = zeros(length(changept_indices)-1,2);
-
-nodiff_version(:,1) = con_values;
-nodiff_version(:,2) = con_times;
+nodiff_version = con_values;
+% nodiff_version = zeros(length(changept_indices)-1,width);
+% 
+% nodiff_version(:,1) = con_values;
+% nodiff_version(:,2) = con_times;

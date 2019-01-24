@@ -36,12 +36,17 @@ gameplay_fromsync(:,6) = gameplay_fromsync(:,6) - gameplay_fromsync(1,6);
 gameplay_fromsync = remove_time_nodiffs(gameplay_fromsync, gameplay_fromsync(:,6));
 
 % Remove data from timestamps after end of EEG data.
-ind_timestamp_after_eeg_end = find(gameplay_fromsync(:,6) > aligned_data(end).timestamp_ms,1);
+eeg_stamps = processed_data.eeg(1,:);
+eeg_endstamp = eeg_stamps(end);
+ind_timestamp_after_eeg_end = find(gameplay_fromsync(:,6) > eeg_endstamp);
 if ~isempty(ind_timestamp_after_eeg_end)
     gameplay_fromsync = gameplay_fromsync(1:ind_timestamp_after_eeg_end,:);
 end
 
+fsr_table = table(gameplay_fromsync(:,1
+
 processed_data.fsr = gameplay_fromsync;
+
 % 
 % % Align data to master array
 % l = 1;

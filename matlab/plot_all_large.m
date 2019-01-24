@@ -26,7 +26,15 @@ end
 %A4_data = zeros(length([aligned_data(:).A4_fsr]),1);
 %interview_times = zeros(200,1);
 
-feeltrace_timestamps = processed_data.feeltrace.timestamp_ms;
+feeltrace_timestamps = processed_data.feeltrace.timestamp_ms/60000;
+fsr_timestamps = processed_data.fsr.timestamp_ms/60000;
+feeltrace_data = processed_data.feeltrace.joystick;
+A0_data = processed_data.fsr.A0;
+A1_data = processed_data.fsr.A1;
+A2_data = processed_data.fsr.A2;
+A3_data = processed_data.fsr.A3;
+A4_data = processed_data.fsr.A4;
+interview_times = processed_data.interview.timestamp_ms/60000;
 
 
 % fti = 1;
@@ -54,15 +62,15 @@ feeltrace_timestamps = processed_data.feeltrace.timestamp_ms;
 %   end
 % end
 % 
-% interview_times = interview_times(2:find(interview_times==0,1,'first')-1);
-% interview_ones = ones(length(interview_times),1);
-% interview_nums_num = 1:length(interview_times);
-% interview_nums = arrayfun(@(x) strcat(num2str(x),convertCharsToStrings(blanks(mod(x,2)*2))), interview_nums_num,'UniformOutput',false);
+%interview_times = interview_times(2:find(interview_times==0,1,'first')-1);
+interview_ones = ones(length(interview_times),1);
+interview_nums_num = (1:length(interview_times)).';
+interview_nums = arrayfun(@(x) strcat(num2str(x),convertCharsToStrings(blanks(mod(x,3)*2))), interview_nums_num,'UniformOutput',false);
+% 
+% space_strings = repmat(["";"  ";"    "],length(interview_times),1);
+% space_strings = space_strings(1:length(interview_times));
+% interview_nums = (horzcat(space_strings, arrayfun(@num2str, interview_nums_num, 'UniformOutput', false)));
 
-%space_strings = (repmat(strcat("","  ","   "),1,100));
-%space_strings = space_strings(1:length(interview_times));
-%interview_num_arr = (vertcat(space_strings, arrayfun(@num2str, interview_nums_num, 'UniformOutput', false)));
-%interview
 
 clearvars title;
 %feeltrace_data = smooth(feeltrace_data, 30);
@@ -74,6 +82,7 @@ ratio = max([max(A0_data) max(A1_data) max(A2_data) max(A3_data) max(A4_data)])/
 %title(strcat("Feeltrace and keypress data for participant ", trial_number));
 fig = figure(1);
 
+%length of longest trial
 max_all = 22;
 
 subplot(29,1,[1 2 3 4 5]);
@@ -88,7 +97,7 @@ yticks([0 max_ft/2 max_ft]);
 yticklabels({'','A0','          Stress'});
 ytickangle(90);
 xlim([0 max_all]);
-xticks(0 : 0.25 : ceil(fsr_timestamps(fsri-1)));
+xticks(0 : 0.25 : ceil(fsr_timestamps(end)));
 xticklabels([]);
 set(gca,'FontSize',30);
 set(gca,'linewidth',1);
@@ -106,7 +115,7 @@ yticks([0 max_ft/2 max_ft]);
 yticklabels({'','A1',''});
 ytickangle(90);
 xlim([0 max_all]);
-xticks(0 : 0.25 : ceil(fsr_timestamps(fsri-1)));
+xticks(0 : 0.25 : ceil(fsr_timestamps(end)));
 xticklabels([]);
 set(gca,'FontSize',30);
 set(gca,'linewidth',1);
@@ -125,7 +134,7 @@ yticklabels({'','A2',''});
 ytickangle(90);
 ylabel(strcat("Participant ", trial_number));
 xlim([0 max_all]);
-xticks(0 : 0.25 : ceil(fsr_timestamps(fsri-1)));
+xticks(0 : 0.25 : ceil(fsr_timestamps(end)));
 xticklabels([]);
 set(gca,'FontSize',30);
 set(gca,'linewidth',1);
@@ -143,7 +152,7 @@ yticks([0 max_ft/2 max_ft]);
 yticklabels({'','A3',''});
 ytickangle(90);
 xlim([0 max_all]);
-xticks(0 : 0.25 : ceil(fsr_timestamps(fsri-1)));
+xticks(0 : 0.25 : ceil(fsr_timestamps(end)));
 xticklabels([]);
 set(gca,'FontSize',30);
 set(gca,'linewidth',1);
@@ -162,8 +171,8 @@ yticklabels({'Relief          ','A4',""});
 ytickangle(90);
 starttick = max(floor(min(fsr_timestamps(1), feeltrace_timestamps(1))),0.25);
 xlim([0 max_all]);
-xticks(0 : 0.25 : ceil(fsr_timestamps(fsri-1)));
-xticklabels(vertcat(strings(1,starttick/0.25), datestr(datetime((starttick/24/60:1/24/60/60*15:1/24/60*ceil(fsr_timestamps(fsri-1))),'ConvertFrom','datenum'),'MM:SS')));
+xticks(0 : 0.25 : ceil(fsr_timestamps(end)));
+xticklabels(vertcat(strings(1,starttick/0.25), datestr(datetime((starttick/24/60:1/24/60/60*15:1/24/60*ceil(fsr_timestamps(end))),'ConvertFrom','datenum'),'MM:SS')));
 xtickangle(90); 
 set(gca,'FontSize',30);
 set(gca,'linewidth',1);
@@ -190,7 +199,7 @@ xlabel(xstring,'FontSize', 11);
 fig.PaperUnits = 'inches';
 fig.PaperPosition = [0 0 110 16];
 print(fullfile(processed_directory,['fsr_and_feeltrace-over' char(trial_number)]),'-dpng','-r0');
-close(f);
+%close(f);
 %clf('reset');
 %clearvars fig;
 %clearvars firsttime fsri xtick_arr starttick definput dims hSub max_ft max_keypress pos1 prompt ratio_max_keypress_over_ft t f feeltrace_timestamps feeltrace_data fsr_timestamps A0_data A1_data A2_data A3_data A4_data k a0i fti;

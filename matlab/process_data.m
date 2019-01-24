@@ -1,11 +1,9 @@
-function [exit_code] = process_data()
-exit_code = 1;
+function processed_data = process_data()
 
 % initialize persistent variables
 persistent trial_directory;
 persistent processed_directory;
 persistent trial_number;
-global processed_data;
 
 
 % select trial directory and navigate to it
@@ -42,9 +40,9 @@ end
 extract_din_time;
 eeg_align;
 %plot_eeg_raw;
-%create_timestamped_video_excerpt;
+create_timestamped_video_excerpt;
 feeltrace_align;
-%align_interview;
+align_interview;
 fsr_gameplay_align;
 plot_all_large;
 %plot_fsr_and_feeltrace;

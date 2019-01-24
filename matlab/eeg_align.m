@@ -17,10 +17,11 @@ varnames = who('*mff');
 eeg_data_raw = eval(varnames{1});
 
 % crop eeg data to din sync 
-processed_data.eeg = eeg_data_raw(:,(processed_data.scalars.din_time_ms-processed_data.scalars.eeg_start_time_ms)/1000:end);
+eeg_data = eeg_data_raw(:,(processed_data.scalars.din_time_ms-processed_data.scalars.eeg_start_time_ms)/1000:end).';
 
 % add a row for millisecond timestamp to synced eeg data
-stamps = ones(1, length(processed_data.eeg(65,:)));
+stamps = ones(length(eeg_data),1);
 stamps(1) = 0;
 stamps = cumsum(stamps);
-processed_data.eeg = vertcat(stamps, processed_data.eeg);
+eeg_table = table(stamps,eeg_data,'VariableNames',{'timestamp_ms','eeg'});
+processed_data.eeg = eeg_table;

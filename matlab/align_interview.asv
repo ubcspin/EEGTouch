@@ -3,6 +3,11 @@
 %extract unique-timestamp interview data and timestamps
 %and compile concise array
 %name of interview file
+
+trial_directory = get_trial_directory();
+processed_directory = get_processed_directory();
+processed_data = get_processed_data();
+
 if (~exist('trial_directory'))
     waitfor(warndlg('Unknown trial directory. Please select trial directory.'));
     trial_directory = uigetdir(path,"Select directory containg raw data from the trial");
@@ -61,7 +66,7 @@ f = waitbar(0.5,'Importing interview data','Name','Data Processing');
 fid = fopen(interview_name, 'rt', 'n', 'UTF16LE');
 fread(fid, 2, '*uint8');   %adjust the 2 to fit the UTF encoding
 filecontent = fread(fid, [1 inf], '*char');
-datacell = textscan(filecontent, '%,s%s%s%s%s%s', 'Delimiter', '	', 'HeaderLines', 1);
+datacell = textscan(filecontent, '%s%s%s%s%s%s', 'Delimiter', '	', 'HeaderLines', 1);
 a = size(datacell{1}); 
 num_markers = a(1);
 interview_comments = strings(num_markers);
@@ -87,23 +92,26 @@ end
 interview_ms_timestamps = interview_ms_timestamps(1:find(interview_ms_timestamps,1,'last'));
 interview_comments = interview_comments(1:length(interview_ms_timestamps));
 
-%interview_ms_timestamps = round(interview_ms_timestamps - scalars.sync_frame*1000 / scalars.frame_rate);
 
-%align feeltrace data to master array
-aligned_data(1).interview = [];
-l = 1;
-a = length(interview_ms_timestamps);
-for k=1:length([aligned_data.timestamp_ms])
-    if l > a
-        break;
-    end
-    if interview_ms_timestamps(l) == aligned_data(k).timestamp_ms
-        aligned_data(k).interview =interview_comments(l);
-        l = l+1;
-    else
-        aligned_data(k).interview = [];
-    end  
-end
 
-save(fullfile(processed_directory, 'processed_data.mat'),'aligned_data', 'scalars');
-close(f);
+interview_ms_timestamps = round(interview_ms_timestamps - processed_data.scalars.sync_frame*1000 / processed_data.scalars.frame_rate);
+
+interview_table = table(interview_ms_timestamps, interview_comments.', 'VariableNames', {'timestamp_ms','label'});
+processed_data.interview = interview_table;
+% %align feeltrace data to master array
+% aligned_data(1).interview = [];
+% l = 1;
+% a = length(interview_ms_timestamps);
+% for k=1:length([aligned_data.timestamp_ms])
+%     if l > a
+%         break;
+%     end
+%     if interview_ms_timestamps(l) == aligned_data(k).timestamp_ms
+%         aligned_data(k).interview =interview_comments(l);
+%         l = l+1;
+%     else
+%         aligned_data(k).interview = [];
+%     end  
+% end
+
+save(fullfile(processed_directory, 'processed_data.mat'),'processed_data');

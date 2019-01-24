@@ -43,7 +43,10 @@ if ~isempty(ind_timestamp_after_eeg_end)
     gameplay_fromsync = gameplay_fromsync(1:ind_timestamp_after_eeg_end,:);
 end
 
-processed_data.fsr = gameplay_fromsync;
+fsr_table = table(gameplay_fromsync(:,6), gameplay_fromsync(:,1), gameplay_fromsync(:,2), gameplay_fromsync(:,3), gameplay_fromsync(:,4), gameplay_fromsync(:,5), 'VariableNames', {'timestamp_ms', 'A0','A1','A2','A3','A4'});
+
+processed_data.fsr = fsr_table;
+
 % 
 % % Align data to master array
 % l = 1;
