@@ -1,6 +1,5 @@
 function the_fullpath = get_path_ui(the_trial_directory, the_pattern, the_descript, help_message, isfile)
 
-
 the_fullpath = dir(fullfile(the_trial_directory, the_pattern));
 if (~isempty(the_fullpath) && isfile)
     the_name = the_fullpath.name;

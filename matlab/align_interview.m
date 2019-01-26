@@ -8,54 +8,39 @@
 %processed_directory = get_processed_directory();
 %processed_data = get_processed_data();
 
-if (~exist('trial_directory'))
-    waitfor(warndlg('Unknown trial directory. Please select trial directory.'));
-    trial_directory = uigetdir(path,"Select directory containg raw data from the trial");
-end
-if (~exist('processed_directory'))
-    waitfor(warndlg('Unknown processed data directory. Please select processed data directory.'));
-    processed_directory = uigetdir(path,"Select directory to save processed data in.");
-end
-if ~exist('aligned_data')
-        data_file = dir(fullfile(processed_directory,'processed_data.mat'));
-    if ~isempty(data_file)
-        data_name = data_file.name;
-        data_path = data_file.folder;
-    else
-        waitfor(warndlg('Unable to automatically locate processed data file for this trial. Please find it manually. The file is usually called processed_data.mat and in the processed data directory. If the data from this trial has not been processed, please process data instead of running this script alone.'));
-        [data_name, data_path] = uigetfile('*.mat','Find processed data .mat file');
-        isdlg = 'No';
-        while (data_name(1) == 0) && strcmp(questdlg('No processed data matlab file was opened. If the data from this trial has not been processed, please process data instead of running this script alone. Do you want to keep looking for this file yourself?',''),'Yes')
-            [data_name, data_path] = uigetfile('*.mat','Find processed data .mat file');
-        end
-        if data_name(1) == 0
-            waitfor(errordlg('Aborting data processing: no processed data file'));
-            throw(MException('Custom:Custom','Failure: unable to find processed data file to add interview timestamps to'));
-        end
-    end
+trial_directory = get_trial_directory();
+processed_directory = get_processed_directory();
+processed_data = get_processed_data;
 
-    if ~contains(data_name,pathsep)
-        data_name = fullfile(data_path,data_name);
-    end
-    load (data_name);
-end
+% if (~exist('processed_directory'))
+%     waitfor(warndlg('Unknown processed data directory. Please select processed data directory.'));
+%     processed_directory = uigetdir(path,"Select directory to save processed data in.");
+% end
+% if ~exist('aligned_data')
+%         data_file = dir(fullfile(processed_directory,'processed_data.mat'));
+%     if ~isempty(data_file)
+%         data_name = data_file.name;
+%         data_path = data_file.folder;
+%     else
+%         waitfor(warndlg('Unable to automatically locate processed data file for this trial. Please find it manually. The file is usually called processed_data.mat and in the processed data directory. If the data from this trial has not been processed, please process data instead of running this script alone.'));
+%         [data_name, data_path] = uigetfile('*.mat','Find processed data .mat file');
+%         isdlg = 'No';
+%         while (data_name(1) == 0) && strcmp(questdlg('No processed data matlab file was opened. If the data from this trial has not been processed, please process data instead of running this script alone. Do you want to keep looking for this file yourself?',''),'Yes')
+%             [data_name, data_path] = uigetfile('*.mat','Find processed data .mat file');
+%         end
+%         if data_name(1) == 0
+%             waitfor(errordlg('Aborting data processing: no processed data file'));
+%             throw(MException('Custom:Custom','Failure: unable to find processed data file to add interview timestamps to'));
+%         end
+%     end
+% 
+%     if ~contains(data_name,pathsep)
+%         data_name = fullfile(data_path,data_name);
+%     end
+%     load (data_name);
+% end
 
-interview_file = dir(fullfile(trial_directory,'interview*.csv'));
-if ~isempty(interview_file)
-    interview_name = interview_file.name;
-    interview_path = interview_file.folder;
-else
-    waitfor(warndlg('Unable to automatically locate interview data for this trial. Please find it manually. The file is usually called intervew-[number].csv and in the main trial directory.'));
-    [interview_name, interview_path] = uigetfile('*.csv','Find inteview csv');
-    isdlg = 'No';
-    while (interview_name(1) == 0) && strcmp(questdlg('No interview csv was opened. Do you want to keep looking for this file yourself?',''),'Yes')
-       [interview_name, interview_path] = uigetfile('*.csv','Find interview csv');
-    end
-    if interview_name(1) == 0
-        waitfor(errordlg('Aborting data processing: no valid interview csv file'));
-        throw(MException('Custom:Custom','Failure: unable to find valid interview csv file'));
-    end
-end
+interview_file = get_path_ui(pwd, 'interview*.csv', 'interview csv', 'The file is usually called intervew-[number].csv and in the main trial directory.', true);
 
 if ~contains(interview_name,pathsep)
     interview_name = fullfile(interview_path,interview_name);
@@ -114,4 +99,4 @@ processed_data.interview = interview_table;
 %     end  
 % end
 
-save(fullfile(processed_directory, 'processed_data.mat'),'processed_data');
+%save(fullfile(processed_directory, 'processed_data.mat'),'processed_data');

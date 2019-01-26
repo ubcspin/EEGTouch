@@ -1,44 +1,25 @@
-function processed_data = process_data()
+function the_processed_data = process_data()
 
 % initialize persistent variables
-persistent trial_directory;
-persistent processed_directory;
-persistent trial_number;
-
+global trial_directory;
+global processed_directory;
+global trial_number;
+global processed_data;
 
 % select trial directory and navigate to it
-trial_directory = get_path_ui(pwd, '', 'trial directory', 'This is the directory that contains one trial worth of raw data you downloaded from the server.', false);
+trial_directory = get_trial_directory();
+processed_directory = get_processed_directory();
+processed_data = get_processed_data(processed_directory);
+trial_number = get_trial_number();
 cd(trial_directory);
 
-% enter trial number
-prompt = {'Enter trial number:'};
-    title = 'Trial number';
-    dims = [1 50];
-    % put thing anticipating here
-    definput = {'0'};
-    trial_response_cell = inputdlg(prompt,title,dims,definput);
-    trial_number = trial_response_cell{1};
-processed_data.scalars.trial_number = trial_number;
 
-% select processed data directory
-processed_directory = get_path_ui(pwd, '', 'processed data directory', 'This is the directory where processed data from this trial will be saved to.', false);
+[din_time_ms, eeg_start_time_ms] = extract_din_time();
+processed_data.scalars.din_time_ms = din_time_ms;
+processed_data.scalars.eeg_start_time_ms = eeg_start_time_ms;
 
-% prompt to select new directory if this one doesn't have write permission
-[fid, errormsg] = fopen(fullfile(processed_directory,'not_a_real_file.txt'), 'a');
-fclose(fid);
-delete(fullfile(processed_directory,'not_a_real_file.txt'));
-while strcmp(errormsg,'Permission denied')
-    msg = 'Cannot write to selected directory.';
-    msg = [msg newline newline 'Please select different directory for saving processed data.'];
-    waitfor(warndlg(msg));
-    processed_directory = get_path_ui(pwd, '', 'processed data directory', 'This is the directory where processed data from this trial will be saved to.', false);
-    [fid, errormsg] = fopen(fullfile(processed_directory,'not_a_real_file.txt'), 'a');
-    fclose(fid);
-    delete(fullfile(processed_directory,'not_a_real_file.txt'));
-end
-
-extract_din_time;
-eeg_align;
+eeg = eeg_align();
+processed_data.eeg = eeg;
 %plot_eeg_raw;
 create_timestamped_video_excerpt;
 feeltrace_align;
