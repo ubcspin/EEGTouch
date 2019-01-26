@@ -1,4 +1,4 @@
-function the_processed_data = process_data()
+%function the_processed_data = process_data()
 
 % initialize persistent variables
 global trial_directory;
@@ -26,6 +26,7 @@ feeltrace_align;
 align_interview;
 fsr_gameplay_align;
 plot_all_large;
+save_file;
 %plot_fsr_and_feeltrace;
 %save_file;
 %video_face_align;
