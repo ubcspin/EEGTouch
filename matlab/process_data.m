@@ -1,16 +1,16 @@
-%function the_processed_data = process_data()
-
 % initialize persistent variables
-global trial_directory;
-global processed_directory;
-global trial_number;
-global processed_data;
+% global trial_directory;
+% global processed_directory;
+% global trial_number;
+% global processed_data;
+% 
+% % select trial directory and navigate to it
+% trial_directory = get_trial_directory();
+% processed_directory = get_processed_directory();
+% processed_data = get_processed_data(processed_directory);
+% trial_number = get_trial_number();
 
-% select trial directory and navigate to it
-trial_directory = get_trial_directory();
-processed_directory = get_processed_directory();
-processed_data = get_processed_data(processed_directory);
-trial_number = get_trial_number();
+load_globals;
 cd(trial_directory);
 
 
