@@ -8,9 +8,7 @@
 %processed_directory = get_processed_directory();
 %processed_data = get_processed_data();
 
-trial_directory = get_trial_directory();
-processed_directory = get_processed_directory();
-processed_data = get_processed_data;
+load_globals;
 
 % if (~exist('processed_directory'))
 %     waitfor(warndlg('Unknown processed data directory. Please select processed data directory.'));
@@ -40,13 +38,13 @@ processed_data = get_processed_data;
 %     load (data_name);
 % end
 
-interview_file = get_path_ui(pwd, 'interview*.csv', 'interview csv', 'The file is usually called intervew-[number].csv and in the main trial directory.', true);
+interview_name = get_path_ui(pwd, 'interview*.csv', 'interview csv', 'The file is usually called intervew-[number].csv and in the main trial directory.', true);
 
-if ~contains(interview_name,pathsep)
-    interview_name = fullfile(interview_path,interview_name);
-end
+% if ~contains(interview_name,pathsep)
+%     interview_name = fullfile(interview_path,interview_name);
+% end
 
-f = waitbar(0.5,'Importing interview data','Name','Data Processing');
+%f = waitbar(0.5,'Importing interview data','Name','Data Processing');
 
 fid = fopen(interview_name, 'rt', 'n', 'UTF16LE');
 fread(fid, 2, '*uint8');   %adjust the 2 to fit the UTF encoding
