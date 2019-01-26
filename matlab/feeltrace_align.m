@@ -19,14 +19,15 @@ feeltrace_videoTimestamp = get_numerical_csv_column(filename, 9);
 feeltrace_joystick = feeltrace_joystick(2:end);
 feeltrace_videoTimestamp = feeltrace_videoTimestamp(2:end);
 
+
 % %find where video actually starts playing, remove data before
 % vid_start_index = find(feeltrace_videoTimestamp > 0, 1)+1;
 % feeltrace_joystick = feeltrace_joystick(vid_start_index:end);
 % feeltrace_videoTimestamp = feeltrace_videoTimestamp(vid_start_index:end);
 
-%% move to single matrix!!
-feeltrace_joystick = feeltrace_joystick(feeltrace_videoTimestamp > 0);
-feeltrace_videoTimestamp = feeltrace_videoTimestamp(feeltrace_videoTimestamp > 0);
+vid_start_index = find(feeltrace_videoTimestamp >0, 1)+1;
+feeltrace_joystick = feeltrace_joystick(vid_start_index:end);
+feeltrace_videoTimestamp = feeltrace_videoTimestamp(vid_start_index:end)
 
 %convert to milliseconds, subtract sync offset and round to integer
 feeltrace_round_times_ms = round((feeltrace_videoTimestamp*1000 - (processed_data.scalars.sync_frame*1000 / processed_data.scalars.frame_rate)));

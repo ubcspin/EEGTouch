@@ -1,5 +1,4 @@
 function [exit_code] = process_data()
-exit_code = 1;
 
 % initialize persistent variables
 persistent trial_directory;
