@@ -47,6 +47,12 @@ end
 clearvars title;
 feeltrace_data = smooth(feeltrace_data, 101);
 
+A0_data = smooth(A0_data, 30);
+A1_data = smooth(A1_data, 30);
+A2_data = smooth(A2_data, 30);
+A3_data = smooth(A3_data, 30);
+A4_data = smooth(A4_data, 30);
+
 max_ft = max(feeltrace_data);
 ratio = max([max(A0_data) max(A1_data) max(A2_data) max(A3_data) max(A4_data)])/max(feeltrace_data);
 fig = figure(1);
@@ -54,23 +60,23 @@ pos1 = [0.1 0.1 0.7 0.8];
 subplot('Position',pos1);
 title(strcat("FSR and Feeltrace data for participant ", trial_number));
 hold on;
-%set(figure,'defaultAxesColorOrder',[[0 0 0]; [0 0 0]]);
-plot(fsr_timestamps,A0_data/ratio,'Color',[0.2 1 0.2]);
-plot(fsr_timestamps,A1_data/ratio,'Color',[0.2 0.2 1]);
-plot(fsr_timestamps,A2_data/ratio,'Color',[1 1 0.2]);
-plot(fsr_timestamps,A3_data/ratio,'Color',[0.2 1 1]);
-plot(fsr_timestamps,A4_data/ratio,'Color',[1 0.2 1]);
+%%%set(figure,'defaultAxesColorOrder',[[0 0 0]; [0 0 0]]);
+area(fsr_timestamps,A0_data/ratio,'FaceColor',[0 1 0], 'EdgeColor', [0 1 0], 'FaceAlpha', 0.5, 'EdgeAlpha', 0.5);
+area(fsr_timestamps,A1_data/ratio,'FaceColor',[0 0 1], 'EdgeColor',[0 0 1], 'FaceAlpha', 0.5, 'EdgeAlpha', 0.5);
+area(fsr_timestamps,A2_data/ratio,'FaceColor',[1 1 0], 'EdgeColor',[1 1 0], 'FaceAlpha', 0.5, 'EdgeAlpha', 0.5);
+area(fsr_timestamps,A3_data/ratio,'FaceColor',[0 1 1], 'EdgeColor',[0 1 1], 'FaceAlpha', 0.5, 'EdgeAlpha', 0.5);
+area(fsr_timestamps,A4_data/ratio,'FaceColor',[1 0 1], 'EdgeColor',[1 0 1], 'FaceAlpha', 0.5, 'EdgeAlpha', 0.5);
 ylabel('Intensity of keypress');
-yticks([])
-plot(feeltrace_timestamps,feeltrace_data,'Color',[0 0 0],'LineWidth',1);
-plot(feeltrace_timestamps,feeltrace_data,'Color',[1 1 1],'LineWidth',6.5);
-plot(feeltrace_timestamps,feeltrace_data,'Color',[0 0 0],'LineWidth',3);
-hold off;
+%yticks([])
+%%%plot(feeltrace_timestamps,feeltrace_data,'Color',[0 0 0],'LineWidth',1);
+%plot(feeltrace_timestamps,feeltrace_data,'Color',[1 1 1],'LineWidth',6.5);
+%plot(feeltrace_timestamps,feeltrace_data,'Color',[0 0 0],'LineWidth',3);
+%hold off;
 
 yyaxis right
 ax = get(gcf,'CurrentAxes');
 ax.YAxis(2).Color = 'black';
-plot(feeltrace_timestamps,feeltrace_data,'Color',[0 0 0]);
+%plot(feeltrace_timestamps,feeltrace_data,'Color',[0 0 0]);
 yticks([0 max_ft])
 yticklabels({'Relief','Stress'})
 ylabel('Feeltrace from stres to relief')
@@ -106,4 +112,4 @@ print(fullfile(processed_directory,['fsr_and_feeltrace-large' char(trial_number)
 
 close(f);
 %clf('reset');
-clearvars f feeltrace_timestamps feeltrace_data fsr_timestamps A0_data A1_data A2_data A3_data A4_data k a0i fti;
+%clearvars f feeltrace_timestamps feeltrace_data fsr_timestamps A0_data A1_data A2_data A3_data A4_data k a0i fti;
