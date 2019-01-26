@@ -22,4 +22,4 @@ stamps = ones(length(eeg_data),1);
 stamps(1) = 0;
 stamps = cumsum(stamps);
 eeg_table = table(stamps,eeg_data,'VariableNames',{'timestamp_ms','eeg'});
-eeg = eeg_table;
+processed_data.eeg = eeg_table;
