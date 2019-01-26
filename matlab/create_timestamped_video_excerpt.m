@@ -17,26 +17,35 @@
 % cue up video. I am working remotely and do not have a non-Windows
 % computer available for testing. If you do not have VLC download it.
 
-video_file = dir(fullfile(trial_directory,'gameplay*.mov'));
-if ~isempty(video_file)
-    video_name = video_file.name;
-    video_path = video_file.folder;
-else
-    waitfor(warndlg('Unable to automatically locate gameplay video for this trial. Please find it manually. The file is usually called gameplay-[number].mov and in the main trial directory.'));
-    [video_name, video_path] = uigetfile('*.mov','Find gameplay mov');
-    isdlg = 'No';
-    while (video_name(1) == 0) && strcmp(questdlg('No gameplay video file was opened. Do you want to keep looking for this file yourself?',''),'Yes')
-       [video_name, video_path] = uigetfile('*.mov','Find gameplay mov');
-    end
-    if video_name(1) == 0
-        waitfor(errordlg('Aborting data processing: no valid gameplay video file'));
-        throw(MException('Custom:Custom','Failure: unable to find valid gameplay video file'));
-    end
+% If no trial directory variable, try current directory.
+if ~exist('trial_directory', 'var')
+    global trial_directory;
+    trial_directory = get_path_ui(pwd, '', 'trial directory', 'This is the directory that contains one trial worth of raw data you downloaded from the server.', false);
 end
 
-if ~contains(video_name,pathsep)
-    video_name = fullfile(video_path,video_name);
-end
+% Get video - find in directory or from UI dialog.
+video_name = get_path_ui(trial_directory, 'gameplay*.mov', 'gameplay video', 'The file is usually called gameplay-[number].mov and in the main trial directory.',true);
+
+% video_file = dir(fullfile(trial_directory,'gameplay*.mov'));
+% if ~isempty(video_file)
+%     video_name = video_file.name;
+%     video_path = video_file.folder;
+% else
+%     waitfor(warndlg('Unable to automatically locate gameplay video for this trial. Please find it manually. The file is usually called gameplay-[number].mov and in the main trial directory.'));
+%     [video_name, video_path] = uigetfile('*.mov','Find gameplay mov');
+%     isdlg = 'No';
+%     while (video_name(1) == 0) && strcmp(questdlg('No gameplay video file was opened. Do you want to keep looking for this file yourself?',''),'Yes')
+%        [video_name, video_path] = uigetfile('*.mov','Find gameplay mov');
+%     end
+%     if video_name(1) == 0
+%         waitfor(errordlg('Aborting data processing: no valid gameplay video file'));
+%         throw(MException('Custom:Custom','Failure: unable to find valid gameplay video file'));
+%     end
+% end
+% 
+% if ~contains(video_name,pathsep)
+%     video_name = fullfile(video_path,video_name);
+% end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % SET DURATION TO PROCESS
@@ -63,7 +72,7 @@ else
 end
 
 vid_reader = VideoReader(video_name);
-scalars.frame_rate = vid_reader.FrameRate;
+processed_data.scalars.frame_rate = vid_reader.FrameRate;
 seconds_to_process = [];
 start_time_sec = [];
 while isempty(seconds_to_process) || isempty(start_time_sec) || seconds_to_process < 0 || seconds_to_process > 60 || start_time_sec < 0 || start_time_sec > seconds_to_process + vid_reader.Duration
@@ -75,7 +84,7 @@ while isempty(seconds_to_process) || isempty(start_time_sec) || seconds_to_proce
     if ~isempty(answer)
         start_time_sec = str2num(answer{1});
         seconds_to_process = str2num(answer{2});
-        scalars.which_gameplay_sync = str2num(answer{3});
+        processed_data.scalars.which_gameplay_sync = str2num(answer{3});
         
     end
     if (isempty(answer) || isempty(seconds_to_process) || isempty(start_time_sec) || seconds_to_process < 0 || seconds_to_process > 60 || start_time_sec < 0 || start_time_sec > seconds_to_process + vid_reader.Duration) && ~strcmp(questdlg(['Invalid parameters for video excerpt. Please select a duration of <60 and a start second between 0 and ' num2str(vid_reader.Duration) '. Do you want to try entering different parameters'],''),'Yes')
@@ -86,15 +95,24 @@ end
 
 quality_to_export = 50; % out of 100
 
-frame_rate = 30; %% could move this to scalars
+frame_rate = 30; %% could move this to processed_data.scalars
 
 
 f = waitbar(0.4,'Processing video','Name','Data Processing');
 
 % initialize video reader
 vid_reader = VideoReader(video_name);
+
+
 % set time
-vid_reader.CurrentTime = start_time_sec;
+%vid_reader.CurrentTime = start_time_sec;
+
+k = 1;
+while k < start_time_sec * frame_rate && hasFrame(vid_reader)
+    readFrame(vid_reader);
+    k = k+1;
+end
+
 % export video the same size as it's read
 vid_height = vid_reader.Height;
 vid_width = vid_reader.Width;
@@ -108,17 +126,18 @@ temp_movie = struct('cdata',zeros(vid_height,vid_width,3,'uint8'),...
 
 % loop through read video for specified number of seconds, using frame rate.
 % do not attempt to seek beyond the end of the video
-k = 1;
-while k < seconds_to_process * frame_rate && hasFrame(vid_reader)
-    temp_movie(k).cdata = insertText(readFrame(vid_reader),[text_offset 1], ['frame ' num2str(k+start_time_sec*frame_rate)], 'FontSize', 50, 'BoxColor', 'black', 'TextColor', 'white');
+l = 1;
+while k < (start_time_sec + seconds_to_process) * frame_rate && hasFrame(vid_reader)
+    temp_movie(l).cdata = insertText(readFrame(vid_reader),[text_offset 1], ['frame ' num2str(k)], 'FontSize', 50, 'BoxColor', 'black', 'TextColor', 'white');
     k = k+1;
+    l = l+1;
 end
 
 % initialize write object to save excerpt
 if contains(video_name,pathsep)
     video_name = video_name(strfind(video_name,pathsep):end);
 end
-proc_vid_name = strcat('gameplay-',trial_number,'-procvid-start-',num2str(start_time_sec),'-len-',num2str(seconds_to_process));
+proc_vid_name = strcat('gameplay-',processed_data.scalars.trial_number,'-procvid-start-',num2str(start_time_sec),'-len-',num2str(seconds_to_process));
 proc_vid_name = char(fullfile(processed_directory, proc_vid_name));
 % set quality
 vid_out = VideoWriter(proc_vid_name);
@@ -169,6 +188,6 @@ while sync_frame < 0 || sync_frame > vid_reader.Duration*30
     end
 end
 
-scalars.sync_frame = sync_frame;
+processed_data.scalars.sync_frame = sync_frame;
 waitfor(helpdlg('Sync frame saved.'));
 %clearvars vid_reader status isdlg frame_rate video_path start_time_sec sync_frame prompt title dims definput answer vid_name proc_vid_name prompt title dims definput answer video_file video_name isdlg frame_rate oldpath;
