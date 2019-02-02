@@ -2,10 +2,7 @@
 %and compile concise array of feeltrace data and timestamps
 %name of feeltrace file
 % If no trial directory variable, try current directory.
-if ~exist('trial_directory', 'var')
-    global trial_directory;
-    trial_directory = get_path_ui(pwd, '', 'trial directory', 'This is the directory that contains one trial worth of raw data you downloaded from the server.', false);
-end
+load_globals;
 
 % Get csv - find in directory or from UI dialog.
 feeltrace_file = get_path_ui(trial_directory, 'feeltrace*.csv', 'feeltrace .csv file', 'The file is usually called feeltrace-[number].csv and in the main trial directory.',true);
@@ -19,14 +16,15 @@ feeltrace_videoTimestamp = get_numerical_csv_column(filename, 9);
 feeltrace_joystick = feeltrace_joystick(2:end);
 feeltrace_videoTimestamp = feeltrace_videoTimestamp(2:end);
 
+
 % %find where video actually starts playing, remove data before
 % vid_start_index = find(feeltrace_videoTimestamp > 0, 1)+1;
 % feeltrace_joystick = feeltrace_joystick(vid_start_index:end);
 % feeltrace_videoTimestamp = feeltrace_videoTimestamp(vid_start_index:end);
 
-%% move to single matrix!!
-feeltrace_joystick = feeltrace_joystick(feeltrace_videoTimestamp > 0);
-feeltrace_videoTimestamp = feeltrace_videoTimestamp(feeltrace_videoTimestamp > 0);
+vid_start_index = find(feeltrace_videoTimestamp >0, 1)+1;
+feeltrace_joystick = feeltrace_joystick(vid_start_index:end);
+feeltrace_videoTimestamp = feeltrace_videoTimestamp(vid_start_index:end);
 
 %convert to milliseconds, subtract sync offset and round to integer
 feeltrace_round_times_ms = round((feeltrace_videoTimestamp*1000 - (processed_data.scalars.sync_frame*1000 / processed_data.scalars.frame_rate)));

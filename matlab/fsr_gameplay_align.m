@@ -1,9 +1,7 @@
 % Import FSR data and align to EEG.
 
 % If no trial directory variable, try current directory.
-if ~exist('trial_directory')
-    trial_directory = pwd;
-end
+load_globals;
 
 % Get FSR gameplay csv - find in directory or from UI dialog.
 fsr_file = get_path_ui(trial_directory, 'gameplay*.csv', 'gameplay .csv file', 'The file is usually called gameplay-[number].csv and in the main trial directory.', true);
@@ -36,8 +34,7 @@ gameplay_fromsync(:,6) = gameplay_fromsync(:,6) - gameplay_fromsync(1,6);
 gameplay_fromsync = remove_time_nodiffs(gameplay_fromsync, gameplay_fromsync(:,6));
 
 % Remove data from timestamps after end of EEG data.
-eeg_stamps = processed_data.eeg(1,:);
-eeg_endstamp = eeg_stamps(end);
+eeg_endstamp = processed_data.eeg.timestamp_ms(end);
 ind_timestamp_after_eeg_end = find(gameplay_fromsync(:,6) > eeg_endstamp);
 if ~isempty(ind_timestamp_after_eeg_end)
     gameplay_fromsync = gameplay_fromsync(1:ind_timestamp_after_eeg_end,:);

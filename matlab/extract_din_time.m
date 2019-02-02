@@ -1,11 +1,10 @@
-function [din_time_ms, eeg_start_time_ms] = extract_din_time()
 %extract din time offset from netstation-generated XML files
 %highly specific to our extraction settings
 %times saved to processed_data.scalars.eeg_start_time_ms
 %and processed_data.scalars.din_time_ms
 
 % If no trial directory variable, try current directory.
-trial_directory = get_trial_directory;
+load_globals;
 
 % Get DIN1 xml and info xml - find in directory or from UI dialog.
 din_name = get_path_ui(trial_directory, fullfile('*mff','Events_DIN1.xml'), 'DIN1 xml file', 'The file is usually called Events_DIN1.xml and in a date-stamped folder ending with mff inside the main trial directory.',true);
@@ -63,4 +62,3 @@ din_time_ms = dins(which_din);
 processed_data.scalars.din_time_ms  = din_time_ms;
 eeg_start_time_ms = microsecs + secs*1000000 + mins*1000000*60;
 processed_data.scalars.eeg_start_time_ms = eeg_start_time_ms;
-end
