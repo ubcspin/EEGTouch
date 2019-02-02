@@ -17,11 +17,8 @@
 % cue up video. I am working remotely and do not have a non-Windows
 % computer available for testing. If you do not have VLC download it.
 
-% If no trial directory variable, try current directory.
-if ~exist('trial_directory', 'var')
-    global trial_directory;
-    trial_directory = get_path_ui(pwd, '', 'trial directory', 'This is the directory that contains one trial worth of raw data you downloaded from the server.', false);
-end
+% nsure variables are loaded.
+load_globals;
 
 % Get video - find in directory or from UI dialog.
 video_name = get_path_ui(trial_directory, 'gameplay*.mov', 'gameplay video', 'The file is usually called gameplay-[number].mov and in the main trial directory.',true);
@@ -51,7 +48,7 @@ video_name = get_path_ui(trial_directory, 'gameplay*.mov', 'gameplay video', 'Th
 % SET DURATION TO PROCESS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % initialize video reader
-waitfor(helpdlg('Attempting to play video with VLC. Please watch the video carefully to determine if the sync button was pressed multiple times, and if so, determine which of th multiple button presses corresponds with the correct DIN in the EEG data. Please eyeball a start time in seconds and duration in seconds that would include the sync frame (when the sync button changes color, for the sync instance you want).'));
+%waitfor(helpdlg('Attempting to play video with VLC. Please watch the video carefully to determine if the sync button was pressed multiple times, and if so, determine which of th multiple button presses corresponds with the correct DIN in the EEG data. Please eyeball a start time in seconds and duration in seconds that would include the sync frame (when the sync button changes color, for the sync instance you want).'));
 
 %Attempting to play video.
 
@@ -63,12 +60,12 @@ waitfor(helpdlg('Attempting to play video with VLC. Please watch the video caref
     end
 elseif convertCharsToStrings(computer) == "MACI64"
     try
-        status = system(['open -a vlc ' video_name '.avi']);
+        status = system(['open -a vlc ' video_name '.mov']);
     catch ME
-        waitfor(errordlg(['Error trying to open video on VLC. Please open ' video_name '.avi manually to view video then return to Matlab.']));
+        waitfor(errordlg(['Error trying to open video on VLC. Please open ' video_name '.mov manually to view video then return to Matlab.']));
     end
 else
-     disp(['Video not automatically opened on this system type. Please open ' video_name '.avi manually to view video then return to Matlab.']);
+     disp(['Video not automatically opened on this system type. Please open ' video_name '.mov manually to view video then return to Matlab.']);
 end
 
 vid_reader = VideoReader(video_name);
@@ -98,7 +95,6 @@ quality_to_export = 50; % out of 100
 frame_rate = 30; %% could move this to processed_data.scalars
 
 
-f = waitbar(0.4,'Processing video','Name','Data Processing');
 
 % initialize video reader
 vid_reader = VideoReader(video_name);
@@ -150,7 +146,7 @@ writeVideo(vid_out, temp_movie);
 close(vid_out);
 
 clearvars seconds_to_process start_time quality_to_export vid_height vid_width text_offset temp_movie k vid_out;
-close(f);
+%close(f);
 waitfor(helpdlg('Attempting to play the video we just processed. Please find the frame number for the FIRST FRAME WHEN THE SYNC BUTTON CHANGES COLOR (for the sync instance you want) then close the video player and return to Matlab.'));
 
 %This is only executed if you have a 64-bit Windows PC and VLC is on your

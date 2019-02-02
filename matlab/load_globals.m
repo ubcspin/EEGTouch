@@ -35,13 +35,15 @@ if isfile(fullfile(processed_directory,'processed_data.mat'))
     t_processed_data = processed_data;
     t_fieldnames = fieldnames(t_processed_data);
     open(fullfile(processed_directory,'processed_data.mat'));
-    for i = numel(t_fieldnames)
-        if strcmp(t_fieldnames{i},'scalars');
-            processed_data.(t_fieldnames{i}) = t_processed_data.(t_fieldnames{i});
-        else
-            t_scalar_fieldnames = fields(t_processed_data.scalars);
-            for j = numel(t_scalar_fieldnames)
-                processed_data.scalars.(t_scalar_fieldnames{i}) = t_processed_data.scalars.(t_struct_fieldnames{i});
+    if ~isempty(t_fieldnames)
+        for i = numel(t_fieldnames)
+            if strcmp(t_fieldnames{i},'scalars')
+                processed_data.(t_fieldnames{i}) = t_processed_data.(t_fieldnames{i});
+            else
+                t_scalar_fieldnames = fields(t_processed_data.scalars);
+                for j = numel(t_scalar_fieldnames)
+                    processed_data.scalars.(t_scalar_fieldnames{i}) = t_processed_data.scalars.(t_scalar_fieldnames{i});
+                end
             end
         end
     end
@@ -61,6 +63,6 @@ if ~exist('trial_number', 'var')
         trial_number = trial_response_cell{1};
     end
 end
-processed_data.scalars.trial_number = trial_number{1};
+processed_data.scalars.trial_number = trial_number;
 
 

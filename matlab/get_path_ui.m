@@ -1,6 +1,9 @@
 function the_fullpath = get_path_ui(the_trial_directory, the_pattern, the_descript, help_message, isfile)
 
 the_fullpath = dir(fullfile(the_trial_directory, the_pattern));
+the_split = strsplit(the_pattern, '.');
+the_ext = the_split(end);
+the_type = fullfile(the_trial_directory,['*.' char(the_ext)]);
 if (~isempty(the_fullpath) && isfile)
     the_name = the_fullpath.name;
     the_path = the_fullpath.folder;
@@ -9,9 +12,6 @@ else
         msg = ['Unable to automatically locate ' the_descript '. Please find it manually.'];
         msg = [msg newline newline help_message];
         waitfor(warndlg(msg, 'Cannot Find Path'));
-        the_split = strsplit(the_pattern, '.');
-        the_ext = the_split(end);
-        the_type = ['*.' char(the_ext)];
         [the_name, the_path] = uigetfile(the_type, ['Find ' the_descript]);
     else
         msg = ['Please select ' the_descript '.' newline newline help_message];
@@ -22,7 +22,7 @@ else
     %isdlg = 'No';
     while the_path(1) == 0 && strcmp(questdlg(['No ' the_descript ' was selected. Do you want to keep looking for this yourself?'],'Cannot Find Path','Yes','No','Yes'),'Yes')
        if isfile
-        [the_name, the_path] = uigetfile(file_type,['Find ' the_descript]);
+        [the_name, the_path] = uigetfile(the_type,['Find ' the_descript]);
        else
         the_path = uigetdir(the_trial_directory, ['Find ' the_descript]);
        end

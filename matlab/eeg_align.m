@@ -1,6 +1,4 @@
-function eeg = eeg_align()
-% If no trial directory variable, try current directory.
-trial_directory = get_trial_directory();
+load_globals;
 
 % get matlab EEG file - find in directory or from UI dialog.
 eeg_name = get_path_ui(trial_directory, '*201*.mat', 'EEG Matlab data', 'The file is usually named with a date and time stamp with the extension .mat and in the main trial directory.',true);
@@ -22,4 +20,4 @@ stamps = ones(length(eeg_data),1);
 stamps(1) = 0;
 stamps = cumsum(stamps);
 eeg_table = table(stamps,eeg_data,'VariableNames',{'timestamp_ms','eeg'});
-eeg = eeg_table;
+processed_data.eeg = eeg_table;
