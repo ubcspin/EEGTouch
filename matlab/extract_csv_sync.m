@@ -1,5 +1,5 @@
 % Gets sync index and sync epochtime from gameplay csv file
-function [sync_index, sync_epochtime] = extract_csv_sync(file_name, which_sync)
+function sync_output = extract_csv_sync(file_name)
 delimiter = ',';
 % Read columns of data as text:
 formatSpec = '%s%[^\n\r]';
@@ -9,16 +9,20 @@ fileID = fopen(file_name,'r');
 dataArray = textscan(fileID, formatSpec, 'Delimiter', delimiter, 'TextType', 'string',  'ReturnOnError', false);
 % Close the csv text file.
 fclose(fileID);
-if (which_sync == 1)
-    sync_index = find(strlength(dataArray{1}) > 4);
+
+% Find indices of syncs.
+sync_indices = find(strlength(dataArray{1}) > 4);
+% Find strings at sync indices.
+sync_strings = dataArray{1}(sync_indices);
+% Split strings to find epochtimes in string format
+sync_epochtimes_split = split(sync_strings,"t");
+% Take just the latter part of the split.
+if length(sync_strings) > 1
+    sync_epochtimes_str = sync_epochtimes_split(:,2);
 else
-    sync_indices = find(strlength(dataArray{1}) > 4);
-    if which_sync > length(sync_indices)
-        throw(MException('Custom:Custom',['Failure: Sync index provided exceeds number of sync signals in csv file']));
-    end
-    sync_index = sync_indices(which_sync);
+    sync_epochtimes_str = sync_epochtimes_split(2);
 end
-sync_string = dataArray{1}(sync_index);
-sync_epochtime_split = strsplit(sync_string,'t');
-sync_epochtime = str2double(sync_epochtime_split(end));
-end
+% Convert epochtimes into numbers.
+sync_epochtimes = str2num(sync_epochtimes_str);
+
+sync_output = [sync_indices sync_epochtimes]
