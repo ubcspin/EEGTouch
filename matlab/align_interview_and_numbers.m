@@ -1,3 +1,5 @@
+%% THIS CODE IS IN PROGRESS AND DOES NOT WORK
+
 % extract unique-timestamp interview data and timestamps
 % and compile concise array
 % name of interview file
