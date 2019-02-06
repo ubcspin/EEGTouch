@@ -78,6 +78,10 @@ end
 % Frame-number-finding video is at 50% quality..
 quality_to_export = 50; % out of 100
 
+frame_rate = 30; %% could move this to processed_data.scalars
+
+
+
 % initialize video reader
 vid_reader = VideoReader(video_name);
 
@@ -86,7 +90,7 @@ vid_reader = VideoReader(video_name);
 %vid_reader.CurrentTime = start_time_sec;
 
 k = 1;
-while k < start_time_sec * processed_data.scalars.frame_rate && hasFrame(vid_reader)
+while k < start_time_sec * frame_rate && hasFrame(vid_reader)
     readFrame(vid_reader);
     k = k+1;
 end
@@ -105,7 +109,7 @@ temp_movie = struct('cdata',zeros(vid_height,vid_width,3,'uint8'),...
 % loop through read video for specified number of seconds, using frame rate.
 % do not attempt to seek beyond the end of the video
 l = 1;
-while k < (start_time_sec + seconds_to_process) * processed_data.scalars.frame_rate && hasFrame(vid_reader)
+while k < (start_time_sec + seconds_to_process) * proceframe_rate && hasFrame(vid_reader)
     temp_movie(l).cdata = insertText(readFrame(vid_reader),[text_offset 1], ['frame ' num2str(k)], 'FontSize', 50, 'BoxColor', 'black', 'TextColor', 'white');
     k = k+1;
     l = l+1;
@@ -169,4 +173,4 @@ end
 processed_data.scalars.sync_frame = sync_frame;
 waitfor(helpdlg('Sync frame saved.'));
 
-clearvars answer definput dims proc_vid_name prompt start_time_sec status sync_frame title vid_reader video_name
+clearvars answer definput dims frame_rate l proc_vid_name prompt start_time_sec status sync_frame title vid_reader video_name
