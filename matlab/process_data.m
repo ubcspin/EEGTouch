@@ -1,4 +1,3 @@
-
 load_globals;
 extract_din_time;
 eeg_align;
