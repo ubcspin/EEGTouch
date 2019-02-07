@@ -11,9 +11,10 @@ interview_name = get_path_ui(trial_directory, 'interview*.csv', 'interview csv',
 
 % Extract text from the csv file.
 fid = fopen(interview_name, 'rt', 'n', 'UTF16LE');
-fread(fid, 2, '*uint8');   %adjust the 2 to fit the UTF encoding
+status = fread(fid, 2, '*uint8');   %adjust the 2 to fit the UTF encoding
 filecontent = fread(fid, [1 inf], '*char');
 datacell = textscan(filecontent, '%s%s%s%s%s%s', 'Delimiter', '	', 'HeaderLines', 1);
+status = fclose(fid);
 a = size(datacell{1}); 
 num_markers = a(1);
 interview_comments = strings(num_markers);
@@ -49,3 +50,5 @@ interview_ms_timestamps = round(interview_ms_timestamps - processed_data.scalars
 interview_table = table(interview_ms_timestamps, interview_comments.', 'VariableNames', {'timestamp_ms','label'});
 
 processed_data.interview = interview_table;
+
+clearvars a datacell fid filecontent frames int_timestamp int_timestamp_strings interview_comments interview_ms_timestamps interview_name interview_table k l mins num_markers secs status
