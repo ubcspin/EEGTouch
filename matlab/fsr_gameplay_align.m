@@ -94,4 +94,4 @@ fsr_table = table(gameplay_fromsync(:,6), gameplay_fromsync(:,1), gameplay_froms
 
 processed_data.fsr = fsr_table;
 
-clearvars A0_raw eeg_endstamp filename fsr_file fsr_table gameplay_fromsync has_gameplaysync i ind_timestamp_after_eeg_end more_syncs sync_pair syncs t_fieldnames
+clearvars A0_raw eeg_endstamp filename fsr_file fsr_table gameplay_fromsync has_gameplaysync i ind_timestamp_after_eeg_end more_syncs sync_pair syncs t_fieldnames NO_TRIAL_HAS_MORE_SYNC_BUTTON_PRESSES_THAN

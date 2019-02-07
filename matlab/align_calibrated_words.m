@@ -44,7 +44,11 @@ while k <= num_markers
             the_timestamp = round((str2num(mins)*60*1000) + (str2num(secs)*1000) + (str2num(frames)*1000/30));
             calib_ms_timestamps(l) = the_timestamp;
             
-            l = l+1;
+            % Does not increment index if word is determined
+            % Skips determined because of bad synonyms.
+            if ~strcmp(calib_word_cell{1},'Determined')
+                l = l+1;
+            end
         end
     end
     k = k+1;
