@@ -6,13 +6,13 @@ load_globals;
 
 interview_name = get_path_ui(pwd, 'interview*.csv', 'interview csv', 'The file is usually called intervew-[number].csv and in the main trial directory.', true);
 
-fid = fopen(interview_name, 'rt', 'n', 'ascii');
+fid = fopen(interview_name, 'rt', 'n', 'UTF16LE');
 fread(fid, 2, '*uint8');   %adjust the 2 to fit the UTF encoding
 filecontent = fread(fid, [1 inf], '*char');
-datacell = textscan(filecontent, '%s%s%s%s%s%s', 'Delimiter', ',', 'HeaderLines', 1);
+datacell = textscan(filecontent, '%s%s%s%s%s%s', 'Delimiter', '	', 'HeaderLines', 1);
 a = size(datacell{1}); 
 num_markers = a(1);
-% interview_comments = strings(num_markers);
+interview_comments = strings(num_markers);
 interview_ms_timestamps = zeros(num_markers,1);
 interview_scales = zeros(num_markers, 1);
 k = 1;
@@ -26,12 +26,8 @@ while k <= num_markers
         int_timestamp = round((str2num(mins{1})*60*1000) + (str2num(secs{1})*1000) + (str2num(frames{1})*1000/30));
         if ~(int_timestamp == 0)
             interview_ms_timestamps(l) = int_timestamp;
-%             interview_comments(l) = datacell{2}{l};
-            if datacell{2}{l} == ""
-                interview_scales(l) = 11;
-            else
-                interview_scales(l) = str2num(datacell{2}{l});
-            end
+            interview_comments(l) = datacell{2}{l};
+            interview_scales(l) = datacell{3}{l};
             l = l+1;
         end
     end
@@ -39,8 +35,7 @@ while k <= num_markers
 end
 
 interview_ms_timestamps = interview_ms_timestamps(1:find(interview_ms_timestamps,1,'last'));
-% interview_comments = interview_comments(1:length(interview_ms_timestamps));
-interview_scales = interview_scales(1:length(interview_ms_timestamps));
+interview_comments = interview_comments(1:length(interview_ms_timestamps));
 interview_ms_timestamps = round(interview_ms_timestamps - processed_data.scalars.sync_frame*1000 / processed_data.scalars.frame_rate);
-interview_table = table(interview_ms_timestamps, interview_scales, 'VariableNames', {'timestamp_ms','label'});
+interview_table = table(interview_ms_timestamps, interview_comments.', 'VariableNames', {'timestamp_ms','label'});
 processed_data.interview = interview_table;
