@@ -4,7 +4,7 @@ the_fullpath = dir(fullfile(the_trial_directory, the_pattern));
 the_split = strsplit(the_pattern, '.');
 the_ext = the_split(end);
 the_type = fullfile(the_trial_directory,['*.' char(the_ext)]);
-if (~isempty(the_fullpath) && isfile)
+if (~isempty(the_fullpath))
     the_name = the_fullpath.name;
     the_path = the_fullpath.folder;
 else
@@ -32,11 +32,5 @@ else
         throw(MException('Custom:Custom',['Failure: unable to find valid ' the_descript '.']));
     end
 end
-
-if isfile
-    the_fullpath = fullfile(the_path,the_name);
-else
-    the_fullpath = the_path;
-end
-
+the_fullpath = fullfile(the_path,the_name);
 end
