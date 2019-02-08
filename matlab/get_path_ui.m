@@ -4,9 +4,36 @@ the_fullpath = dir(fullfile(the_trial_directory, the_pattern));
 the_split = strsplit(the_pattern, '.');
 the_ext = the_split(end);
 the_type = fullfile(the_trial_directory,['*.' char(the_ext)]);
-if (~isempty(the_fullpath) && isfile)
-    the_name = the_fullpath.name;
-    the_path = the_fullpath.folder;
+if ~strcmp(the_pattern,'') && ~isempty(the_fullpath) %if a pattern is given, and it's matched
+    [fp_size, ~] = size(the_fullpath);
+    if fp_size > 1 %&& ~empty(the_pattern)
+        if isfile
+            file_or_folder = 'file';
+        else
+            file_or_folder = 'folder';
+        end
+        msg = [{['More than one ' file_or_folder ' matches the pattern ' the_pattern '. Please select the appropriate ' the_descript ' to use.']} {''} {help_message} {''} {''} {''} {''}];
+        title = ['Select ' file_or_folder];
+        list = {};
+        for i = 1:fp_size
+            list{end+1} = the_fullpath(i).name;
+        end
+        tf = false;
+        while ~tf
+            [indx,tf] = listdlg('PromptString',msg,'Name',title,'ListSize',[200,100],'SelectionMode','single','ListString',list);
+            if ~tf
+                if strcmp(questdlg(['No ' the_descript ' selected. Do you want to try again?'],['No ' the_descript ' selected'],'Yes','No','Yes'),'No')
+                    waitfor(errordlg(['Aborting data processing: refusal to choose a ' the_descript ' when more than one exists.'], 'Did Not Choose'));
+                    throw(MException('Custom:Custom',['Failure: unable to choose a ' the_descript '.']));
+                end
+            end
+        end
+        the_name = the_fullpath(indx).name;
+        the_path = the_fullpath(indx).folder;
+    else
+        the_name = the_fullpath.name;
+        the_path = the_fullpath.folder;
+    end
 else
     if isfile
         msg = ['Unable to automatically locate ' the_descript '. Please find it manually.'];
@@ -32,11 +59,5 @@ else
         throw(MException('Custom:Custom',['Failure: unable to find valid ' the_descript '.']));
     end
 end
-
-if isfile
-    the_fullpath = fullfile(the_path,the_name);
-else
-    the_fullpath = the_path;
-end
-
+the_fullpath = fullfile(the_path,the_name);
 end

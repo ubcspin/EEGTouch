@@ -1,6 +1,6 @@
 % Import FSR data and align to EEG.
 
-% If no trial directory variable, try current directory.
+% Ensure trial directory, processed directory, trial data, are all loaded.
 load_globals;
 
 % Get FSR gameplay csv - find in directory or from UI dialog.
@@ -22,8 +22,58 @@ gameplay_fromsync(:,4) = get_numerical_csv_column(filename, 4);
 gameplay_fromsync(:,5) = get_numerical_csv_column(filename, 5);
 
 % Extract sync time and sync index from csv.
-% If more than one sync, get sync as specified in processed_data.scalars.
-[processed_data.scalars.gameplay_sync_index, processed_data.scalars.gameplay_sync_epochtime]  = extract_csv_sync(filename, processed_data.scalars.which_gameplay_sync);
+syncs = extract_csv_sync(fsr_file);
+
+% If more than one sync, find which one to use.
+[more_syncs, ~] = size(syncs);
+
+if more_syncs > 1
+    % Is which gameplay sync already entered in processed data?
+    has_gameplaysync = any(ismember(fields(processed_data),{'scalars'})) && ~any(ismember(fields(processed_data.scalars),{'trial_number'}));
+    if (~has_gameplaysync)
+        % If you don't know which gameplay sync to use, prompt user to
+        % enter.
+        NO_TRIAL_HAS_MORE_SYNC_BUTTON_PRESSES_THAN = 20;
+        if strcmp(questdlg('Processed data does not yet indicate which sync button press to use. How many times was the sync button pressed in this trial after the last time the server was started?','Unsure Which Sync','1','>1 or Not Sure','>1 or Not Sure'),'>1 or Not Sure')
+           % If user says to use not the first sync, prompt for which.
+           waitfor(warndlg('If necessary, rewatch the trial video or review trial notes to determine which sync button press to use.','Need To Know Which Sync'));
+           which_sync_response = [];
+           which_sync_num = [];
+           % Ensure they enter a number greater than 1 and not absurdly
+           % high.
+           while (isempty(which_sync_response) || isempty(which_sync_num) || which_sync_num < 1 || which_sync_num > NO_TRIAL_HAS_MORE_SYNC_BUTTON_PRESSES_THAN)
+                prompt = {'Which sync button press should be used?'};
+                title = 'Enter sync button press';
+                dims = [1 50];
+                definput = {''};
+                which_sync_response_cell = inputdlg(prompt,title,dims,definput);
+                which_sync_response = which_sync_response_cell{1};
+                if ~isempty(which_sync_response)
+                    which_sync_num = str2num(which_sync_response);
+                end
+                if (isempty(which_sync_response) || isempty(which_sync_num) || which_sync_num < 1 || which_sync_num > NO_TRIAL_HAS_MORE_SYNC_BUTTON_PRESSES_THAN) && ~strcmp(questdlg(['Invalid sync number entered. Please enter a number between 1 and 20.' newline 'Do you want to try again?'],'Invalid Sync Number','Yes','No','Yes'),'Yes')
+                    throw(MException('Custom:Custom' ,'Failed to align FSR data: cannot determine which sync button press to use.'));
+                end
+           end
+           processed_data.scalars.which_gameplay_sync = which_sync_num;
+        else
+           % If user says to use first sync, do that.
+           processed_data.scalars.which_gameplay_sync = 1;
+        end
+    end
+else
+    % If there's only one sync present in the file, just use that one.
+    processed_data.scalars.which_gameplay_sync = 1;
+end
+
+% Cut the "syncs" matrix correctly, obtain the row from the correct sync.
+if processed_data.scalars.which_gameplay_sync > 1
+    sync_pair = syncs(processed_data.scalars.which_gameplay_sync);
+else
+    sync_pair = syncs;
+end
+processed_data.scalars.gameplay_sync_index = sync_pair(1);
+processed_data.scalars.gameplay_sync_epochtime = sync_pair(2);
 
 % Remove data from before sync.
 % Subtract epoch time offset to get time = miliseconds from sync.
@@ -44,26 +94,4 @@ fsr_table = table(gameplay_fromsync(:,6), gameplay_fromsync(:,1), gameplay_froms
 
 processed_data.fsr = fsr_table;
 
-% 
-% % Align data to master array
-% l = 1;
-% aligned_data(1).A0_fsr = 0;
-% aligned_data(1).A1_fsr = 0;
-% a1 = [];
-% for k=1:length([aligned_data(:).timestamp_ms])
-%     if (l > length(gameplay_fromsync(:,6)))
-%         break;
-%     end
-%     if gameplay_fromsync(l,6) == aligned_data(k).timestamp_ms
-%         aligned_data(k).A0_fsr = gameplay_fromsync(l,1);
-%         a1 = [a1 gameplay_fromsync(l,2)];
-%         aligned_data(k).A1_fsr = gameplay_fromsync(l,2);
-%         aligned_data(k).A2_fsr = gameplay_fromsync(l,3);
-%         aligned_data(k).A3_fsr = gameplay_fromsync(l,4);
-%         aligned_data(k).A4_fsr = gameplay_fromsync(l,5);
-%         l = l+1;
-%     end
-% end
-% 
-% %
-% clearvars f gameplay_fromsync a1 gameplay_A0 gameplay_A1 gameplay_A2 gameplay_A3 gameplay_A4 gameplay_time_epoch old_path fsr_file fsr_name fsr_path ind_timestamp_after_eeg_end time_diffs time_nodiffs nodiffs_vec k l m zind a b l averagel;
+clearvars A0_raw eeg_endstamp filename fsr_file fsr_table gameplay_fromsync has_gameplaysync i ind_timestamp_after_eeg_end more_syncs sync_pair syncs t_fieldnames NO_TRIAL_HAS_MORE_SYNC_BUTTON_PRESSES_THAN

@@ -22,10 +22,10 @@ for k = 1:length(has_time)
     cplace = cplace(1);
     mins = str2num(tag(cplace+1:cplace+2));
     secs = str2num(tag(cplace+4:cplace+5));
-    microsecs = str2num(tag(cplace+7:cplace+12));
-    dins = [dins microsecs + secs*1000000 + mins*60*1000000;];
+    millisecs = str2num(tag(cplace+7:cplace+12));
+    dins = [dins millisecs + secs*1000000 + mins*60*1000000;];
 end
-fclose(fileID);
+status = fclose(fileID);
 fileID = fopen(info_name,'r');
 info_imp = textscan(fileID,'%s');
 info_imp = info_imp{1};
@@ -36,7 +36,7 @@ cplace = strfind(tag,':');
 cplace = cplace(1);
 mins = str2num(tag(cplace+1:cplace+2));
 secs = str2num(tag(cplace+4:cplace+5));
-microsecs = str2num(tag(cplace+7:cplace+12));
+millisecs = str2num(tag(cplace+7:cplace+12));
 which_din = 0;
 if length(dins) > 1
 %%take user input on which din
@@ -60,5 +60,7 @@ end
 
 din_time_ms = dins(which_din);
 processed_data.scalars.din_time_ms  = din_time_ms;
-eeg_start_time_ms = microsecs + secs*1000000 + mins*1000000*60;
+eeg_start_time_ms = millisecs + secs*1000000 + mins*1000000*60;
 processed_data.scalars.eeg_start_time_ms = eeg_start_time_ms;
+
+clearvars answer status cplace definput dims din_imp din_name din_time_ms dins eeg_start_time_ms fileID has_time info_imp info_name k millisecs mins prompt secs tag title which_din

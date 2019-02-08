@@ -21,3 +21,5 @@ stamps(1) = 0;
 stamps = cumsum(stamps);
 eeg_table = table(stamps,eeg_data,'VariableNames',{'timestamp_ms','eeg'});
 processed_data.eeg = eeg_table;
+
+clearvars -except processed_data processed_directory trial_directory trial_number f;
