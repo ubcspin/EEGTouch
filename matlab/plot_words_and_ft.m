@@ -36,7 +36,7 @@ ax = gca;
 ax.XGrid = 'on';
 hold off;
 zoom xon;
-zoom(2);
+%zoom(2);
 pan xon;
 
 clearvars i starttick t x_offset x_textpos y_offset y_textpos ax

@@ -17,7 +17,7 @@ i = 1;
 j = 1;
 while i <= num_markers
     % Ignore markers with empty comments.
-    if (~isempty(datacell{3}{i}) && ~(datacell{3}{i} == ""))
+    if (~isempty(datacell{1}{i}) && ~(datacell{1}{i} == ""))
         % Process time in Premiere format to milliseconds.
         int_timestamp_strings = strsplit(datacell{3}{i}, ':');
         mins = int_timestamp_strings(2);
@@ -27,7 +27,7 @@ while i <= num_markers
         % Ignore timestamps at 0:00.
         if ~(int_timestamp == 0)
             csv_ms_timestamps(j) = int_timestamp;
-            csv_comments(j) = datacell{1}{j};
+            csv_comments(j) = datacell{1}{i};
             j = j+1;
         end
     end
