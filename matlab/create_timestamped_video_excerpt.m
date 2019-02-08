@@ -23,55 +23,40 @@ load_globals;
 % Get video - find in directory or from UI dialog.
 video_name = get_path_ui(trial_directory, 'gameplay*.mov', 'gameplay video', 'The file is usually called gameplay-[number].mov and in the main trial directory.',true);
 
-% video_file = dir(fullfile(trial_directory,'gameplay*.mov'));
-% if ~isempty(video_file)
-%     video_name = video_file.name;
-%     video_path = video_file.folder;
-% else
-%     waitfor(warndlg('Unable to automatically locate gameplay video for this trial. Please find it manually. The file is usually called gameplay-[number].mov and in the main trial directory.'));
-%     [video_name, video_path] = uigetfile('*.mov','Find gameplay mov');
-%     isdlg = 'No';
-%     while (video_name(1) == 0) && strcmp(questdlg('No gameplay video file was opened. Do you want to keep looking for this file yourself?',''),'Yes')
-%        [video_name, video_path] = uigetfile('*.mov','Find gameplay mov');
-%     end
-%     if video_name(1) == 0
-%         waitfor(errordlg('Aborting data processing: no valid gameplay video file'));
-%         throw(MException('Custom:Custom','Failure: unable to find valid gameplay video file'));
-%     end
-% end
-% 
-% if ~contains(video_name,pathsep)
-%     video_name = fullfile(video_path,video_name);
-% end
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % SET DURATION TO PROCESS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % initialize video reader
 %waitfor(helpdlg('Attempting to play video with VLC. Please watch the video carefully to determine if the sync button was pressed multiple times, and if so, determine which of th multiple button presses corresponds with the correct DIN in the EEG data. Please eyeball a start time in seconds and duration in seconds that would include the sync frame (when the sync button changes color, for the sync instance you want).'));
 
-%Attempting to play video.
-
+% Attempting to play video.
+% This auto-opens the video in VLC on Windows. Auto-open script attempted on
+% Mac but it doesn't work.
  if convertCharsToStrings(computer) == "PCWIN64"
     try
         status = system(['start vlc ' video_name]);
     catch ME
-        waitfor(errordlg(['Error trying to open video on VLC. Please open ' video_name '.mov, inside the raw data directory, manually to view video then return to Matlab.']));
+        waitfor(errordlg(['Error trying to open video on VLC. Please open ' video_name ', inside the raw data directory, manually to view video then return to Matlab.']));
     end
+% Mac case doesn't work and needs to open manually. :(.
 elseif convertCharsToStrings(computer) == "MACI64"
     try
-        status = system(['open -a vlc ' video_name '.mov']);
+        status = system(['open -a vlc ' video_name]);
     catch ME
-        waitfor(errordlg(['Error trying to open video on VLC. Please open ' video_name '.mov manually to view video then return to Matlab.']));
+        waitfor(errordlg(['Error trying to open video on VLC. Please open ' video_name ' manually to view video then return to Matlab.']));
     end
-else
-     disp(['Video not automatically opened on this system type. Please open ' video_name '.mov manually to view video then return to Matlab.']);
-end
+ else
+     % Other OS: prompt to open video manually.
+     disp(['Video not automatically opened on this system type. Please open ' video_name ' manually to view video then return to Matlab.']);
+ end
 
+% Initialize video reader from .mov file.
 vid_reader = VideoReader(video_name);
 processed_data.scalars.frame_rate = vid_reader.FrameRate;
 seconds_to_process = [];
 start_time_sec = [];
+
+% Prompt for how many seconds of the video to process (to assign frame number to).
 while isempty(seconds_to_process) || isempty(start_time_sec) || seconds_to_process < 0 || seconds_to_process > 60 || start_time_sec < 0 || start_time_sec > seconds_to_process + vid_reader.Duration
     prompt = {'Enter time in seconds to start video processing:','Enter duration in seconds to process:', 'If multiple sync signals sent, enter the correct one to use (first = 1, second = 2, etc)'};
     title = 'Video parameters';
@@ -84,27 +69,22 @@ while isempty(seconds_to_process) || isempty(start_time_sec) || seconds_to_proce
         processed_data.scalars.which_gameplay_sync = str2num(answer{3});
         
     end
-    if (isempty(answer) || isempty(seconds_to_process) || isempty(start_time_sec) || seconds_to_process < 0 || seconds_to_process > 60 || start_time_sec < 0 || start_time_sec > seconds_to_process + vid_reader.Duration) && ~strcmp(questdlg(['Invalid parameters for video excerpt. Please select a duration of <60 and a start second between 0 and ' num2str(vid_reader.Duration) '. Do you want to try entering different parameters'],''),'Yes')
-        waitfor(errordlg('No valid parameters available for video processing. Data processing aborted: cannot process video to extract timestamp.'));
+    if (isempty(answer) || isempty(seconds_to_process) || isempty(start_time_sec) || seconds_to_process < 0 || seconds_to_process > 60 || start_time_sec < 0 || start_time_sec > seconds_to_process + vid_reader.Duration) && ~strcmp(questdlg(['Invalid parameters for video excerpt. Please select a duration of <60 and a start second between 0 and ' num2str(vid_reader.Duration) '. Do you want to try entering different parameters?'],'Invalid Video Parameters','Yes','No','Yes'),'Yes')
+        waitfor(errordlg('No valid parameters available for video processing. Data processing aborted: cannot process video to extract timestamp.','Cannot Process Video'));
         throw(MException('Custom:Custom' ,'Failure: unable to excerpt video.'));
     end
 end
 
+% Frame-number-finding video is at 50% quality..
 quality_to_export = 50; % out of 100
-
-frame_rate = 30; %% could move this to processed_data.scalars
-
-
 
 % initialize video reader
 vid_reader = VideoReader(video_name);
 
 
-% set time
-%vid_reader.CurrentTime = start_time_sec;
-
+% advance to start of clip framewise
 k = 1;
-while k < start_time_sec * frame_rate && hasFrame(vid_reader)
+while k < start_time_sec * processed_data.scalars.frame_rate && hasFrame(vid_reader)
     readFrame(vid_reader);
     k = k+1;
 end
@@ -123,7 +103,7 @@ temp_movie = struct('cdata',zeros(vid_height,vid_width,3,'uint8'),...
 % loop through read video for specified number of seconds, using frame rate.
 % do not attempt to seek beyond the end of the video
 l = 1;
-while k < (start_time_sec + seconds_to_process) * frame_rate && hasFrame(vid_reader)
+while k < (start_time_sec + seconds_to_process) * processed_data.scalars.frame_rate && hasFrame(vid_reader)
     temp_movie(l).cdata = insertText(readFrame(vid_reader),[text_offset 1], ['frame ' num2str(k)], 'FontSize', 50, 'BoxColor', 'black', 'TextColor', 'white');
     k = k+1;
     l = l+1;
@@ -159,7 +139,7 @@ if convertCharsToStrings(computer) == "PCWIN64"
     end
 elseif convertCharsToStrings(computer) == "MACI64"
     try
-        status = system(['open -a vlc ' fullfile(pwd,proc_vid_name) '.avi']);
+        status = system(['open -a vlc ' proc_vid_name '.avi']);
     catch ME
         waitfor(errordlg(['Error trying to open video on VLC. Please open ' proc_vid_name '.avi manually to view video then return to Matlab.']));
     end
@@ -186,4 +166,5 @@ end
 
 processed_data.scalars.sync_frame = sync_frame;
 waitfor(helpdlg('Sync frame saved.'));
-%clearvars vid_reader status isdlg frame_rate video_path start_time_sec sync_frame prompt title dims definput answer vid_name proc_vid_name prompt title dims definput answer video_file video_name isdlg frame_rate oldpath;
+
+clearvars answer definput dims proc_vid_name prompt start_time_sec status sync_frame title vid_reader video_name
