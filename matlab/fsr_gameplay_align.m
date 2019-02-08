@@ -25,7 +25,7 @@ gameplay_fromsync(:,5) = get_numerical_csv_column(filename, 5);
 syncs = extract_csv_sync(fsr_file);
 
 % If more than one sync, find which one to use.
-[~, more_syncs] = size(syncs);
+[more_syncs, ~] = size(syncs);
 
 if more_syncs > 1
     % Is which gameplay sync already entered in processed data?

@@ -36,18 +36,18 @@ video_name = get_path_ui(trial_directory, 'gameplay*.mov', 'gameplay video', 'Th
     try
         status = system(['start vlc ' video_name]);
     catch ME
-        waitfor(errordlg(['Error trying to open video on VLC. Please open ' video_name '.mov, inside the raw data directory, manually to view video then return to Matlab.']));
+        waitfor(errordlg(['Error trying to open video on VLC. Please open ' video_name ', inside the raw data directory, manually to view video then return to Matlab.']));
     end
 % Mac case doesn't work and needs to open manually. :(.
 elseif convertCharsToStrings(computer) == "MACI64"
     try
-        status = system(['open -a vlc ' video_name '.mov']);
+        status = system(['open -a vlc ' video_name]);
     catch ME
-        waitfor(errordlg(['Error trying to open video on VLC. Please open ' video_name '.mov manually to view video then return to Matlab.']));
+        waitfor(errordlg(['Error trying to open video on VLC. Please open ' video_name ' manually to view video then return to Matlab.']));
     end
  else
      % Other OS: prompt to open video manually.
-     disp(['Video not automatically opened on this system type. Please open ' video_name '.mov manually to view video then return to Matlab.']);
+     disp(['Video not automatically opened on this system type. Please open ' video_name ' manually to view video then return to Matlab.']);
  end
 
 % Initialize video reader from .mov file.
@@ -82,9 +82,7 @@ quality_to_export = 50; % out of 100
 vid_reader = VideoReader(video_name);
 
 
-% set time
-%vid_reader.CurrentTime = start_time_sec;
-
+% advance to start of clip framewise
 k = 1;
 while k < start_time_sec * processed_data.scalars.frame_rate && hasFrame(vid_reader)
     readFrame(vid_reader);
@@ -141,7 +139,7 @@ if convertCharsToStrings(computer) == "PCWIN64"
     end
 elseif convertCharsToStrings(computer) == "MACI64"
     try
-        status = system(['open -a vlc ' fullfile(pwd,proc_vid_name) '.avi']);
+        status = system(['open -a vlc ' proc_vid_name '.avi']);
     catch ME
         waitfor(errordlg(['Error trying to open video on VLC. Please open ' proc_vid_name '.avi manually to view video then return to Matlab.']));
     end

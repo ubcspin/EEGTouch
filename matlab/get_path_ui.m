@@ -4,9 +4,9 @@ the_fullpath = dir(fullfile(the_trial_directory, the_pattern));
 the_split = strsplit(the_pattern, '.');
 the_ext = the_split(end);
 the_type = fullfile(the_trial_directory,['*.' char(the_ext)]);
-if (~isempty(the_fullpath))
+if ~strcmp(the_pattern,'') && ~isempty(the_fullpath) %if a pattern is given, and it's matched
     [fp_size, ~] = size(the_fullpath);
-    if fp_size > 1
+    if fp_size > 1 %&& ~empty(the_pattern)
         if isfile
             file_or_folder = 'file';
         else
