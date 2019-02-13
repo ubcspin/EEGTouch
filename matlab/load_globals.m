@@ -34,7 +34,7 @@ if isfile(fullfile(processed_directory,'processed_data.mat'))
     load(fullfile(processed_directory,'processed_data.mat'));
     if ~isempty(t_fieldnames)
         for i = 1:numel(t_fieldnames)
-            if strcmp(t_fieldnames{i},'scalars')
+            if ~strcmp(t_fieldnames{i},'scalars')
                 processed_data.(t_fieldnames{i}) = t_processed_data.(t_fieldnames{i});
             else
                 t_scalar_fieldnames = fields(t_processed_data.scalars);
