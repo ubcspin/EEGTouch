@@ -20,6 +20,12 @@ while i <= num_markers
     if (~isempty(datacell{1}{i}) && ~(datacell{1}{i} == ""))
         % Process time in Premiere format to milliseconds.
         int_timestamp_strings = strsplit(datacell{3}{i}, ':');
+        % for some reason some timestamps from premiere are separated by
+        % colons, but others are separated by semicolons? idk why?
+        % anyway this deals w/both
+        if length(int_timestamp_strings) == 1
+            int_timestamp_strings = strsplit(datacell{3}{i}, ';');
+        end
         mins = int_timestamp_strings(2);
         secs = int_timestamp_strings(3);
         frames = int_timestamp_strings(4);
