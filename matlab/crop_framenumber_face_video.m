@@ -30,8 +30,7 @@ end
 k = 1;
 while hasFrame(vid_reader)
     cropped_frame = imcrop(readFrame(vid_reader), rect);
-    temp_movie(k).cdata = insertText(cat(1,cropped_frame,zeros(20,ceil(rect(3)),3,'uint8')), [1 vid_
-        height-25], ['frame ' num2str(k)], 'FontSize', 10, 'BoxColor', 'black', 'TextColor', 'white');
+    temp_movie(k).cdata = insertText(cat(1,cropped_frame,zeros(20,ceil(rect(3)),3,'uint8')), [1 vid_height-25], ['frame ' num2str(k)], 'FontSize', 10, 'BoxColor', 'black', 'TextColor', 'white');
     final_movie(k).cdata = cat(2, cat(1, cropped_frame, zeros(250-(ceil(rect(4))), ceil(rect(3)),3,'uint8')),zeros(250, 250-ceil(rect(3)), 3, 'uint8'));
     final_movie(k).timestamp_ms = round((k-1)*1000/processed_data.scalars.frame_rate);
     k = k+1;
