@@ -13,7 +13,7 @@ interview_file = get_path_ui(trial_directory, 'interview*.csv', 'interview csv',
 interview_table = get_premiere_markers(interview_file);
 
 % Align video millisecond timestamp to sync frame.
-interview_table.timestamp_ms = round(interview_table.timestamp_ms - processed_data.scalars.sync_frame*1000 / processed_data.scalars.frame_rate);
+interview_table.timestamp_ms = round(interview_table.timestamp_ms - processed_data.scalars.sync_frame*1000/processed_data.scalars.frame_rate);
 
 % Add to processed data struct.
 processed_data.interview = interview_table;

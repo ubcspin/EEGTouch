@@ -2,7 +2,7 @@
 load_globals;
 
 % Get video - find in directory or from UI dialog.
-video_name = get_path_ui(trial_directory, 'gameplay*.mov', 'gameplay video', 'The file is usually called gameplay-[number].mov and in the main trial directory.',true);
+video_name = get_path_ui(trial_directory, '*gameplay*.mov', 'gameplay video', 'The file is usually called gameplay-[number].mov and in the main trial directory.',true);
 % Initialize video reader from .mov file.
 vid_reader = VideoReader(video_name);
 
@@ -100,8 +100,8 @@ while hasFrame(vid_reader) && j < NUM_OF_FRAMES_TO_PROC
     if ck <= c_len && ms >= processed_data.events.character.timestamp_ms(ck) 
         ctext = processed_data.events.character.label(ck);
         ck = ck + 1;
-        ctext_expiry_frame = l + i_expiry_frames;
-    elseif l == itext_expiry_frame
+        ctext_expiry_frame = l + expiry_frames;
+    elseif l == ctext_expiry_frame
         itext = no_label_chars;
     end
     
