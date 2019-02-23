@@ -21,7 +21,7 @@
 load_globals;
 
 % Get video - find in directory or from UI dialog.
-video_name = get_path_ui(trial_directory, 'gameplay*.mov', 'gameplay video', 'The file is usually called gameplay-[number].mov and in the main trial directory.',true);
+video_name = get_path_ui(trial_directory, '*gameplay*.mov', 'gameplay video', 'The file is usually called gameplay-[number].mov and in the main trial directory.',true);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % SET DURATION TO PROCESS

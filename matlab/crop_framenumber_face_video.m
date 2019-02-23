@@ -6,7 +6,7 @@ video_name = get_path_ui(trial_directory, 'gameplay*.mov', 'gameplay video', 'Th
 % Initialize video reader from .mov file.
 vid_reader = VideoReader(video_name);
 
-quality_to_export = 100;
+quality_to_export = 40;
 
 %crop one frame to get the size
 im2crop = readFrame(vid_reader);
