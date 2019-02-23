@@ -56,6 +56,8 @@ end
 
 last = l-1;
 calib_ms_timestamps = calib_ms_timestamps(1:last);
+calib_ms_timestamps = round(calib_ms_timestamps - processed_data.scalars.sync_frame*1000/processed_data.scalars.frame_rate);
+
 emotion_words = emotion_words(1:last);
 calib_words = calib_words(1:last);
 calib_nums = calib_nums(1:last);
