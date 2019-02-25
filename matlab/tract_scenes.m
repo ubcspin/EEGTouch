@@ -113,13 +113,3 @@ for i = 1:length(scenes_cell)
        scenes_cell{i,1} = scenes_cell{i-1,1}; 
     end
 end
-
-
-scenes_toplot = [];
-for i = 1:length(scenes)
-    scenes_toplot(i).name = scenes(i).name;
-    indices = find([scenes_cell{:,1}]' == scenes(i).name);
-    for j = 1:length(indices)
-        %scenes_toplot(i).values(j)
-    end
-end
