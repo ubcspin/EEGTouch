@@ -1,5 +1,5 @@
 scene_names_raw = string(unique(labels.scene, 'stable'));
-scene_names_vars =  arrayfun(@(c) lower(c{1}(c{1} ~= ' ')), string(unique(labels.scene, 'stable')),'UniformOutput',false);
+scene_names_raw = scene_names_raw(2:end);
 
 scenes = [];
 
@@ -32,3 +32,5 @@ for i = 1:length(scene_names_raw)
         end
     end
 end
+
+clearvars begin finish i indices j peak scene_names_raw this_scene
