@@ -113,3 +113,37 @@ for i = 1:length(scenes_cell)
        scenes_cell{i,1} = scenes_cell{i-1,1}; 
     end
 end
+
+%column for start of each scene
+scenes_cell{1,10} = 1;
+for i = 2:length(scenes_cell)
+    if ~(strcmp(scenes_cell{i,1}, scenes_cell{i-1,1}))
+        scenes_cell{i,10} = 1;
+    else
+        scenes_cell{i,10} = 0;
+    end
+end
+
+length_c = length(scenes_cell);
+i = 2;
+while i < length_c
+    if strcmpi(scenes_cell{i,7}, "light-river-2") && strcmpi(scenes_cell{i-1,7}, "light-river-1")
+        scenes_cell(i,:) = [];
+        i = i -1;
+        length_c = length_c -1;
+    end
+    i = i+1;
+end
+
+length_c = length(scenes_cell);
+i = 2;
+while i < length_c
+    if strcmpi(scenes_cell{i,7}, "light-river-1") && strcmpi(scenes_cell{i-1,7}, "splash")
+        scenes_cell(i,:) = [];
+        i = i - 1;
+        length_c = length_c -1;
+    end
+    i = i+1;
+end
+
+clearvars begin_event_inds begin_event_labels begin_event_stream begin_event_time finish_event_inds finish_event_labels finish_event_stream finish_event_time i j k mat_ind peak_event_inds peak_event_labels peak_event_stream peak_event_time sz scenes_mat 
