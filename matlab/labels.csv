@@ -1,0 +1,36 @@
+scene,tag,stream,type
+Truck,Light-truck-1,game,begin
+Truck,Truck-backup,game,peak
+Truck,Truck-tree,game,end
+Portal,Portal-light,game,begin
+Portal,Flashlight-portal,game,peak
+Portal,Portal-tree,game,end
+Fridge,Inframe,game,begin
+Fridge,Fridge-hit,game,peak
+Fridge,Fridge-wall,game,end
+Far truck,Truck-move,game,begin
+Far truck,Centre,game,peak
+Far truck,Safe-far-truck,game,end
+Crate,Crate-beam,game,begin
+Crate,Crate-over,game,peak
+Crate,Crate-beam-source,game,end
+River,Splash,game,begin
+River,Light-river-1,game,begin
+River,Light-river-2,game,begin
+River,Dog-river-3,game,peak
+River,Dog-river-5,game,peak
+River,Jump-success,game,end
+Road,Tree-road-1,game,begin
+Road,Panting,sound,peak
+Road,Beam-road-out,game,end
+Dogs,Two-lights,game,begin
+Dogs,Two-lights-2,game,begin
+Dogs,Soundtrack start,sound,peak
+Dogs,Hide-dogs,game,peak
+Dogs,Dogs super loud,sound,peak
+Dogs,Cliff-land,game,end
+Water,Cliff-land,game,begin
+Water,Mid-water,game,peak
+Water,Pass-water,game,end
+Pigs,Pass-pig,game,begin
+Pigs,End-gameplay,game,end
