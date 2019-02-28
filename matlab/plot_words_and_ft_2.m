@@ -39,36 +39,44 @@ fig = figure(1);
 %% FIRST SUBPLOT: feeltrace and calibrated words
 
 % plot in sections 1-12 of 29-section grid
-subplot(29,1,[1 2 3 4 5 6 7 8 9 10 11 12]);
+subplot(29,1,[2 3 4 5 6 7 8 9 10 11 12]);
 hold on;
 grid on;
 
+% %plot fsrs
+max_fsr = max([processed_data.fsr.A0  processed_data.fsr.A1  processed_data.fsr.A2 processed_data.fsr.A3 processed_data.fsr.A4],[],2);
+area(processed_data.fsr.timestamp_ms/60000, max_fsr/1023*20, 'FaceColor',[0.9 0.9 0.9],'EdgeColor',[0.9 0.9 0.9]);
 % line plot the feeltrace
-plot(processed_data.feeltrace.timestamp_ms/60000,(processed_data.feeltrace.joystick-112)/11.2,'Color',[85/255 165/255 250/255],'LineWidth',2);
+max_joystick = max(processed_data.feeltrace.joystick);
+plot(processed_data.feeltrace.timestamp_ms/60000,processed_data.feeltrace.joystick/max_joystick*20,'Color',[21/255 104/255 237/255],'LineWidth',2);
 % line plot the calibrated words
-plot(processed_data.calibrated_words.timestamp_ms/60000, processed_data.calibrated_words.calibrated_values, 'Color', [255/255 179/255 48/255], 'LineWidth', 2)
+plot(processed_data.calibrated_words.timestamp_ms/60000, processed_data.calibrated_words.calibrated_values+10, 'Color', [255/255 129/255 0/255], 'LineWidth', 2)
 % scatter plot the calibrated words
-scatter(processed_data.calibrated_words.timestamp_ms/60000, processed_data.calibrated_words.calibrated_values)
+scatter(processed_data.calibrated_words.timestamp_ms/60000, processed_data.calibrated_words.calibrated_values+10,5,'Marker','*','LineWidth',2,'MarkerEdgeColor',[255/255 129/255 0/255]);
 % set positions for calibrated words text
 x_textpos = processed_data.calibrated_words.timestamp_ms/60000;
-y_textpos = processed_data.calibrated_words.calibrated_values;
+y_textpos = processed_data.calibrated_words.calibrated_values+10;
 % plot calibrated words text
 text_g = text(x_textpos, y_textpos, cellstr(processed_data.calibrated_words.emotion_words));
 
 % set text angle, weight, size
 for i = 1:length(processed_data.calibrated_words.timestamp_ms)
-    text_g(i).Rotation = 80;
+    text_g(i).Rotation = 90;
     text_g(i).FontWeight = 'bold';
-    text_g(i).FontSize = 20;
+    text_g(i).FontSize = 18;
 end
 
 % set range from -10 to 10
-ylim([-10,10]);
+ylim([0,20]);
 % y ticks at maximum, minimum, middle
-yticks([-10,0,10]);
+yticks([0,10,20]);
 % label direction of y axis
-yticklabels(["Relieved" "" "Stressed"]);
-ytickangle(90);
+%yticklabels(["Relieved" "" "Stressed"]);
+emo_ylab = 'Reported emotion';
+emo_ylab = [emo_ylab newline 'Relieved                                             Stressed'];
+ylabel(emo_ylab,'FontSize',12);
+yticklabels([]);
+%ytickangle(90);
 % set domain to longest trial length for equivalent figure size
 xlim([0 LONGEST_TRIAL_LENGTH_MIN]);
 % x ticks every 15 seconds
@@ -77,8 +85,20 @@ xticklabels([]);
 xtickangle(90); 
 ax = gca;
 ax.XGrid = 'on';
- set(ax,'FontSize',30);
+ set(ax,'FontSize',15);
  set(ax,'linewidth',1);
+ 
+yyaxis right
+ax = get(gcf,'CurrentAxes');
+ax.YAxis(2).Color = 'black';
+ylabel('Keypress intensity','FontSize',15);
+ytickangle(90);
+%ylabelangle(90);
+yticks([0 20]);
+ylim([0,20]);
+yticklabels(["Min" "Max"]);
+ax = gca;
+set(ax,'FontSize',15);
 hold off;
 
 %% SUBPLOT 2: interview text
@@ -116,6 +136,14 @@ for i = 1:length(processed_data.interview.timestamp_ms)
     text_g(i).FontSize = 13;
 end
 
+% if hastimes
+%     ylabel('Interview','FontSize',15,'FontName','Times New Roman');
+% elseif haspal
+%     ylabel('Interview','FontSize',15,'FontName','Palatino');
+% else
+    ylabel('Interview','FontSize',15);
+% end
+
 yticks([]);
 xlim([0 LONGEST_TRIAL_LENGTH_MIN]);
 xticks(0 : 0.25 : ceil(processed_data.fsr.timestamp_ms(end)));
@@ -130,12 +158,21 @@ hold on;
 grid on;
 
 
-
+ytickangle(90);
+%ylabelangle(90);
+%yticks([0 1 2]);
+%ylim([0,20]);
+yticks([]);
+%yticklabels(["Game" "Sound" "Character"]);
+ax = gca;
+set(ax,'FontSize',12);
+grid off;
 % game events
-x_textpos = processed_data.events.game.timestamp_ms/60000;
-y_textpos = zeros(length(processed_data.events.game.timestamp_ms),1);
+x_textpos = vertcat(7/60, processed_data.events.game.timestamp_ms/60000);
+y_textpos = zeros(length(processed_data.events.game.timestamp_ms)+1,1);
 wrapped_text = char(processed_data.events.game.label);
 wrapped_text = wrapped_text(:,1:9);
+wrapped_text = vertcat('GAME     ',wrapped_text);
 %wrapped_text = arrayfun(@(c) extractBefore(c,min(strlength(c),12)+1), processed_data.events.game.label,'UniformOutput',false);
 %text_g = text(x_textpos, y_textpos, wrapped_text);
 if hastimes
@@ -152,10 +189,12 @@ for i = 1:length(processed_data.events.game.timestamp_ms)
 end
 
 % sound events
-x_textpos = processed_data.events.sound.timestamp_ms/60000;
-y_textpos = ones(length(processed_data.events.sound.timestamp_ms),1);
+x_textpos = vertcat(7/60,processed_data.events.sound.timestamp_ms/60000);
+y_textpos = ones(length(processed_data.events.sound.timestamp_ms)+1,1);
 wrapped_text = char(processed_data.events.sound.label);
 wrapped_text = wrapped_text(:,1:9);
+wrapped_text = vertcat('SOUND    ',wrapped_text);
+
 %wrapped_text = arrayfun(@(c) extractBefore(c,min(strlength(c),12)+1), processed_data.events.sound.label,'UniformOutput',false);
 %text_s = text(x_textpos, y_textpos, wrapped_text,'Color',[124/255 10/255 2/255],'Margin',0.5);
 if hastimes
@@ -172,10 +211,11 @@ for i = 1:length(processed_data.events.sound.timestamp_ms)
 end
 
 % character events
-x_textpos = processed_data.events.character.timestamp_ms/60000;
-y_textpos = ones(length(processed_data.events.character.timestamp_ms),1)*2;
+x_textpos = vertcat(7/60,processed_data.events.character.timestamp_ms/60000);
+y_textpos = ones(length(processed_data.events.character.timestamp_ms)+1,1)*2;
 wrapped_text = char(processed_data.events.character.label);
 wrapped_text = wrapped_text(:,1:9);
+wrapped_text = vertcat('CHAR     ',wrapped_text);
 %arrayfun(@(c) extractBefore(c,min(strlength(c),12)+1), processed_data.events.character.label,'UniformOutput',false);
 
 if hastimes
@@ -191,17 +231,26 @@ for i = 1:length(processed_data.events.character.timestamp_ms)
     text_c(i).FontSize = 12;
 end
 
-yticks([]);
+%([]);
+
 ylim([0 3]);
 xlim([0 LONGEST_TRIAL_LENGTH_MIN]);
 xticks(0 : 0.25 : ceil(processed_data.fsr.timestamp_ms(end)));
 xticklabels([]);
 
+% if hastimes
+%     ylabel('Events','FontSize',15,'FontName','Times New Roman');
+% elseif haspal
+%     ylabel('Events','FontSize',15,'FontName','Palatino');
+% else
+    ylabel('Events','FontSize',15);
+%end
+
+
  %% SUBPLOT 4: frames
 subplot(29,1,[23 24 25 26 27]);
 hold on;
 grid on;
-
 for i = 1:length(temp_movie)
     image([(i-1)/4 i/4],[0 1], imrotate(temp_movie(i).cdata,90));
 end
@@ -293,6 +342,7 @@ xstring = join(repmat(strcat("                                                  
 xlabel(xstring,'FontSize', 11);
 hold off;
 yticks([]);
+ylabel('Scenes','FontSize',15);
 
 %% PRINT AND SAVE
 fig.PaperUnits = 'inches';
