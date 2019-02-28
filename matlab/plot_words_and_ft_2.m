@@ -182,7 +182,7 @@ elseif haspal
 else
     text_g = text(x_textpos, y_textpos, wrapped_text,'Color',[0 0 0]);
 end
-for i = 1:length(processed_data.events.game.timestamp_ms)
+for i = 1:length(processed_data.events.game.timestamp_ms)+1
     text_g(i).Rotation = 90;
     %text_g(i).FontWeight = 'bold';
     text_g(i).FontSize = 12;
@@ -204,7 +204,7 @@ elseif haspal
 else
     text_s = text(x_textpos, y_textpos, wrapped_text,'Color',[124/255 10/255 2/255]);
 end
-for i = 1:length(processed_data.events.sound.timestamp_ms)
+for i = 1:length(processed_data.events.sound.timestamp_ms)+1
     text_s(i).Rotation = 90;
     %text_s(i).FontWeight = 'bold';
     text_s(i).FontSize = 12;
@@ -225,7 +225,7 @@ elseif haspal
 else
     text_c = text(x_textpos, y_textpos, wrapped_text,'Color',[17/255 30/255 108/255]);
 end
-for i = 1:length(processed_data.events.character.timestamp_ms)
+for i = 1:length(processed_data.events.character.timestamp_ms)+1
     text_c(i).Rotation = 90;
     %text_c(i).FontWeight = 'bold';
     text_c(i).FontSize = 12;
@@ -302,14 +302,21 @@ for i = 1:length(scenes)
     plot([times(indices(1))/60000,times(indices(end))/60000], [1,1],'LineWidth',5,'Color',colors(i,:));
     for j = 1:length(indices)
         if isfirst(indices(j))
-            if hastimes
-                tt = text(times(indices(j))/60000, 1.6, labels(indices(j)),'Color',colors(i,:),'FontSize',17,'FontName','Times New Roman');
-            elseif haspal
-                tt = text(times(indices(j))/60000, 1.6, labels(indices(j)),'Color',colors(i,:),'FontSize',17,'FontName','Palatino');
+            if strcmp(labels(indices(j)),'Far truck')
+                p_text = 'Far';
+                p_text = [p_text newline 'truck'];
             else
-                tt = text(times(indices(j))/60000, 1.6, labels(indices(j)),'Color',colors(i,:),'FontSize',17);
+                p_text = labels(indices(j));
+            end
+            if hastimes
+                tt = text(times(indices(j))/60000, 1.4, p_text,'Color',colors(i,:),'FontSize',14,'FontName','Times New Roman','BackgroundColor',[1 1 1],'Margin',0.1);
+            elseif haspal
+                tt = text(times(indices(j))/60000, 1.4, p_text,'Color',colors(i,:),'FontSize',14,'FontName','Palatino','BackgroundColor',[1 1 1],'Margin',0.1);
+            else
+                tt = text(times(indices(j))/60000, 1.4, p_text,'Color',colors(i,:),'FontSize',14,'BackgroundColor',[1 1 1],'Margin',0.1);
             end
             tt(1).FontWeight = 'bold';
+            tt(1).Rotation = 90;
             %text(times(indices(j))/60000, 2, labels(indices(j)),'Color',colors(i,:),'FontSize',10);
         end
         if isstart(indices(j))
