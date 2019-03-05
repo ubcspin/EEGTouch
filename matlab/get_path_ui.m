@@ -15,12 +15,28 @@ if ~strcmp(the_pattern,'') && ~isempty(the_fullpath) %if a pattern is given, and
         msg = [{['More than one ' file_or_folder ' matches the pattern ' the_pattern '. Please select the appropriate ' the_descript ' to use.']} {''} {help_message} {''} {''} {''} {''}];
         title = ['Select ' file_or_folder];
         list = {};
+        foldlist = strings(fp_size);
         for i = 1:fp_size
-            list{end+1} = the_fullpath(i).name;
+%             stri = char(the_fullpath(i).folder);
+%             seps = regexp(stri,filesep);
+%             lastsep = seps(end);
+%            foldlist(i) = stri(1:lastsep);
+            foldlist(i) = the_fullpath(i).folder;
+        end
+        has_diff_folders = ~all(foldlist == foldlist(1));
+        for i = 1:fp_size
+            if has_diff_folders
+                filname = fullfile(the_fullpath(i).folder, the_fullpath(i).name);
+                widthw = 400;
+            else
+                filname = the_fullpath(i).name;
+                widthw = 200;
+            end
+            list{end+1} = filname;
         end
         tf = false;
         while ~tf
-            [indx,tf] = listdlg('PromptString',msg,'Name',title,'ListSize',[200,100],'SelectionMode','single','ListString',list);
+            [indx,tf] = listdlg('PromptString',msg,'Name',title,'ListSize',[widthw,100],'SelectionMode','single','ListString',list);
             if ~tf
                 if strcmp(questdlg(['No ' the_descript ' selected. Do you want to try again?'],['No ' the_descript ' selected'],'Yes','No','Yes'),'No')
                     waitfor(errordlg(['Aborting data processing: refusal to choose a ' the_descript ' when more than one exists.'], 'Did Not Choose'));

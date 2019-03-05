@@ -99,7 +99,11 @@ for i = 1:length(processed_data.events.character.timestamp_ms)
     end
 end
 
-scenes_cell = struct2cell(scenes_mat);
+if length(scenes_mat) ~= 0
+    scenes_cell = struct2cell(scenes_mat);
+else
+    scenes_cell = {"__________";"__________";0;0;0;0;"__________";0;0;0};
+end
 sz = size(scenes_cell);
 % Convert to a matrix
 scenes_cell = reshape(scenes_cell, sz(1), []);      % Px(MxN)
@@ -108,7 +112,12 @@ scenes_cell = scenes_cell';                         % (MxN)xP
 % Sort by first field "name"
 scenes_cell = sortrows(scenes_cell, 9);
 
-for i = 1:length(scenes_cell)
+game_table = table(0, "__________", 'VariableNames', {'timestamp_ms', 'label'});
+
+
+
+[len,~] = size(scenes_cell);
+for i = 1:len
     if strcmp(scenes_cell{i,1}, "unknown")
        scenes_cell{i,1} = scenes_cell{i-1,1}; 
     end
@@ -116,7 +125,7 @@ end
 
 %column for start of each scene
 scenes_cell{1,10} = 1;
-for i = 2:length(scenes_cell)
+for i = 2:len
     if ~(strcmp(scenes_cell{i,1}, scenes_cell{i-1,1}))
         scenes_cell{i,10} = 1;
     else
@@ -124,24 +133,24 @@ for i = 2:length(scenes_cell)
     end
 end
 
-length_c = length(scenes_cell);
+[len,~] = size(scenes_cell);
 i = 2;
-while i < length_c
+while i < len
     if strcmpi(scenes_cell{i,7}, "light-river-2") && strcmpi(scenes_cell{i-1,7}, "light-river-1")
         scenes_cell(i,:) = [];
         i = i -1;
-        length_c = length_c -1;
+        len = len -1;
     end
     i = i+1;
 end
 
-length_c = length(scenes_cell);
+[len,~] = size(scenes_cell);
 i = 2;
-while i < length_c
+while i < len
     if strcmpi(scenes_cell{i,7}, "light-river-1") && strcmpi(scenes_cell{i-1,7}, "splash")
         scenes_cell(i,:) = [];
         i = i - 1;
-        length_c = length_c -1;
+        len = len -1;
     end
     i = i+1;
 end

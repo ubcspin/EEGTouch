@@ -19,10 +19,14 @@ sync_epochtimes_split = split(sync_strings,"t");
 % Take just the latter part of the split.
 if length(sync_strings) > 1
     sync_epochtimes_str = sync_epochtimes_split(:,2);
+    for i = 1:length(sync_strings)
+        sync_epochtimes(i) = str2num(sync_epochtimes_str(i));
+    end
 else
     sync_epochtimes_str = sync_epochtimes_split(2);
+    sync_epochtimes = str2num(sync_epochtimes_str);
 end
 % Convert epochtimes into numbers.
-sync_epochtimes = str2num(sync_epochtimes_str);
+%sync_epochtimes = str2num(sync_epochtimes_str);
 
-sync_output = [sync_indices sync_epochtimes]
+sync_output = [sync_indices sync_epochtimes'];

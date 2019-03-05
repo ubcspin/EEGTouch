@@ -22,8 +22,8 @@ for k = 1:length(has_time)
     cplace = cplace(1);
     mins = str2num(tag(cplace+1:cplace+2));
     secs = str2num(tag(cplace+4:cplace+5));
-    millisecs = str2num(tag(cplace+7:cplace+12));
-    dins = [dins millisecs + secs*1000000 + mins*60*1000000;];
+    subsecs = str2num(tag(cplace+7:cplace+12));
+    dins = [dins round(subsecs/1000) + secs*1000 + mins*60*1000;];
 end
 status = fclose(fileID);
 fileID = fopen(info_name,'r');
@@ -36,31 +36,41 @@ cplace = strfind(tag,':');
 cplace = cplace(1);
 mins = str2num(tag(cplace+1:cplace+2));
 secs = str2num(tag(cplace+4:cplace+5));
-millisecs = str2num(tag(cplace+7:cplace+12));
+subsecs = str2num(tag(cplace+7:cplace+12));
+eeg_start_time_ms = round(subsecs/1000) + secs*1000 + mins*1000*60;
+processed_data.scalars.eeg_start_time_ms = eeg_start_time_ms;
+
 which_din = 0;
+
 if length(dins) > 1
-%%take user input on which din
-    while which_din < 1 || which_din > length(dins)
-        prompt = {['DIN log has multiple DIN1s for this trial. Which DIN to use (between 1 and ' num2str(length(dins)) ' inclusive?) Check notes for this trial if unsure.']};
-        title = 'Select DIN';
-        dims = [1 35];
-        definput =cellstr('1');
-        answer = inputdlg(prompt,title,dims,definput);
-        if ~isempty(answer)
-                which_din = str2num(answer{1});
+    msg = [{['More than one DIN1 signal time found for trial ' trial_number '. Please select the appropriate DIN to use.']} {''} {''} {''}];
+        title = ['Select DIN'];
+        list = {};
+        for i = 1:length(dins)
+            offsetd = dins(i) - eeg_start_time_ms;
+            offsetd_mins = floor(offsetd/60000);
+            offsetd_secs = floor(rem(offsetd,60000)/1000);
+            offsetd_ptsecs = rem(offsetd,1000);
+            offset_str = [num2str(offsetd_mins) ' mins, ' num2str(offsetd_secs) '.' num2str(offsetd_ptsecs) ' secs from EEG start'];
+            list{end+1} = [num2str(i) ': ' offset_str];
         end
-        while (isempty(which_din) || which_din < 1 || which_din > length(dins) || which_din ~= floor(which_din) )&& ~strcmp(questdlg(['No valid DIN index entered. Please double check value and enter an integer between 1 and ' num2str(length(dins)) '. Do you want to try again?'],'Invalid DIN Index','Yes','No','Yes'),'Yes')
-            waitfor(errordlg('No valid DIN index available. Data processing aborted.'));
-            throw(MException('Custom:Custom','Failure: DIN index.'));
+        tf = false;
+        while ~tf
+            [indx,tf] = listdlg('PromptString',msg,'Name',title,'ListSize',[250,75],'SelectionMode','single','ListString',list);
+            if ~tf
+                if strcmp(questdlg(['No DIN selected. Do you want to try again?'],['No DIN selected'],'Yes','No','Yes'),'No')
+                    waitfor(errordlg(['Aborting data processing: refusal to choose a DIN when more than one exists.'], 'Did Not Choose DIN'));
+                    throw(MException('Custom:Custom',['Failure: unable to choose a DIN']));
+                end
+            end
         end
-    end
+which_din = indx;
 else
     which_din = 1;
 end
 
 din_time_ms = dins(which_din);
 processed_data.scalars.din_time_ms  = din_time_ms;
-eeg_start_time_ms = millisecs + secs*1000000 + mins*1000000*60;
-processed_data.scalars.eeg_start_time_ms = eeg_start_time_ms;
 
-clearvars answer status cplace definput dims din_imp din_name din_time_ms dins eeg_start_time_ms fileID has_time info_imp info_name k millisecs mins prompt secs tag title which_din
+
+clearvars answer status cplace definput dims din_imp din_name din_time_ms dins eeg_start_time_ms fileID has_time info_imp info_name k millisecs mins prompt secs tag title which_din i indx list msg offset_str offsetd offsetd_mins offsetd_secs offsetd_ptsecs subsecs tf 

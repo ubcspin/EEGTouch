@@ -45,7 +45,17 @@ grid on;
 
 % %plot fsrs
 max_fsr = max([processed_data.fsr.A0  processed_data.fsr.A1  processed_data.fsr.A2 processed_data.fsr.A3 processed_data.fsr.A4],[],2);
-area(processed_data.fsr.timestamp_ms/60000, max_fsr/1023*20, 'FaceColor',[0.9 0.9 0.9],'EdgeColor',[0.9 0.9 0.9]);
+area(processed_data.fsr.timestamp_ms/60000, max_fsr/1023*20, 'FaceColor',[0.8 0.8 0.8],'EdgeColor',[1 1 1]);
+%set(gca,'linewidth',0.00001);
+tickbars = (0 : 0.25 : ceil(processed_data.fsr.timestamp_ms(end)/60000));
+tickhei = ones(length(tickbars),1)*20;
+gridcol = [0.60 0.60 0.60];
+bar(tickbars,tickhei,1/60,'FaceColor',gridcol,'EdgeColor',gridcol);
+
+plot([0 22],[10 10],'Color',gridcol,'LineWidth',1);
+plot([0 22],[10 10],'Color',gridcol,'LineWidth',1);
+plot([0 22],[0 0],'Color',gridcol,'LineWidth',1);
+
 % line plot the feeltrace
 max_joystick = max(processed_data.feeltrace.joystick);
 plot(processed_data.feeltrace.timestamp_ms/60000,processed_data.feeltrace.joystick/max_joystick*20,'Color',[21/255 104/255 237/255],'LineWidth',2);
@@ -59,6 +69,7 @@ y_textpos = processed_data.calibrated_words.calibrated_values+10;
 % plot calibrated words text
 text_g = text(x_textpos, y_textpos, cellstr(processed_data.calibrated_words.emotion_words));
 
+
 % set text angle, weight, size
 for i = 1:length(processed_data.calibrated_words.timestamp_ms)
     text_g(i).Rotation = 90;
@@ -66,39 +77,63 @@ for i = 1:length(processed_data.calibrated_words.timestamp_ms)
     text_g(i).FontSize = 18;
 end
 
+%%%plot([0 22],[0 0],'Color',[1 1 1],'LineWidth',10);
+%%%plot([0 22],[0 0],'Color',gridcol,'LineWidth',1);
+
 % set range from -10 to 10
 ylim([0,20]);
 % y ticks at maximum, minimum, middle
-yticks([0,10,20]);
+yticks([10,20]);
 % label direction of y axis
 %yticklabels(["Relieved" "" "Stressed"]);
 emo_ylab = 'Reported emotion';
 emo_ylab = [emo_ylab newline 'Relieved                                             Stressed'];
-ylabel(emo_ylab,'FontSize',12);
+ylabel(emo_ylab,'FontSize',14);
 yticklabels([]);
 %ytickangle(90);
 % set domain to longest trial length for equivalent figure size
 xlim([0 LONGEST_TRIAL_LENGTH_MIN]);
 % x ticks every 15 seconds
-xticks(0 : 0.25 : ceil(processed_data.fsr.timestamp_ms(end)));
+xticks(0 : 0.25 : ceil(processed_data.fsr.timestamp_ms(end)/60000));
 xticklabels([]);
 xtickangle(90); 
 ax = gca;
 ax.XGrid = 'on';
- set(ax,'FontSize',15);
- set(ax,'linewidth',1);
+ %set(ax,'FontSize',14);
+ %set(ax,'linewidth',1);
+%set(gca,'xaxisLocation','top');
  
 yyaxis right
 ax = get(gcf,'CurrentAxes');
 ax.YAxis(2).Color = 'black';
-ylabel('Keypress intensity','FontSize',15);
+bot_ylab = 'Min                                             Max';
+bot_ylab = [bot_ylab newline 'Keypress intensity'];
+
+ylabel(bot_ylab,'FontSize',14);
 ytickangle(90);
 %ylabelangle(90);
-yticks([0 20]);
+yticks([10 20]);
 ylim([0,20]);
-yticklabels(["Min" "Max"]);
+yticklabels([]);
 ax = gca;
-set(ax,'FontSize',15);
+%set(ax,'FontSize',14);
+xlim([0 LONGEST_TRIAL_LENGTH_MIN]);
+% x ticks every 15 seconds
+xticks(0 : 0.25 : ceil(processed_data.fsr.timestamp_ms(end)/60000));
+xticklabels([]);
+%xtickangle(90); 
+ax.TickLength = [0 0];
+ax = gca;
+ax.XGrid = 'on';
+ %set(ax,'FontSize',14);
+ %set(ax,'linewidth',1);
+ ax.GridColor = [0, 0, 0];
+ set(gca,'Layer','top');
+%set(gca,'xaxisLocation','top');
+%ax.TickLength = [0.1 0];
+%plot([0 22],[0 0],'Color',[1 1 1],'LineWidth',5);
+
+
 hold off;
 
 %% SUBPLOT 2: interview text
@@ -106,6 +141,11 @@ hold off;
 subplot(29,1,[13 14 15 16 17]);
 hold on;
 grid on;
+tickbars = (0 : 0.25 : ceil(processed_data.fsr.timestamp_ms(end)/60000));
+tickhei = ones(length(tickbars),1)*20;
+gridcol = [0.80 0.80 0.80];
+bar(tickbars,tickhei,1/60,'FaceColor',gridcol,'EdgeColor',gridcol);
+
 x_textpos = processed_data.interview.timestamp_ms/60000;
 y_textpos = zeros(length(processed_data.interview.timestamp_ms),1);
 j = 2;
@@ -146,9 +186,11 @@ end
 
 yticks([]);
 xlim([0 LONGEST_TRIAL_LENGTH_MIN]);
-xticks(0 : 0.25 : ceil(processed_data.fsr.timestamp_ms(end)));
+xticks(0 : 0.25 : ceil(processed_data.fsr.timestamp_ms(end)/60000));
 xticklabels([]);
-xtickangle(90); 
+xtickangle(90);
+ax = gca;
+ax.TickLength = [0 0];
 
 hold off;
 
@@ -157,6 +199,10 @@ subplot(29,1,[18 19 20 21 22]);
 hold on;
 grid on;
 
+tickbars = (0 : 0.25 : ceil(processed_data.fsr.timestamp_ms(end)/60000));
+tickhei = ones(length(tickbars),1)*20;
+gridcol = [0.80 0.80 0.80];
+bar(tickbars,tickhei,1/60,'FaceColor',gridcol,'EdgeColor',gridcol);
 
 ytickangle(90);
 %ylabelangle(90);
@@ -166,10 +212,10 @@ yticks([]);
 %yticklabels(["Game" "Sound" "Character"]);
 ax = gca;
 set(ax,'FontSize',12);
-grid off;
+grid on;
 % game events
 x_textpos = vertcat(7/60, processed_data.events.game.timestamp_ms/60000);
-y_textpos = zeros(length(processed_data.events.game.timestamp_ms)+1,1);
+y_textpos = zeros(length(processed_data.events.game.timestamp_ms)+1,1)+0.1;
 wrapped_text = char(processed_data.events.game.label);
 wrapped_text = wrapped_text(:,1:9);
 wrapped_text = vertcat('GAME     ',wrapped_text);
@@ -190,7 +236,7 @@ end
 
 % sound events
 x_textpos = vertcat(7/60,processed_data.events.sound.timestamp_ms/60000);
-y_textpos = ones(length(processed_data.events.sound.timestamp_ms)+1,1);
+y_textpos = ones(length(processed_data.events.sound.timestamp_ms)+1,1)+0.1;
 wrapped_text = char(processed_data.events.sound.label);
 wrapped_text = wrapped_text(:,1:9);
 wrapped_text = vertcat('SOUND    ',wrapped_text);
@@ -212,7 +258,7 @@ end
 
 % character events
 x_textpos = vertcat(7/60,processed_data.events.character.timestamp_ms/60000);
-y_textpos = ones(length(processed_data.events.character.timestamp_ms)+1,1)*2;
+y_textpos = ones(length(processed_data.events.character.timestamp_ms)+1,1)*2+0.1;
 wrapped_text = char(processed_data.events.character.label);
 wrapped_text = wrapped_text(:,1:9);
 wrapped_text = vertcat('CHAR     ',wrapped_text);
@@ -235,8 +281,10 @@ end
 
 ylim([0 3]);
 xlim([0 LONGEST_TRIAL_LENGTH_MIN]);
-xticks(0 : 0.25 : ceil(processed_data.fsr.timestamp_ms(end)));
+xticks(0 : 0.25 : ceil(processed_data.fsr.timestamp_ms(end)/60000));
 xticklabels([]);
+ax = gca;
+ax.TickLength = [0 0];
 
 % if hastimes
 %     ylabel('Events','FontSize',15,'FontName','Times New Roman');
@@ -248,16 +296,16 @@ xticklabels([]);
 
 
  %% SUBPLOT 4: frames
-subplot(29,1,[23 24 25 26 27]);
+subplot(29,1,[23 24 25 26]);
 hold on;
 grid on;
-for i = 1:length(temp_movie)
-    image([(i-1)/4 i/4],[0 1], imrotate(temp_movie(i).cdata,90));
+for i = 1:length(processed_data.frames.frames)
+    image([(i-1)/4 i/4],[0 1], imrotate(processed_data.frames.frames(i).cdata,90));
 end
-
+ylim([0 1]);
 yticks([]);
 xlim([0 LONGEST_TRIAL_LENGTH_MIN]);
-xticks(0 : 0.25 : ceil(processed_data.fsr.timestamp_ms(end)));
+xticks(0 : 0.25 : ceil(processed_data.fsr.timestamp_ms(end)/60000));
 xticklabels([]);
 %starttick = 0.25;
 %xticklabels(vertcat(strings(1,starttick/0.25), datestr(datetime((starttick/24/60:1/24/60/60*15:1/24/60*ceil(processed_data.feeltrace.timestamp_ms(end)/60000)),'ConvertFrom','datenum'),'MM:SS')));
@@ -299,37 +347,52 @@ labels = [scenes_cell{:,1}]';
 for i = 1:length(scenes)
     indices = find([scenes_cell{:,1}]' == scenes(i).name);
     times = [scenes_cell{:,9}]';
-    plot([times(indices(1))/60000,times(indices(end))/60000], [1,1],'LineWidth',5,'Color',colors(i,:));
+    if ~isempty(indices)
+        plot([times(indices(1))/60000,times(indices(end))/60000], [1-0.25+rem(i,2)*0.5,1-0.25+rem(i,2)*0.5],'LineWidth',5,'Color',colors(i,:));
+    end
     for j = 1:length(indices)
         if isfirst(indices(j))
             if strcmp(labels(indices(j)),'Far truck')
                 p_text = 'Far';
                 p_text = [p_text newline 'truck'];
+                p_pos = times(indices(j))/60000+4/60;
             else
                 p_text = labels(indices(j));
+                p_pos = times(indices(j))/60000+3/60;
             end
             if hastimes
-                tt = text(times(indices(j))/60000, 1.4, p_text,'Color',colors(i,:),'FontSize',14,'FontName','Times New Roman','BackgroundColor',[1 1 1],'Margin',0.1);
+                tt = text(p_pos, 1.3-0.25+rem(i,2)*0.5, p_text,'Color',colors(i,:),'FontSize',14,'FontName','Times New Roman','BackgroundColor',[1 1 1],'Margin',0.01);
             elseif haspal
-                tt = text(times(indices(j))/60000, 1.4, p_text,'Color',colors(i,:),'FontSize',14,'FontName','Palatino','BackgroundColor',[1 1 1],'Margin',0.1);
+                tt = text(p_pos, 1.3-0.25+rem(i,2)*0.5, p_text,'Color',colors(i,:),'FontSize',14,'FontName','Palatino','BackgroundColor',[1 1 1],'Margin',0.01);
             else
-                tt = text(times(indices(j))/60000, 1.4, p_text,'Color',colors(i,:),'FontSize',14,'BackgroundColor',[1 1 1],'Margin',0.1);
+                tt = text(p_pos, 1.3-0.25+rem(i,2)*0.5, p_text,'Color',colors(i,:),'FontSize',14,'BackgroundColor',[1 1 1],'Margin',0.01);
             end
             tt(1).FontWeight = 'bold';
             tt(1).Rotation = 90;
             %text(times(indices(j))/60000, 2, labels(indices(j)),'Color',colors(i,:),'FontSize',10);
         end
         if isstart(indices(j))
-            scatter((times(indices(j))-2500)/60000,1,5,'Marker','>','MarkerEdgeColor',colors(i,:),'LineWidth',2);
+            %text((times(indices(j))-2500)/60000,1,'>');
+            %scatter((times(indices(j))-2500)/60000,1-0.25+rem(i,2)*0.5,5,'Marker','>','MarkerEdgeColor',colors(i,:),'LineWidth',2);
+            plot([(times(indices(j)))/60000-2/60,(times(indices(j)))/60000], [1-0.25+rem(i,2)*0.5+0.4,1-0.25+rem(i,2)*0.5], 'LineWidth',3,'Color',colors(i,:));
+            plot([(times(indices(j)))/60000-2/60,(times(indices(j)))/60000], [1-0.25+rem(i,2)*0.5-0.4,1-0.25+rem(i,2)*0.5], 'LineWidth',3,'Color',colors(i,:));
+            %text((times(indices(j)))/60000,1-0.25+rem(i,2)*0.5,'>','FontSize',40,'HorizontalAlignment','right','Color',colors(i,:),'FontName','Gill Sans MT Condensed');
+            %scatter((times(indices(j)))/60000,1-0.25+rem(i,2)*0.5,5,'Marker','.','MarkerEdgeColor',[0 0 0],'LineWidth',1);
             %scatter(times(indices(j))/60000,1,10,'Marker','.','MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[0 0 0], 'LineWidth', 1);
         elseif ispeak(indices(j))
-            scatter(times(indices(j))/60000,1,20,'Marker','.','MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[0 0 0], 'LineWidth', 3);
+            scatter(times(indices(j))/60000,1-0.25+rem(i,2)*0.5,20,'Marker','.','MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[0 0 0], 'LineWidth', 3);
         elseif isfinish(indices(j))
-            scatter((times(indices(j))+2500)/60000,1,5,'Marker','<','MarkerEdgeColor',colors(i,:),'LineWidth',2);
+            %
+            plot([(times(indices(j)))/60000,(times(indices(j)))/60000+2/60], [1-0.25+rem(i,2)*0.5,1-0.25+rem(i,2)*0.5+0.4], 'LineWidth',3,'Color',colors(i,:));
+            plot([(times(indices(j)))/60000,(times(indices(j)))/60000+2/60], [1-0.25+rem(i,2)*0.5,1-0.25+rem(i,2)*0.5-0.4], 'LineWidth',3,'Color',colors(i,:));
+            %text((times(indices(j)))/60000,1-0.25+rem(i,2)*0.5,'>','FontSize',40,'HorizontalAlignment','right','Color',colors(i,:),'FontName','Gill Sans MT Condensed');
+            %scatter((times(indices(j)))/60000,1-0.25+rem(i,2)*0.5,5,'Marker','.','MarkerEdgeColor',[0 0 0],'LineWidth',1);
+            %
+            %scatter((times(indices(j))+2500)/60000,1-0.25+rem(i,2)*0.5,5,'Marker','<','MarkerEdgeColor',colors(i,:),'LineWidth',2);
             %scatter(times(indices(j))/60000,1,10,'Marker','.','MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[0 0 0], 'LineWidth', 1);
             %scatter(times(indices(j))/60000,1,40,'Marker','<','MarkerEdgeColor',colors(i,:),'MarkerFaceColor',colors(i,:));
         elseif isdeath(indices(j))
-            scatter(times(indices(j))/60000,1,10,'Marker','x','MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[0 0 0],'LineWidth',3);
+            scatter(times(indices(j))/60000,1-0.25+rem(i,2)*0.5,10,'Marker','x','MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[0 0 0],'LineWidth',3);
         end
     end
 end
@@ -337,7 +400,7 @@ end
 
 xlim([0 LONGEST_TRIAL_LENGTH_MIN]);
 % x ticks every 15 seconds
-xticks(0 : 0.25 : ceil(processed_data.fsr.timestamp_ms(end)));
+xticks(0 : 0.25 : ceil(processed_data.fsr.timestamp_ms(end)/60000));
 starttick = 0.25;
 xticklabels(vertcat(strings(1,starttick/0.25), datestr(datetime((starttick/24/60:1/24/60/60*15:1/24/60*ceil(processed_data.feeltrace.timestamp_ms(end)/60000)),'ConvertFrom','datenum'),'MM:SS')));
 xtickangle(90); 
@@ -349,6 +412,7 @@ xstring = join(repmat(strcat("                                                  
 xlabel(xstring,'FontSize', 11);
 hold off;
 yticks([]);
+ylim([0 2]);
 ylabel('Scenes','FontSize',15);
 
 %% PRINT AND SAVE
