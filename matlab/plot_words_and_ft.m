@@ -3,12 +3,16 @@
 
 clf
 hold on
+%plot fsrs
+max_fsr = max([processed_data.fsr.A0  processed_data.fsr.A1  processed_data.fsr.A2 processed_data.fsr.A3 processed_data.fsr.A4],[],2);
+area(processed_data.fsr.timestamp_ms/60000, max_fsr/1023*20, 'FaceColor',[0.9 0.9 0.9],'EdgeColor',[0.9 0.9 0.9]);
 
-plot(processed_data.feeltrace.timestamp_ms/60000, (processed_data.feeltrace.joystick-112)/11.2, 'Color',[85/255 165/255 250/255],'LineWidth',2)
-plot(processed_data.calibrated_words.timestamp_ms/60000, processed_data.calibrated_words.calibrated_values, 'Color', [255/255 179/255 48/255], 'LineWidth', 2)
-scatter(processed_data.calibrated_words.timestamp_ms/60000, processed_data.calibrated_words.calibrated_values)
+max_joystick = max(processed_data.feeltrace.joystick);
+plot(processed_data.feeltrace.timestamp_ms/60000, (processed_data.feeltrace.joystick)/max_joystick*20, 'Color',[85/255 165/255 250/255],'LineWidth',2)
+plot(processed_data.calibrated_words.timestamp_ms/60000, processed_data.calibrated_words.calibrated_values+10, 'Color', [255/255 179/255 48/255], 'LineWidth', 2)
+scatter(processed_data.calibrated_words.timestamp_ms/60000, processed_data.calibrated_words.calibrated_values+10)
 x_textpos = processed_data.calibrated_words.timestamp_ms/60000;
-y_textpos = processed_data.calibrated_words.calibrated_values;
+y_textpos = processed_data.calibrated_words.calibrated_values+10;
 %x_offset = 0.5;
 %y_offset = 1;
 %for i = 1:length(x_textpos)
@@ -25,8 +29,8 @@ for i = 1:length(processed_data.calibrated_words.timestamp_ms)
     %t(i).BackgroundColor = [1 1 1];
 end
 
-ylim([-10,10]);
-yticks([-10,0,10]);
+ylim([0,20]);
+yticks([0,10,20]);
 yticklabels(["Relieved" "-" "Stressed"]);
 xticks(0 : 0.25 : ceil(processed_data.fsr.timestamp_ms(end)));
 starttick = 0.25;
@@ -38,5 +42,14 @@ hold off;
 zoom xon;
 %zoom(2);
 pan xon;
+
+
+yyaxis right
+ax = get(gcf,'CurrentAxes');
+ax.YAxis(2).Color = 'black';
+ylabel('Keypress intensity');
+yticks([0 20]);
+ylim([0,20]);
+yticklabels(["Min" "Max"]);
 
 clearvars i starttick t x_offset x_textpos y_offset y_textpos ax

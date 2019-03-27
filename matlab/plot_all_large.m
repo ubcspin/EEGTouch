@@ -4,7 +4,7 @@
 load_globals;
 
 MS_PER_MIN = 60000;
-LONGEST_TRIAL_LENGTH_MIN = 10;
+LONGEST_TRIAL_LENGTH_MIN = 22;
 
 % If data to plot is not available, get it.
 if ~any(ismember(fields(processed_data),{'feeltrace'}))
