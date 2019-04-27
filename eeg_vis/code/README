@@ -1,0 +1,199 @@
+## preprocessing.m:
+Script for preprocessing EEG data. 
+
+IMPORTANT: The dataset saved by this file contains the ICA weights, but the component rejection must be done on hand before any visualization scripts are run.
+
+Requirements:
+	- Load the dataset of interest by calling eeglab on the command line, then select "File"->"Import data"->"Using EEGLAB functions and plugins"->"From Netstation Matlab Files". Select the eeg_data.mat file, sample at 1000Hz
+	- Needs the clean_rawdata eeglab extension to be installed
+
+Ensure that the ../data/Pxx folder also contains:
+	- the eeg_data.mat file, which is the raw data file that contains the evt_DIN1 array
+	- the channel_locations.sfp file 
+
+Contains two parameters to be set by the user:
+	- participant = "P17"; % participant number in Pxx format; eg. P09
+	- din_num = 1; % which DIN number to use
+	- asr_param = 20; % standard deviation for automatic data cleaning (20 recommended)
+
+Description:
+	- Assuming that eeglab is launched and a dataset has been loaded, performs the following preprocessing steps:
+		- Removes data from 0 to DIN to time-align it with the feeltrace
+		- Loads the channel locations from the .sfp file
+		- Resamples the data to 250Hz
+		- Bandpass filters the data to remove frequencies below 1Hz and above 50Hz
+		- Uses the clean_rawdata extension to remove badly correlated channels and cleans bad sections of the data using ASR
+		- Interpolate the removed channels using the rest of the data
+		- Set to average reference
+		- Perform ICA decomposition with lowered data rank, equal to the number of channels after clean_rawdata's channel removal
+		- Saves the processed dataset and ICA weights to ../data/Pxx/Processed_ICA.set, which can then be loaded any time later for artifact rejection
+
+
+## plotting_main.m:
+Script for setting up parameters and generating all visualizations for the current participant. 
+
+Requirement: EEGLAB is launched, and has a cleaned dataset loaded.
+
+Ensure that the ../data/Pxx folder also contains:
+	- game_events.mat file, containing the game events. If unavailable, use get_game_events.m to extract game events from processed_data.mat
+
+Parameters to be set by the user
+	- participant = "P17"; % participant number in Pxx format; eg. P09
+	- run_tf = true; % boolean for whether to run time_frequency decomposition (if plotting previously run tf, keep false)
+	- booleans for which visualizations to plot: 
+			- power_tf = false; % general power density and time frequency
+			- event_centered = false; % event-centered power density and time freqeuncy
+			- frequency_bands = false; % power over time for all frequency band
+			- alpha_theta_diff = false; % alpha-theta power difference over time
+			- left_right = false; % left-right hemispheres power difference over time
+	- time-frequency parameters can also be edited; see lines 71-82
+
+Note: The time-frequency decomposition is rather time-consuming. Recommended to turn run_tf to false after the initial run for the participant.
+
+Description: 
+	- Sets up parameters, runs time-frequency decomposition, and calls plotting scripts. All scripts share workspace variables to avoid recomputation, so the order must be maintained; all other plotting scripts must only be called from this script. 
+	- Possible visualizations include general power density and time-frequency plots, event-centered power density and time-frequency plots, frequency band power over time, difference in alpha and theta band power over time, and difference in left and right hemispheres over time.
+	- If run_tf is set to false, it loads the tf_outputs from the ../data/Pxx folder. If run_tf is set to true, it performs the time-frequency decomposition and saves the output to the ../data/Pxx folder. The parameters for the time-frequency decomposition can be edited: see "https://github.com/openroc/eeglab/blob/master/tags/EEGLAB7_0_2_10beta/functions/timefreqfunc/newtimef.m" for documentation
+	- Defines the frequency ranges that will be used in subsequent scripts for plotting
+	- Maps the electrode names ("Exx", which stay constant) and numbers (which can change if the clean_rawdata() preprocessing step rejects some channels which are later interpolated). Also maps brain regions to electrodes, to simplify subsequent averaging over brain regions
+
+
+## get_game_events.m:
+Script for extracting game events from processed_data.mat file. 
+
+Parameter to be set by the user
+	- participant = "P17"; % participant number in Pxx format; eg. P09
+
+
+## -------------------------------------------------------------------------
+
+## The following scripts are run from the plotting_main.m script
+
+## -------------------------------------------------------------------------
+
+## general_pd_tf.m:
+Script for generating general power density and time-frequency plots
+
+Requirement: run from plotting_main
+
+Output: saves plots to vis/Pxx/general_pd and vis/Pxx/general_tf
+
+Description:
+	- Uses the full time range of the data to plot one power density diagram, and a time-frequency plot over each of the main channels. This gives a high-level view of the data in terms of its frequency content and power over channels or time
+	- Generation details:
+		- For power-density: Uses the eeglab function spectopo to plot all channels' power 
+		- For time-frequency: uses the pre-computed time-frequency analyses and the eeglab function tftopo to generate the time-frequency plots. **Note that tftopo should also plot the colour legend for the plots, but for a reason unknown it does not. The plots are being generated on a -15 to 15 dB range, where the power is given by 10*log_10(power)
+
+
+
+## event_pd_tf.m:
+Script for generating power density and time-frequency plots centered around game events
+
+Requirement: run from plotting_main
+
+Ensure that the ../data/Pxx folder also contains:
+	- game_events.mat, a table of game events where the first column is the name of the event and the second column is the time (in ms) of occurrance. Note that the get_game_events.m script in the main scripts directory can be used to extract the game events from a processed_data.mat file
+
+Output: saves plots to vis/Pxx/event_pd and vis/Pxx/event_tf
+
+Description:
+	- The goal of this script was to imitate the event-related analysis that is often done in literature, to see if we can pick up on any patterns in the data.
+	- Generation details:
+		- For the power density plots, the data in the 20s after an event occurs is used with the eeglab spectopo function to create a plot for that time span. The advantage this has over the general power density plots is that it gives us some access to the the power across the channels around a game event
+		- For the time frequency plots, the  data in the 20s before and 20s after an event occurs is used with the eeglab newtimef function to create a time-frequency plot centered at that game event. The power difference from baseline is given between -15 and 15 dB, with a legend on the right hand side of the plot. The vertical and horizontal rectangular plots that are also generated are not of interest.
+
+
+## frequency_band_power.m:
+Script for generating plots of frequency band power over time
+
+Requirement: run from plotting_main
+
+Output: saves plots to vis/Pxx/band_power_ch and vis/Pxx/band_power_br
+
+Description: 
+	- If plot_br = true, creates a subfolder for plots over brain regions. If plot_ch = true, creates a subfolder for plots over each main channel
+	- Within each of these subfolders, creates a subfolder for each frequency band and generates a plot of the log power difference from baseline over time, averaged over the frequencies within a frequency band.
+	- Generation details:
+		- Iterates over all the channels/brain regions and gets the 5 bands' averaged band power difference from baseline
+		- Gets the maximum and minimum of these values, to be enable all plots to be on the same axis limits for easy cross-comparison
+		- Generates the plots using matlab's plot function
+		- The difference in the brain regions version is that the power across electrodes in the same brain region are also averaged before plotting
+
+
+
+## alpha_theta.m:
+Script for generating plots of the difference between the alpha and theta band power over time
+
+Requirement: run from plotting_main
+
+Output: saves plots to vis/Pxx/alpha_theta_ch and vis/Pxx/alpha_theta_br
+
+Description: 
+	- If plot_br = true, creates a subfolder for plots over brain regions. If plot_ch = true, creates a subfolder for plots over each main channel
+	- Within each of these subfolders, creates a subfolder for each frequency band and generates a plot of the log subtracted power difference between the left and right hemispheres.
+	- Generation details:
+		- Iterates over all the channels/brain regions and gets the two bands' averaged band power difference from baseline
+		- Uses these values to calculate the ratio between the band powers (ie. the log difference between the powers) over time
+		- Gets the maximum and minimum of these values, to be enable all plots to be on the same axis limits for easy cross-comparison
+		- Generates the plots using matlab's plot function
+		- The difference in the brain regions version is that the power across electrodes in the same brain region are also averaged before plotting
+
+
+
+## asymmetry.m:
+Script for generating plots of the difference between the left and right hemisphere over
+
+Requirement: run from plotting_main
+
+Output: saves plots to vis/Pxx/asymmetry_ch and vis/Pxx/asymmetry_br
+
+Description: 
+	- If plot_br = true, creates a subfolder for plots over brain regions. If plot_ch = true, creates a subfolder for plots over each main channel
+	- Within each of these subfolders, generates a plot of the log subtracted power difference between the  and theta bands. 
+	- Generation details:
+		- Iterates over all the channels/brain regions and gets the two bands' averaged band power difference from baseline
+		- Uses these values to calculate the ratio between the band powers (ie. the log difference between the powers) over time
+		- Gets the maximum and minimum of these values, to be enable all plots to be on the same axis limits for easy cross-comparison
+		- Generates the plots using matlab's plot function
+		- The difference in the brain regions version is that the power across electrodes in the same brain region are also averaged before plotting
+
+
+
+
+## File/folder naming conventions:
+	- _ch refers to per-channel, _br refers to per-brain-region
+	- _ch: Folders containing plots over each main channel. The main channels were chosen using the international 10-20 system, which is the method used to describe the locations of scalp electrodes for EEGs. The electrode labels (F3,O2,etc) are mapped to the electrode numbers (E12,E39,etc) using the 64-channel map provided with the EEG nets, given below:
+		- FP2: "E5"
+		- FCz = "E6"
+		- FP1 = "E10"
+		- F3 = "E12"
+		- F7 = "E18"
+		- C3 = "E20"
+		- T7 = "E24"
+		- P3 = "E28"
+		- P7 = "E30"
+		- Pz = "E34"
+		- O1 = "E35"
+		- Oz = "E37"
+		- O2 = "E39"
+		- P4 = "E42"
+		- P8 = "E44"
+		- C4 = "E50"
+		- T8 = "E52"
+		- F8 = "E58"
+		- F4 = "E60"
+		
+	- _br: Folders containing plots over brain regions. These plots were generated by averaging the power over all the electrodes that correspond to that brain region. The mapping of electrodes to brain regions (R = right, L = left) is given by:
+		- RFrontal = "E6", "E3", "E60", "E8", "E2", "E59", "E5", "E58", "E1"
+		- LFrontal = "E6", "E9", "E12", "E8", "E11", "E13", "E10", "E18", "E17"
+		- RCentral = "E4", "E54", "E51", "E41", "E53", "E50", "E57", "E49", "E46"
+		- LCentral = "E4", "E7", "E16", "E21", "E15", "E20", "E14", "E22", "E26"
+		- RTemporal = "E56", "E48", "E52", "E55", "E47"
+		- LTemporal = "E19", "E25", "E24", "E23", "E29"
+		- RParietal = "E34", "E40", "E42", "E45", "E44"
+		- LParietal = "E34", "E31", "E28", "E27", "E30"
+		- ROccipital = "E36", "E38", "E37", "E39", "E43"
+		- LOccipital = "E36", "E33", "E37", "E35", "E32"
+
+
+## TODO: refactor code to be less repetitive; use functions and function variables instead of relying on shared workspace variables
