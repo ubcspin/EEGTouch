@@ -21,7 +21,7 @@ function events_timeseries = align_events(local_paths, trial_data)
     sound_table.timestamp_ms = round(sound_table.timestamp_ms - trial_data.scalars.sync_frame*1000 / trial_data.scalars.frame_rate);
 
     % Add to processed data struct.
-    events_timeseries.game = game_table;
-    events_timeseries.character = character_table;
-    events_timeseries.sound = sound_table;
+    events_timeseries.game_controlled_visual = game_table;
+    events_timeseries.game_controlled_sound = sound_table;
+    events_timeseries.player_controlled = character_table;
 end

@@ -1,0 +1,36 @@
+scene,tag,stream,type
+Truck,Light-truck-1,game_controlled_visual,begin
+Truck,Truck-backup,game_controlled_visual,peak
+Truck,Truck-tree,game_controlled_visual,end
+Portal,Portal-light,game_controlled_visual,begin
+Portal,Flashlight-portal,game_controlled_visual,peak
+Portal,Portal-tree,game_controlled_visual,end
+Fridge,Inframe,game_controlled_visual,begin
+Fridge,Fridge-hit,game_controlled_visual,peak
+Fridge,Fridge-wall,game_controlled_visual,end
+Far truck,Truck-move,game_controlled_visual,begin
+Far truck,Centre,game_controlled_visual,peak
+Far truck,Safe-far-truck,game_controlled_visual,end
+Crate,Crate-beam,game_controlled_visual,begin
+Crate,Crate-over,game_controlled_visual,peak
+Crate,Crate-beam-source,game_controlled_visual,end
+River,Splash,game_controlled_visual,begin
+River,Light-river-1,game_controlled_visual,begin
+River,Light-river-2,game_controlled_visual,begin
+River,Dog-river-3,game_controlled_visual,peak
+River,Dog-river-5,game_controlled_visual,peak
+River,Jump-success,game_controlled_visual,end
+Road,Tree-road-1,game_controlled_visual,begin
+Road,Panting,game_controlled_sound,peak
+Road,Beam-road-out,game_controlled_visual,end
+Dogs,Two-lights,game_controlled_visual,begin
+Dogs,Two-lights-2,game_controlled_visual,begin
+Dogs,Soundtrack start,game_controlled_sound,peak
+Dogs,Hide-dogs,game_controlled_visual,peak
+Dogs,Dogs super loud,game_controlled_sound,peak
+Dogs,Cliff-land,game_controlled_visual,end
+Water,Cliff-land,game_controlled_visual,begin
+Water,Mid-water,game_controlled_visual,peak
+Water,Pass-water,game_controlled_visual,end
+Pigs,Pass-pig,game_controlled_visual,begin
+Pigs,End-gameplay,game_controlled_visual,end
