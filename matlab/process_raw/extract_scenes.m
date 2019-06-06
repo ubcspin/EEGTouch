@@ -6,13 +6,6 @@ function scenes_played = extract_scenes(trial_data)
     scenes_mat = [];
     mat_ind = 1;
 
-    % corrects pig typo
-    for i = 1:length(trial_data.events.game_controlled_visual.label)
-        if contains(trial_data.events.game_controlled_visual.label(i),"pass-pig")
-            trial_data.events.game_controlled_visual.label(i) = "Pass-pig";
-        end
-    end
-
     for i = 1:length(scenes)
         for j = 1:length(scenes(i).begin)
             begin_event_stream = getfield(trial_data.events, scenes(i).begin(j).stream);
