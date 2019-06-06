@@ -1,5 +1,5 @@
 function scenes = get_scenes_list()
-    labels = import_labels(pwd);
+    labels = import_labels(fileparts(mfilename('fullpath')));
     scene_names_raw = string(unique(labels.scene, 'stable'));
     scene_names_raw = scene_names_raw(2:end);
 

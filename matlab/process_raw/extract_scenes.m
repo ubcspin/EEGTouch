@@ -7,9 +7,9 @@ function scenes_played = extract_scenes(trial_data)
     mat_ind = 1;
 
     % corrects pig typo
-    for i = 1:length(trial_data.events.game.label)
-        if contains(trial_data.events.game.label(i),"pass-pig")
-            trial_data.events.game.label(i) = "Pass-pig";
+    for i = 1:length(trial_data.events.game_controlled_visual.label)
+        if contains(trial_data.events.game_controlled_visual.label(i),"pass-pig")
+            trial_data.events.game_controlled_visual.label(i) = "Pass-pig";
         end
     end
 
@@ -84,8 +84,8 @@ function scenes_played = extract_scenes(trial_data)
         end
     end
 
-    for i = 1:length(trial_data.events.character.timestamp_ms)
-        if strcmp(lower(extractBefore(trial_data.events.character.label(i),"-")),"death")
+    for i = 1:length(trial_data.events.player_controlled.timestamp_ms)
+        if strcmp(lower(extractBefore(trial_data.events.player_controlled.label(i),"-")),"death")
 
                 % TODO: find out which scene by checking label
                 scenes_mat(mat_ind).name = "unknown";
@@ -94,9 +94,9 @@ function scenes_played = extract_scenes(trial_data)
                 scenes_mat(mat_ind).ispeak = false;
                 scenes_mat(mat_ind).isfinish = false;
                 scenes_mat(mat_ind).isdeath = true;
-                scenes_mat(mat_ind).label = trial_data.events.character.label(i);
+                scenes_mat(mat_ind).label = trial_data.events.player_controlled.label(i);
                 scenes_mat(mat_ind).ind = i;
-                scenes_mat(mat_ind).time = trial_data.events.character.timestamp_ms(i);
+                scenes_mat(mat_ind).time = trial_data.events.player_controlled.timestamp_ms(i);
                 mat_ind = mat_ind+1;
         end
     end
