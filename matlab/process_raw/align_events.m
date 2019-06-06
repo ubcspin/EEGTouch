@@ -12,8 +12,11 @@ function events_timeseries = align_events(local_paths, trial_data)
 
     % Extract data from CSV
     game_table = get_premiere_markers(game_file);
+    game_table.label = lower(game_table.label);
     character_table = get_premiere_markers(character_file);
+    character_table.label = lower(character_table.label);
     sound_table = get_premiere_markers(sound_file);
+    sound_table.label = lower(sound_table.label);
 
     % Align video millisecond timestamps to sync frame.
     game_table.timestamp_ms = round(game_table.timestamp_ms - trial_data.scalars.sync_frame*1000 / trial_data.scalars.frame_rate);
