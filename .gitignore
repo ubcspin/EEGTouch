@@ -2,4 +2,6 @@
 */node_modules/*
 */localtest/*
 */logs/log_*
-matlab/tableau/processed_data_pxx
+matlab/tableau/processed_data_pxx 
+matlab/tableau/*.csv
+matlab/experiments/results

@@ -9,7 +9,7 @@ for i = 1:size(all_data,1)
     
     if ~isempty(pfile)
         fprintf('Extracting scene data from participant %d...\n', i);
-        scene_data = extract_scenes(pfile.processed_data);
+        scene_data = extract_scenes(pfile);
         
         scene_data_len = size(scene_data, 1);
         
