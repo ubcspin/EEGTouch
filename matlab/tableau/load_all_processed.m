@@ -15,7 +15,7 @@ for i = 1:ptotal
     fprintf('Loading data from participant %d... ', i);
     try 
         pfile = load(strcat('processed_data_pxx/processed_data_p', str_i, '/processed_data.mat'));
-        all_data{i,1} = pfile;  
+        all_data{i,1} = rename_fields(pfile.processed_data);
         fprintf('SUCCESS!\n');
     catch ex
         fprintf('FAILED.\n');
