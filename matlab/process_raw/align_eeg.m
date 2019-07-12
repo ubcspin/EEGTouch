@@ -45,7 +45,7 @@ function eeg_timeseries = align_eeg(local_paths, trial_data)
 end
 
 function which_din = select_which_din(all_din_times, trial_number)
-    msg = [{['More than one DIN1 signal time found for trial ' trial_number '. Please select the appropriate DIN to use.']} {''} {''} {''}];
+    msg = [{['More than one DIN1 signal time found for trial ' char(trial_number) '. Please select the appropriate DIN to use.']} {''} {''} {''}];
     title = 'Select DIN';
     list = {};
     for i = 1:length(all_din_times)
