@@ -1,5 +1,8 @@
-function [frequency_table, full_time_ms, f] = freq_table(data_table, processed_directory)
+function [frequency_table, full_time_ms, f] = freq_table(trial_data, local_paths)
 %load_globals;
+
+init_app;
+trial_data = rename_fields(trial_data);
 
 % Split of frequency bands
 freq_split = 128;
@@ -13,13 +16,13 @@ overlap = 0;
 s_rate = 1000;
 % Number of EEG channels
 num_channels = 64;
-% Window size for feeltrace convolution
-feeltrace_window = 10;
-% Slope cutoff for feeltrace slope categorization
-feeltrace_slopecut = 5;
+% Window size for joystick convolution
+joystick_window = 10;
+% Slope cutoff for joystick slope categorization
+joystick_slopecut = 5;
 
 % Prelim spectrogram to establish table size
-[s,f,t] = spectrogram(data_table.eeg.eeg(:,1),window_val,overlap,freq_split,s_rate,'onesided');
+[s,f,t] = spectrogram(trial_data.eeg.eeg(:,1),window_val,overlap,freq_split,s_rate,'onesided');
 % Time interval in milliseconds
 time_interval = round((t(2) - t(1))*1000);
 % Find last frequency band to keep
@@ -31,7 +34,7 @@ time_lead = 0:time_interval/1000:t(1)-(time_interval/1000);
 frequency_table = table;
 
 % Length of original EEG recording
-[eeglen, ~] = size(data_table.eeg);
+[eeglen, ~] = size(trial_data.eeg);
 
 % Time vector
 full_time = [t time_lead];
@@ -50,7 +53,7 @@ end
 % Spectrogram for each EEG channel
 for i = 1:num_channels
     % compute spectrogram
-    [s,f,t] = spectrogram(data_table.eeg.eeg(:,i),window_val,overlap,freq_split,s_rate,'onesided');
+    [s,f,t] = spectrogram(trial_data.eeg.eeg(:,i),window_val,overlap,freq_split,s_rate,'onesided');
     % add leading zeros to frequency matrix
     frequencies_with_lead = [lead_zeros abs(s(1:freq_cut_idx,:))]';
     % string of band labels with channel number eg "ch1_1"
@@ -59,60 +62,60 @@ for i = 1:num_channels
     frequency_table = [frequency_table channel_frequency_table];
 end
 
-% interpolate irregularly-sampled feeltrace to EEG sampling frequency
-feeltrace = interp1(data_table.feeltrace.timestamp_ms,data_table.feeltrace.joystick,1:eeglen)';
+% interpolate irregularly-sampled joystick to EEG sampling frequency
+joystick = interp1(trial_data.joystick.timestamp_ms,trial_data.joystick.joystick,1:eeglen)';
 % downsample to spectrogram sample rate & cut to size
-ft_downsampled = downsample(feeltrace,time_interval);
-ft_downsampled = ft_downsampled(1:length(full_time));
+js_downsampled = downsample(joystick,time_interval);
+js_downsampled = js_downsampled(1:length(full_time));
 % add to table
-feeltrace_table = table(ft_downsampled, 'VariableNames', "feeltrace");
-feeltrace_table = fillmissing(feeltrace_table,'nearest');
-frequency_table = [feeltrace_table frequency_table];
+joystick_table = table(js_downsampled, 'VariableNames', "joystick");
+joystick_table = fillmissing(joystick_table,'nearest');
+frequency_table = [joystick_table frequency_table];
 
 % Convolution window vector for approx slopes
-ft_window = [-1 zeros(1,max(0,feeltrace_window-2)) 1];
-% Apply to downsampled feeltrace & trim to size
-conv_ft = conv(ft_downsampled',ft_window)';
-conv_ft = conv_ft(1:length(full_time));
+js_window = [-1 zeros(1,max(0,joystick_window-2)) 1];
+% Apply to downsampled joystick & trim to size
+conv_js = conv(js_downsampled',js_window)';
+conv_js = conv_js(1:length(full_time));
 % Find slopes above and below threshold cutoff
-conv_ft_slope_above = conv_ft > feeltrace_slopecut;
-conv_ft_slope_poslow = (conv_ft > 0) & (conv_ft <= feeltrace_slopecut);
-conv_ft_slope_below = conv_ft <= -(feeltrace_slopecut);
-conv_ft_slope_neglow = (conv_ft <= 0) & (conv_ft > -(feeltrace_slopecut));
+conv_js_slope_above = conv_js > joystick_slopecut;
+conv_js_slope_poslow = (conv_js > 0) & (conv_js <= joystick_slopecut);
+conv_js_slope_below = conv_js <= -(joystick_slopecut);
+conv_js_slope_neglow = (conv_js <= 0) & (conv_js > -(joystick_slopecut));
 % Convert to integer categories
-conv_ft_slope_cat = conv_ft_slope_above + conv_ft_slope_below*-1;
-conv_ft_slope_multicat = conv_ft_slope_above*2 + conv_ft_slope_poslow + conv_ft_slope_neglow*-1 + conv_ft_slope_below*-2;
+conv_js_slope_cat = conv_js_slope_above + conv_js_slope_below*-1;
+conv_js_slope_multicat = conv_js_slope_above*2 + conv_js_slope_poslow + conv_js_slope_neglow*-1 + conv_js_slope_below*-2;
 % Optional categorical vectors (for logical classifiers)
 %convs_cat = [conv_slope_above conv_slope_below ~(conv_slope_above & conv_slope_below)];
-ft_slopecat_table = table(conv_ft_slope_cat, 'VariableNames', "ft_slopecat");
-ft_slopemulticat_table = table(conv_ft_slope_multicat, 'VariableNames', "ft_slopecat_mult");
-frequency_table = [ft_slopecat_table frequency_table];
-frequency_table = [ft_slopemulticat_table frequency_table];
-%frequency_table = addvars(frequency_table, conv_ft_slope_cat, 'NewVariableNames',"ft_slopecat");
+js_slopecat_table = table(conv_js_slope_cat, 'VariableNames', "js_slopecat");
+js_slopemulticat_table = table(conv_js_slope_multicat, 'VariableNames', "js_slopecat_mult");
+frequency_table = [js_slopecat_table frequency_table];
+frequency_table = [js_slopemulticat_table frequency_table];
+%frequency_table = addvars(frequency_table, conv_js_slope_cat, 'NewVariableNames',"js_slopecat");
 
-fsr_times = data_table.fsr.timestamp_ms;
-frequency_table.fsrA0 = downsample_fsr(data_table.fsr.A0, fsr_times, time_interval, eeglen, full_time);
-frequency_table.fsrA1 = downsample_fsr(data_table.fsr.A1, fsr_times, time_interval, eeglen, full_time);
-frequency_table.fsrA2 = downsample_fsr(data_table.fsr.A2, fsr_times, time_interval, eeglen, full_time);
-frequency_table.fsrA3 = downsample_fsr(data_table.fsr.A3, fsr_times, time_interval, eeglen, full_time);
-frequency_table.fsrA4 = downsample_fsr(data_table.fsr.A4, fsr_times, time_interval, eeglen, full_time);
+fsr_times = trial_data.fsr.timestamp_ms;
+frequency_table.fsrA0 = downsample_fsr(trial_data.fsr.A0, fsr_times, time_interval, eeglen, full_time);
+frequency_table.fsrA1 = downsample_fsr(trial_data.fsr.A1, fsr_times, time_interval, eeglen, full_time);
+frequency_table.fsrA2 = downsample_fsr(trial_data.fsr.A2, fsr_times, time_interval, eeglen, full_time);
+frequency_table.fsrA3 = downsample_fsr(trial_data.fsr.A3, fsr_times, time_interval, eeglen, full_time);
+frequency_table.fsrA4 = downsample_fsr(trial_data.fsr.A4, fsr_times, time_interval, eeglen, full_time);
 
-frequency_table.events_game = downsample_text(data_table.events.game.label, data_table.events.game.timestamp_ms, time_interval, eeglen, full_time);
-frequency_table.events_sound = downsample_text(data_table.events.sound.label, data_table.events.sound.timestamp_ms, time_interval, eeglen, full_time);
-frequency_table.events_character = downsample_text(data_table.events.character.label, data_table.events.character.timestamp_ms, time_interval, eeglen, full_time);
-frequency_table.inteview = downsample_text(data_table.interview.label, data_table.interview.timestamp_ms, time_interval, eeglen, full_time);
+frequency_table.events_game = downsample_text(trial_data.events.game_controlled_visual.label, trial_data.events.game_controlled_visual.timestamp_ms, time_interval, eeglen, full_time);
+frequency_table.events_sound = downsample_text(trial_data.events.game_controlled_sound.label, trial_data.events.game_controlled_sound.timestamp_ms, time_interval, eeglen, full_time);
+frequency_table.events_character = downsample_text(trial_data.events.player_controlled.label, trial_data.events.player_controlled.timestamp_ms, time_interval, eeglen, full_time);
+frequency_table.inteview = downsample_text(trial_data.interview.label, trial_data.interview.timestamp_ms, time_interval, eeglen, full_time);
 
-calibrated_words = downsample(interp1(data_table.calibrated_words.timestamp_ms,data_table.calibrated_words.calibrated_values,1:eeglen,'nearest','extrap'),100)';
+calibrated_words = downsample(interp1(trial_data.calibrated_words.timestamp_ms,trial_data.calibrated_words.calibrated_values,1:eeglen,'nearest','extrap'),100)';
 frequency_table.calibrated_words = calibrated_words(1:length(full_time));
 
 % save to file - matlab
 balanced_frequency_table = balance_freq_table(frequency_table);
-save(fullfile(processed_directory, [data_table.scalars.trial_number '_frequency_table.mat']),'frequency_table','balanced_frequency_table','f','full_time_ms');
+save(fullfile(local_paths.processed_directory, [trial_data.scalars.trial_number '_frequency_table.mat']),'frequency_table','balanced_frequency_table','f','full_time_ms');
 
 % save to file - csv
-csv_dir = fullfile(processed_directory,['csv' data_table.scalars.trial_number]);
+csv_dir = fullfile(local_paths.processed_directory,['csv' trial_data.scalars.trial_number]);
 status = mkdir(csv_dir);
-writetable(frequency_table,fullfile(csv_dir,['freqs' data_table.scalars.trial_number '.csv']));
+writetable(frequency_table,fullfile(csv_dir,['freqs' trial_data.scalars.trial_number '.csv']));
 end
 
 function downsampled_fsr = downsample_fsr(fsr_vector, fsr_time_vector, time_interval, eeglen, full_time)

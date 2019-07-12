@@ -1,3 +1,5 @@
+load_globals;
+
 big_table = processed_data.eeg;
 [eeglen, ~] = size(processed_data.eeg);
 
