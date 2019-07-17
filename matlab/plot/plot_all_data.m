@@ -5,11 +5,9 @@
 
 % Load directories and data.
 function the_plot = plot_all_data(local_paths, trial_data)
-    the_plot = "";
+    clf;
+    the_plot = figure(1);
     confirm_required_data_present(trial_data);
-
-    %% LET'S GET PLOTTING
-    fig = figure(1);
 
     %% FIRST SUBPLOT: feeltrace and calibrated words
 
@@ -20,61 +18,26 @@ function the_plot = plot_all_data(local_paths, trial_data)
     PLOT1_MAXIMUM_VAL = 10;
 
     %plot fsrs
-    plot_fsr(trial_data.fsr, PLOT1_MAXIMUM_VAL);
-    plot_gridlines_with_midpoint();
+    fsr_plot = plot_fsr(trial_data.fsr, PLOT1_MAXIMUM_VAL);
+    gridlines_with_midpoint = plot_gridlines_with_midpoint();
 
-    %plot joystick
-    
-    plot_joystick(trial_data.joystick, PLOT1_MAXIMUM_VAL);
+    %plot joystic
+    joystick_plot = plot_joystick(trial_data.joystick, PLOT1_MAXIMUM_VAL);
 
-%     max_joystick = max(trial_data.joystick.joystick);
-%     joystick_plot_colour = [21/255 104/255 237/255];
-%     joystick_plot_linewidth = 2;
-%     plot(trial_data.joystick.timestamp_ms/get_ms_per_min(),trial_data.joystick.joystick/max_joystick*plot_maximum_val*2,'Color',joystick_plot_colour,'LineWidth',joystick_plot_linewidth);
     % line plot the calibrated words
-    calibrated_words_plot_colour = [255/255 129/255 0/255];
-    calibrated_words_plot_linewidth = 2;
-    calibrated_words_plot_marker = '*';
-    calibrated_words_marker_size = 5;
-    plot(trial_data.calibrated_words.timestamp_ms/get_ms_per_min(), trial_data.calibrated_words.calibrated_values+PLOT1_MAXIMUM_VAL, 'Color', calibrated_words_plot_colour, 'LineWidth', calibrated_words_plot_linewidth)
-    % scatter plot the calibrated words
-    scatter(trial_data.calibrated_words.timestamp_ms/get_ms_per_min(), trial_data.calibrated_words.calibrated_values+PLOT1_MAXIMUM_VAL,calibrated_words_marker_size,'Marker',calibrated_words_plot_marker,'LineWidth',calibrated_words_plot_linewidth,'MarkerEdgeColor',calibrated_words_plot_colour);
-    % set positions for calibrated words text
-    calibrated_words_x_textpositions = trial_data.calibrated_words.timestamp_ms/get_ms_per_min();
-    calibrated_words_y_textpositions = trial_data.calibrated_words.calibrated_values+PLOT1_MAXIMUM_VAL;
-    % plot calibrated words text
-    calibrated_words_text = text(calibrated_words_x_textpositions, calibrated_words_y_textpositions, cellstr(trial_data.calibrated_words.emotion_words));
-
-
-    % set text angle, weight, size
-    for i = 1:length(trial_data.calibrated_words.timestamp_ms)
-        calibrated_words_text(i).Rotation = 90;
-        calibrated_words_text(i).FontWeight = 'bold';
-        calibrated_words_text(i).FontSize = 18;
-    end
+    
+    [calibrated_words_plot, calibrated_words_points, calibrated_words_words] = plot_calibrated_words(trial_data.calibrated_words, PLOT1_MAXIMUM_VAL);
 
     % set range to min and max of calibrated words
     ylim([0,PLOT1_MAXIMUM_VAL*2]);
-    % y ticks at maximum, minimum, middle
     yticks([PLOT1_MAXIMUM_VAL,PLOT1_MAXIMUM_VAL*2]);
-    % label direction of y axis
-    %yticklabels(["Relieved" "" "Stressed"]);
     emotion_ylabel = 'Reported emotion';
     emotion_ylabel = [emotion_ylabel newline 'Relieved                                             Stressed'];
     ylabel(emotion_ylabel,'FontSize',14);
     yticklabels([]);
-    %ytickangle(90);
-    % set domain to longest trial length for equivalent figure size
-    xlim([0 get_longest_trial_length_min()]);
+    
     % x ticks every 15 seconds
-    xticks(0 : 0.25 : ceil(trial_data.fsr.timestamp_ms(end)/get_ms_per_min()));
-    xticklabels([]);
-    xtickangle(90); 
-    ax = gca;
-    ax.XGrid = 'on';
-     %set(ax,'FontSize',14);
-     %set(ax,'linewidth',1);
-    %set(gca,'xaxisLocation','top');
+    plot1_x_axis = x_axis_no_labels(trial_data.fsr.timestamp_ms(end));
 
     yyaxis right
     ax = get(gcf,'CurrentAxes');
@@ -84,28 +47,12 @@ function the_plot = plot_all_data(local_paths, trial_data)
 
     ylabel(fsr_ylabel,'FontSize',14);
     ytickangle(90);
-    %ylabelangle(90);
     yticks([10 20]);
     ylim([0,20]);
     yticklabels([]);
     ax = gca;
-    %set(ax,'FontSize',14);
-    xlim([0 get_longest_trial_length_min()]);
-    % x ticks every 15 seconds
-    xticks(0 : 0.25 : ceil(trial_data.fsr.timestamp_ms(end)/get_ms_per_min()));
-    xticklabels([]);
-    %xtickangle(90); 
-    ax.TickLength = [0 0];
-    ax = gca;
-    ax.XGrid = 'on';
-     %set(ax,'FontSize',14);
-     %set(ax,'linewidth',1);
-     ax.GridColor = [0, 0, 0];
-     set(gca,'Layer','top');
-    %set(gca,'xaxisLocation','top');
-    %ax.TickLength = [0.1 0];
-    %plot([0 22],[0 0],'Color',[1 1 1],'LineWidth',5);
-
+    ax.GridColor = [0, 0, 0];
+    set(gca,'Layer','top');
 
     hold off;
 
@@ -114,27 +61,15 @@ function the_plot = plot_all_data(local_paths, trial_data)
     subplot(29,1,[13 14 15 16 17]);
     hold on;
     grid on;
-    tickbars = (0 : 0.25 : ceil(trial_data.fsr.timestamp_ms(end)/get_ms_per_min()));
-    tickhei = ones(length(tickbars),1)*20;
-    gridcol = [0.80 0.80 0.80];
-    bar(tickbars,tickhei,1/60,'FaceColor',gridcol,'EdgeColor',gridcol);
+    gridlines_2 = plot_gridlines();
     
     % array of ones for 1D interview plot at controlled height
     %interview_ones = ones(length(trial_data.interview.timestamp_ms),1);
     % array of number + staggered space strings for interview x-labels
     %interview_nums_num = (1:length(trial_data.interview.timestamp_ms)).';
     %interview_nums = arrayfun(@(x) strcat(num2str(x),convertCharsToStrings(blanks(mod(x,3)*2))), interview_nums_num,'UniformOutput',false);
-
-
     interview_words_x_textpositions = trial_data.interview.timestamp_ms/get_ms_per_min();
     interview_words_y_textpositions = zeros(length(trial_data.interview.timestamp_ms),1);
-    j = 2;
-    for i = 1:length(trial_data.interview.timestamp_ms)
-        while trial_data.joystick.timestamp_ms(j) < trial_data.interview.timestamp_ms(i)
-            j = j+1;
-        end
-    end
-    
     
     wrapped_text = arrayfun(@(c) textwrap(c,30), trial_data.interview.label,'UniformOutput',false);
     interview_text = text(interview_words_x_textpositions, interview_words_y_textpositions, wrapped_text,'Margin',0.001,'BackgroundColor',[1 1 1],'FontName',get_small_text_font());
@@ -143,12 +78,13 @@ function the_plot = plot_all_data(local_paths, trial_data)
     ylabel('Interview','FontSize',15);
 
     yticks([]);
-    xlim([0 get_longest_trial_length_min()]);
-    xticks(0 : 0.25 : ceil(trial_data.fsr.timestamp_ms(end)/get_ms_per_min()));
-    xticklabels([]);
-    xtickangle(90);
-    ax = gca;
-    ax.TickLength = [0 0];
+    plot2_x_axis = x_axis_no_labels(trial_data.fsr.timestamp_ms(end));
+%     xlim([0 get_longest_trial_length_min()]);
+%     xticks(0 : 0.25 : ceil(trial_data.fsr.timestamp_ms(end)/get_ms_per_min()));
+%     xticklabels([]);
+%     xtickangle(90);
+%     ax = gca;
+%     ax.TickLength = [0 0];
 
     hold off;
 
@@ -163,11 +99,7 @@ function the_plot = plot_all_data(local_paths, trial_data)
     bar(tickbars,tickhei,1/60,'FaceColor',gridcol,'EdgeColor',gridcol);
 
     ytickangle(90);
-    %ylabelangle(90);
-    %yticks([0 1 2]);
-    %ylim([0,20]);
     yticks([]);
-    %yticklabels(["Game" "Sound" "Character"]);
     ax = gca;
     set(ax,'FontSize',12);
     grid on;
@@ -177,11 +109,7 @@ function the_plot = plot_all_data(local_paths, trial_data)
     player_events_text = plot_events(trial_data.events.player_controlled, 2.1, 'PLAYER   ', [17/255 30/255 108/255]);
 
     ylim([0 3]);
-    xlim([0 get_longest_trial_length_min()]);
-    xticks(0 : 0.25 : ceil(trial_data.fsr.timestamp_ms(end)/get_ms_per_min));
-    xticklabels([]);
-    ax = gca;
-    ax.TickLength = [0 0];
+    plot3_x_axis = x_axis_no_labels(trial_data.fsr.timestamp_ms(end));
     ylabel('Events','FontSize',15);
 
      %% SUBPLOT 4: frames
@@ -305,8 +233,8 @@ function the_plot = plot_all_data(local_paths, trial_data)
     ylabel('Scenes','FontSize',15);
 
     %% PRINT AND SAVE
-    fig.PaperUnits = 'inches';
-    fig.PaperPosition = [0 0 110 16];
+    the_plot.PaperUnits = 'inches';
+    the_plot.PaperPosition = [0 0 110 16];
     print(fullfile(local_paths.processed_directory,['data_plot' char(trial_data.scalars.trial_number)]),'-dpng','-r0');
 end
     
@@ -331,6 +259,24 @@ function fsr_plot = plot_fsr(fsr_data, plot_maximum_val)
      fsr_plot = area(fsr_data.timestamp_ms/get_ms_per_min(), max_fsr/1023*plot_maximum_val*2, 'FaceColor',fsr_plot_colour,'EdgeColor',fsr_plot_colour);
 end
 
+function [calibrated_words_plot, calibrated_words_points, calibrated_words_words] = plot_calibrated_words(calibrated_words_data, PLOT1_MAXIMUM_VAL)
+    calibrated_words_plot_colour = [255/255 129/255 0/255];
+    calibrated_words_plot_linewidth = 2;
+    calibrated_words_plot_marker = '*';
+    calibrated_words_marker_size = 5;
+    calibrated_words_plot = plot(calibrated_words_data.timestamp_ms/get_ms_per_min(), calibrated_words_data.calibrated_values+PLOT1_MAXIMUM_VAL, 'Color', calibrated_words_plot_colour, 'LineWidth', calibrated_words_plot_linewidth);
+    % scatter plot the calibrated words
+    calibrated_words_points = scatter(calibrated_words_data.timestamp_ms/get_ms_per_min(), calibrated_words_data.calibrated_values+PLOT1_MAXIMUM_VAL,calibrated_words_marker_size,'Marker',calibrated_words_plot_marker,'LineWidth',calibrated_words_plot_linewidth,'MarkerEdgeColor',calibrated_words_plot_colour);
+    % set positions for calibrated words text
+    calibrated_words_x_textpositions = calibrated_words_data.timestamp_ms/get_ms_per_min();
+    calibrated_words_y_textpositions = calibrated_words_data.calibrated_values+PLOT1_MAXIMUM_VAL;
+    % plot calibrated words text
+    calibrated_words_words = text(calibrated_words_x_textpositions, calibrated_words_y_textpositions, cellstr(calibrated_words_data.emotion_words));
+    set(calibrated_words_words,'Rotation',90);
+    set(calibrated_words_words,'FontSize',13);
+    set(calibrated_words_words,'FontWeight','bold');
+end
+
 function gridlines = plot_gridlines_with_midpoint()
     gridlines = struct;
     
@@ -346,11 +292,28 @@ function gridlines = plot_gridlines_with_midpoint()
      gridlines.bottom = plot([0 22],[0 0],'Color',gridcol,'LineWidth',1);
 end
 
+function gridlines = plot_gridlines()
+    tickbars = (0 : 0.25 : get_longest_trial_length_min());
+    tickhei = ones(length(tickbars),1)*20;
+    gridcol = [0.80 0.80 0.80];
+    gridlines = bar(tickbars,tickhei,1/60,'FaceColor',gridcol,'EdgeColor',gridcol);
+end
+
 function joystick_plot = plot_joystick(joystick_data, plot_maximum_val)
     max_joystick = max(joystick_data.joystick);
     joystick_plot_colour = [21/255 104/255 237/255];
     joystick_plot_linewidth = 2;
     joystick_plot = plot(joystick_data.timestamp_ms/get_ms_per_min(),joystick_data.joystick/max_joystick*plot_maximum_val*2,'Color',joystick_plot_colour,'LineWidth',joystick_plot_linewidth);
+end
+
+function the_x_axis = x_axis_no_labels(end_timestamp)
+    xlim([0 get_longest_trial_length_min()]);
+    xticks(0 : 0.25 : ceil(end_timestamp/get_ms_per_min()));
+    xticklabels([]);
+    xtickangle(90); 
+    the_x_axis = gca;
+    the_x_axis.XGrid = 'on';
+    the_x_axis.TickLength = [0 0];
 end
 
 function events_text = plot_events(events_stream, y_position,events_stream_name_string,events_stream_colour)

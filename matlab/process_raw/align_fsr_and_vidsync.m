@@ -28,77 +28,21 @@ function [fsr_timeseries, sync_frame, frame_rate] = align_fsr_and_vidsync(local_
     [num_syncs, ~] = size(syncs);
     
     % Use video UI function to find which sync.
-    [sync_frame, frame_rate, which_sync] = ui_get_sync_frame(local_paths, num_syncs);
-
-%     if more_syncs > 1
-%          % Is which gameplay sync already entered in processed data?
-%          has_gameplaysync = any(ismember(fields(processed_data),{'scalars'})) && ~any(ismember(fields(processed_data.scalars),{'trial_number'}));
-%          if (~has_gameplaysync)
-% 
-%              %%
-%             msg = [{['Sync button pressed more than once in trial ' trial_number '. Please select the sync button press that occurred at the same time as the EEG DIN1.']} {''} {'(If there was more than 1 EEG DIN1 signal, ensure you choose the sync button press aligned with the DIN1 signal you chose.'} {''} {''} {''} {''}];
-%             title = 'Select which sync';
-%             list = {};
-%             for i = 1:more_syncs
-%                 list{end+1} = ['Sync press ' num2str(i)];
-%             end
-%             tf = false;
-%             while ~tf
-%                 [indx,tf] = listdlg('PromptString',msg,'Name',title,'ListSize',[250,75],'SelectionMode','single','ListString',list);
-%                 if ~tf
-%                     if strcmp(questdlg(['No sync button press selected. Do you want to try again?'],['No sync button press selected'],'Yes','No','Yes'),'No')
-%                         waitfor(errordlg(['Aborting data processing: refusal to choose a sync button press when more than one exists.'], 'Did Not Choose Sync Button Press'));
-%                         throw(MException('Custom:Custom',['Failure: unable to choose a sync button press']));
-%                     end
-%                 end
-%             end
-%             processed_data.scalars.which_gameplay_sync = indx;
-             %%
-
-    %         % If you don't know which gameplay sync to use, prompt user to
-    %         % enter.
-    %         NO_TRIAL_HAS_MORE_SYNC_BUTTON_PRESSES_THAN = 20;
-    %         if strcmp(questdlg('Processed data does not yet indicate which sync button press to use. How many times was the sync button pressed in this trial after the last time the server was started?','Unsure Which Sync','1','>1 or Not Sure','>1 or Not Sure'),'>1 or Not Sure')
-    %            % If user says to use not the first sync, prompt for which.
-    %            waitfor(warndlg('If necessary, rewatch the trial video or review trial notes to determine which sync button press to use.','Need To Know Which Sync'));
-    %            which_sync_response = [];
-    %            which_sync_num = [];
-    %            % Ensure they enter a number greater than 1 and not absurdly
-    %            % high.
-    %            while (isempty(which_sync_response) || isempty(which_sync_num) || which_sync_num < 1 || which_sync_num > NO_TRIAL_HAS_MORE_SYNC_BUTTON_PRESSES_THAN)
-    %                 prompt = {'Which sync button press should be used?'};
-    %                 title = 'Enter sync button press';
-    %                 dims = [1 50];
-    %                 definput = {''};
-    %                 which_sync_response_cell = inputdlg(prompt,title,dims,definput);
-    %                 which_sync_response = which_sync_response_cell{1};
-    %                 if ~isempty(which_sync_response)
-    %                     which_sync_num = str2num(which_sync_response);
-    %                 end
-    %                 if (isempty(which_sync_response) || isempty(which_sync_num) || which_sync_num < 1 || which_sync_num > NO_TRIAL_HAS_MORE_SYNC_BUTTON_PRESSES_THAN) && ~strcmp(questdlg(['Invalid sync number entered. Please enter a number between 1 and 20.' newline 'Do you want to try again?'],'Invalid Sync Number','Yes','No','Yes'),'Yes')
-    %                     throw(MException('Custom:Custom' ,'Failed to align FSR data: cannot determine which sync button press to use.'));
-    %                 end
-    %            end
-    %            processed_data.scalars.which_gameplay_sync = which_sync_num;
-    %         else
-    %            % If user says to use first sync, do that.
-    %            processed_data.scalars.which_gameplay_sync = 1;
-    %         end
-%          end
-%     else
-%         % If there's only one sync present in the file, just use that one.
-%         processed_data.scalars.which_gameplay_sync = 1;
-%     end
+    if ~isfield(trial_data, 'scalars') || ~isfield(trial_data.scalars, 'sync_frame') || ~isfield(trial_data.scalars, 'frame_rate') || ~isfield(trial_data.scalars, 'which_gameplay_sync')
+        [sync_frame, frame_rate, which_gameplay_sync] = ui_get_sync_frame(local_paths, num_syncs);
+    else
+        sync_frame = trial_data.scalars.sync_frame;
+        frame_rate = trial_data.scalars.frame_rate;
+        which_gameplay_sync = trial_data.scalars.which_gameplay_sync;
+    end
 
     % Cut the "syncs" matrix correctly, obtain the row from the correct sync.
-    
-    if which_sync > 1
-        sync_pair = syncs(which_sync,:);
+    if which_gameplay_sync > 1
+        sync_pair = syncs(which_gameplay_sync,:);
     else
         sync_pair = syncs;
     end
     fsr_sync_index = sync_pair(1);%
-    %fsr_sync_epochtime = sync_pair(2);
 
     % Remove data from before sync.
     % Subtract epoch time offset to get time = miliseconds from sync.
