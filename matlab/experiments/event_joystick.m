@@ -128,7 +128,6 @@ d_res{1,8} = 'n-abs';
 d_res{1,9} = 'kurt-abs';
 d_res{1,10} = 'skew-abs';
 
-
 d_res{1,11} = 'mean-var';
 d_res{1,12} = 'sd-var';
 d_res{1,13} = 'h-var';
@@ -136,6 +135,11 @@ d_res{1,14} = 'p-var';
 d_res{1,15} = 'n-var';
 d_res{1,16} = 'kurt-var';
 d_res{1,17} = 'skew-var';
+
+
+d_res{1,18} = 'iqr-abs';
+d_res{1,19} = 'iqr-var';
+d_res{1,20} = 'scene';
 
 for i = 1:size(fe,1)
     ce = fe{i};
@@ -154,8 +158,7 @@ for i = 1:size(fe,1)
     % the right. The skewness of the normal distribution (or any perfectly symmetric 
     % distribution) is zero.
     
-    
-    [h1, p1, w1] = swtest(ce_rows.w1abs);
+    [h1, p1, w1] = swtest(ce_rows.w1abs, 0.05);
     d_res{i+1,4} = mean(ce_rows.w1abs);
     d_res{i+1,5} = std(ce_rows.w1abs);
     d_res{i+1,6} = h1;
@@ -164,7 +167,7 @@ for i = 1:size(fe,1)
     d_res{i+1,9} = kurtosis(ce_rows.w1abs);
     d_res{i+1,10} = skewness(ce_rows.w1abs);
     
-    [h2, p2, w2] = swtest(ce_rows.w1var);
+    [h2, p2, w2] = swtest(ce_rows.w1var, 0.05);
     d_res{i+1,11} = mean(ce_rows.w1var);
     d_res{i+1,12} = std(ce_rows.w1var);
     d_res{i+1,13} = h2;
@@ -173,50 +176,87 @@ for i = 1:size(fe,1)
     d_res{i+1,16} = kurtosis(ce_rows.w1var);
     d_res{i+1,17} = skewness(ce_rows.w1var);
     
+    % THIS IS WHERE I PUT IN MY OWN THRESHOLDS FOR SPREAD
+    %  - change alpha to 0.10 for a more lax normality test. 
+    %  - but I don't really believe the normality test works well for a
+    %  histogram, because it seems like the values are mostly close
+    %  together, and it still says there's a non-normal distribution
+    %  (possibly because it's not as spread apart, but its all concentrated
+    % near the same point. 
+    %  - maybe it's one of those voting procedures; where you pick values
+    %  that pass a couple of the tests. 
+    
+    % - Variance/standard deviation is a big deal for sure. Use that as a threshold first? 
+    
+    % SD Is the best measure of spread of an approximately normal
+    % distribution.
+    %   - but not if there are extreme values in a distribution, or when
+    %   the distribution is skewed. Otherwise, IQR or semi IQR is preferred
+    %   measures. 
+    
+    
+    d_res{i+1,18} = iqr(ce_rows.w1abs);
+    d_res{i+1,19} = iqr(ce_rows.w1var);
+    
+    % TODO: change this to something that takes into account both in some
+    % way, but maybe have some kind of weighting? Or just have a simple
+    % vote system. 
     if h1 == 0
         % fail to reject null hypothesis - abs dist is normal
-        % normal means that spread is low
-        d_res{i+1,2} = 'low';
+        % use standard deviation if normal
+        if d_res{i+1,5} <= 40
+            d_res{i+1,2} = 'low';
+            d_res{i+1,20} = string(mode(categorical(ce_rows.scene)));
+        else 
+            d_res{i+1,2} = 'high';
+        end
     else
-        % spread is high
-        d_res{i+1,2} = 'high';
+        % else, use IQR if non-normal 
+        if d_res{i+1,18} <= 40
+            d_res{i+1,2} = 'low';
+            d_res{i+1,20} = string(mode(categorical(ce_rows.scene)));
+        else 
+            d_res{i+1,2} = 'high';
+        end
     end
     
     if h2 == 0
         % fail to reject null hypothesis - var dist is normal
-        % normal means that spread is low
-        d_res{i+1,3} = 'low';
     else
-        % spread is high
-        d_res{i+1,3} = 'high';
+        
     end
     
-    if strcmp(ce, 'cliff-land')==1
-        histfit(ce_rows.w1abs, 10, 'kernel');
+  
+%     if h1 == 0
+%         % fail to reject null hypothesis - abs dist is normal
+%         % normal means that spread is low
+%         d_res{i+1,2} = 'low';
+%     else
+%         % spread is high
+%         d_res{i+1,2} = 'high';
+%     end
+%     
+%     if h2 == 0
+%         % fail to reject null hypothesis - var dist is normal
+%         % normal means that spread is low
+%         d_res{i+1,3} = 'low';
+%     else
+%         % spread is high
+%         d_res{i+1,3} = 'high';
+%     end
+    
+    if strcmp(ce, 'road-end')==1
+        histfit(ce_rows.w1abs, 15, 'kernel');
     end
 end
 
-
-
-% next step is to get the values per event again, and then for one window
-% size, we see what the distribution of values actually looks like. This
-% time, we don't just simply take the variance/spread of values, but we
-% actually want to plot to see what they look like. And do this for a
-% particular window size (lets go with 5000ms for now). 
-
-% We will, for each event, plot out the absolute values spread/distribution and
-% the variance's spread/distribution. That will help us visualize it.
-
-% we have the variance values already, so maybe applying a simple threshold
-% could also mean something? 
-
-%% 
+%% HELPER FUNCTIONS 
 
 function events = clean_up_events(events) 
     events.label = strtrim(events.label);
     events.label = strrep(events.label, ' ', '-');
+    events.label = lower(events.label);
 end 
-
 
 function [abs, variance, slp, slp2] = extract_joystick(timeseries, timestamps, low_off, high_off) 
     abs = zeros(height(timestamps), 1);
