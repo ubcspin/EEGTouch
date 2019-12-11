@@ -1,6 +1,6 @@
 function all_data = load_all_data()
     % replace with parent directory of EEG data locally
-    parent_directory = 'C:\Users\laura\Documents\SPIN\EEG_data';
+    parent_directory = 'C:\Users\Laura Cang\Documents\EEG';
     % replace with directory containing raw trial data
     num_trials = 16; 
     processed_data_directory = 'proc_data';
