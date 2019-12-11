@@ -1,0 +1,56 @@
+function calibrated_words_timeseries = align_calibrated_words(local_paths, trial_data)
+
+big_table = trial_data.eeg;
+[eeglen, ~] = size(trial_data.eeg);
+
+big_table.joystick = interp1(trial_data.joystick.timestamp_ms,trial_data.joystick.joystick,1:eeglen)';
+big_table.fsrA0 = interp1(trial_data.fsr.timestamp_ms,trial_data.fsr.A0,1:eeglen)';
+big_table.fsrA1 = interp1(trial_data.fsr.timestamp_ms,trial_data.fsr.A1,1:eeglen)';
+big_table.fsrA2 = interp1(trial_data.fsr.timestamp_ms,trial_data.fsr.A2,1:eeglen)';
+big_table.fsrA3 = interp1(trial_data.fsr.timestamp_ms,trial_data.fsr.A3,1:eeglen)';
+big_table.fsrA4 = interp1(trial_data.fsr.timestamp_ms,trial_data.fsr.A4,1:eeglen)';
+big_table.calibrated_words = interp1(trial_data.calibrated_words.timestamp_ms,trial_data.calibrated_words.calibrated_values,1:eeglen)';
+
+big_table.events_game_controlled_visual = strings(eeglen,1);
+for i = 1:length(trial_data.events.game_controlled_visual.timestamp_ms)
+    big_table.events_game_controlled_visual(trial_data.events.game_controlled_visual.timestamp_ms(i)) = trial_data.events.game_controlled_visual.label(i);
+end
+big_table.events_game_controlled_visual = standardizeMissing(big_table.events_game_controlled_visual,"");
+big_table.events_game_controlled_visual = fillmissing(big_table.events_game_controlled_visual,'nearest');
+
+
+big_table.events_player_controlled = strings(eeglen,1);
+for i = 1:length(trial_data.events.player_controlled.timestamp_ms)
+    big_table.events_player_controlled(trial_data.events.player_controlled.timestamp_ms(i)) = trial_data.events.player_controlled.label(i);
+end
+big_table.events_player_controlled = standardizeMissing(big_table.events_player_controlled,"");
+big_table.events_player_controlled = fillmissing(big_table.events_player_controlled,'nearest');
+
+big_table.events_game_controlled_sound = strings(eeglen,1);
+for i = 1:length(trial_data.events.game_controlled_sound.timestamp_ms)
+    big_table.events_sound(trial_data.events.game_controlled_sound.timestamp_ms(i)) = trial_data.events.game_controlled_sound.label(i);
+end
+big_table.events_game_controlled_sound = standardizeMissing(big_table.events_game_controlled_sound,"");
+big_table.events_game_controlled_sound = fillmissing(big_table.events_game_controlled_sound,'nearest');
+
+big_table.interview = strings(eeglen,1);
+for i = 1:length(trial_data.interview.timestamp_ms)
+    big_table.interview(trial_data.interview.timestamp_ms(i)) = trial_data.interview.label(i);
+end
+big_table.interview = standardizeMissing(big_table.interview,"");
+big_table.interview = fillmissing(big_table.interview,'nearest');
+
+js_interpolate = NaN(eeglen,1);
+for i = 1:10:eeglen
+    js_interpolate(i) = big_table.joystick(i);
+end
+js_interpolate = standardizeMissing(js_interpolate,NaN);
+js_interpolate = fillmissing(js_interpolate,'nearest');
+%big_table.ft_category = diff(big_table.feeltrace);
+
+csv_dir = fullfile(processed_directory,['csv' trial_number]);
+status = mkdir(csv_dir);
+
+%for i = 1: 
+
+writetable(big_table,fullfile(csv_dir,['eeg' trial_number '.csv']));
