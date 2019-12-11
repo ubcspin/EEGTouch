@@ -1,7 +1,7 @@
 % loc = parent dir of processed dirs
 loc = 'C:\Users\laura\Documents\SPIN\EEG_data';
-%subdir = 'processed';
-subdir = 'raw';
+subdir = 'processed';
+%subdir = 'raw';
 num_trials = 16; 
 dirs = dir(fullfile(loc,subdir,'*'));
 names = strings(length(dirs),1);
