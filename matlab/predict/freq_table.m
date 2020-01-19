@@ -68,7 +68,7 @@ function [frequency_table, full_time_ms, f] = freq_table(trial_data,local_paths)
     js_downsampled = downsample(joystick,time_interval);
     js_downsampled = js_downsampled(1:length(full_time));
     % add to table
-    joystick_table = table(js_downsampled, 'VariableNames', "joystick");
+    joystick_table = table(js_downsampled, 'VariableNames', {'joystick'});
     joystick_table = fillmissing(joystick_table,'nearest');
     frequency_table = [joystick_table frequency_table];
 
@@ -87,8 +87,8 @@ function [frequency_table, full_time_ms, f] = freq_table(trial_data,local_paths)
     conv_js_slope_multicat = conv_js_slope_above*2 + conv_js_slope_poslow + conv_js_slope_neglow*-1 + conv_js_slope_below*-2;
     % Optional categorical vectors (for logical classifiers)
     %convs_cat = [conv_slope_above conv_slope_below ~(conv_slope_above & conv_slope_below)];
-    js_slopecat_table = table(conv_js_slope_cat, 'VariableNames', "js_slopecat");
-    js_slopemulticat_table = table(conv_js_slope_multicat, 'VariableNames', "js_slopecat_mult");
+    js_slopecat_table = table(conv_js_slope_cat, 'VariableNames', {'js_slopecat'});
+    js_slopemulticat_table = table(conv_js_slope_multicat, 'VariableNames', {'js_slopecat_mult'});
     frequency_table = [js_slopecat_table frequency_table];
     frequency_table = [js_slopemulticat_table frequency_table];
     %frequency_table = addvars(frequency_table, conv_js_slope_cat, 'NewVariableNames',"js_slopecat");
