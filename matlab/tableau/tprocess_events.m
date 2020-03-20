@@ -12,17 +12,17 @@ for i = 1:size(all_data,1)
     if ~isempty(pfile)
         fprintf('Processing event data from participant %d...\n', i);
         
-        g_rows = size(pfile.processed_data.events.game, 1);
-        c_rows = size(pfile.processed_data.events.character, 1);
-        s_rows = size(pfile.processed_data.events.sound, 1);
+        g_rows = size(pfile.events.game_controlled_visual, 1);
+        c_rows = size(pfile.events.player_controlled, 1);
+        s_rows = size(pfile.events.game_controlled_sound, 1);
 
-        pfile.processed_data.events.game.pnum = ones(g_rows, 1) * i;
-        pfile.processed_data.events.character.pnum = ones(c_rows, 1) * i;
-        pfile.processed_data.events.sound.pnum = ones(s_rows, 1) * i;
+        pfile.events.game_controlled_visual.pnum = ones(g_rows, 1) * i;
+        pfile.events.player_controlled.pnum = ones(c_rows, 1) * i;
+        pfile.events.game_controlled_sound.pnum = ones(s_rows, 1) * i;
 
-        game = vertcat(game, pfile.processed_data.events.game);
-        char = vertcat(char, pfile.processed_data.events.character);
-        sound = vertcat(sound, pfile.processed_data.events.sound);
+        game = vertcat(game, pfile.events.game_controlled_visual);
+        char = vertcat(char, pfile.events.player_controlled);
+        sound = vertcat(sound, pfile.events.game_controlled_sound);
     end 
 end
 
