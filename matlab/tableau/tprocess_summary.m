@@ -32,4 +32,4 @@ end
 
 writetable(all_summary, './tableau/summary.csv');
 
-clearvars i pfile game_start game_end_tmp game_end current_summary all_summary duration
+clearvars i pfile game_start game_end_tmp game_end current_summary duration

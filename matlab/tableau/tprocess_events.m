@@ -30,4 +30,4 @@ writetable(game, './tableau/events_game.csv')
 writetable(char, './tableau/events_char.csv')
 writetable(sound, './tableau/events_sound.csv')
 
-clearvars c_rows g_rows s_rows i pfile char game sound
+clearvars c_rows g_rows s_rows i pfile

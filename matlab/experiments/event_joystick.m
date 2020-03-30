@@ -244,7 +244,8 @@ for i = 1:size(fe,1)
 %         d_res{i+1,3} = 'high';
 %     end
     
-    % fitting a curve to the histogram
+    % fitting a curve to the histogram, right now just hard coded to show
+    % the joystick value distribution for "road-end" event label below. 
     if strcmp(ce, 'road-end')==1
         histfit(ce_rows.w1abs, 15, 'kernel');
     end
