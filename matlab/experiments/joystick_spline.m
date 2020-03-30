@@ -12,6 +12,8 @@ for i = 1:size(all_data,1)
             
             xe = pfile.events.game_controlled_visual.timestamp_ms;
             
+            % NEED TO INSTALL CURVE FITTING TOOLBOX FOR "fit" function. 
+            
             % 1e-16 is more smooth. closer to 1 is less smooth. 
             [curve, goodness, output] = fit(x, y,'smoothingspline', 'SmoothingParam', 1e-8);
 %             plot(xe, ones(size(xe, 1)) * 5, '-.or', x, y);

@@ -1,6 +1,5 @@
 load_all_processed;
 
-
 for i = 1:size(all_data,1)
     pfile = all_data{i,1};
     
@@ -24,6 +23,9 @@ for i = 1:size(all_data,1)
             % sense to default it at 0. 
             
             
+            % NEED TO INSTALL SIGNAL PROCESSING TOOLBOX FOR HIGH PASS
+            % FILTER TO WORK. STEPS: Apps -> Get More Apps -> Search for
+            % "Signal Processing Toolbox" -> Install/Sign in to Install
             h_fsr_abs = highpass(fsr_abs, 0.5);
             
             
@@ -44,7 +46,11 @@ for i = 1:size(all_data,1)
     
     % For each participant, we want to check how closely their FSR data 
     % correlates with their joystick data. There might be some time delay,
-    % so we apply a cross-correlation method to the two time series. 
+    % so we apply a cross-correlation method to the two time series.
+    
+    % KC NOTE 03/30/2020: WAS TRYING TO DO THIS, but didn't finish.
+    % cross-correlation needs to be tweaked/maybe isn't the right approach
+    % for this. 
     
     % How do we interpret the cross-correlation data??
     
