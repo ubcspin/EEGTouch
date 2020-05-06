@@ -16,6 +16,18 @@ for i = 1:size(all_data,1)
         % Process scene information into viz-ready format, and append
         % participant number to rightmost column.
         
+        % From extract_scenes:
+        %       1: Name of the scene // scenes_mat(mat_ind).name = scenes(i).name; 
+        %       2: What "stream" the event is in - player controlled, game, sound // scenes_mat(mat_ind).stream = scenes(i).begin(j).stream;
+        %       3: "Beginning" label // scenes_mat(mat_ind).isbegin = true;
+        %       4: "Peak" label // scenes_mat(mat_ind).ispeak = false;
+        %       5: "Finish" label // scenes_mat(mat_ind).isfinish = false;
+        %       6: Whether or not it's a death // scenes_mat(mat_ind).isdeath = false;
+        %       7: Name of the event // scenes_mat(mat_ind).label = scenes(i).begin(j).tag;
+        %       8: Index of the event, internal thing I think // scenes_mat(mat_ind).ind = begin_event_inds(k);
+        %       9: Start time of the event, ms // scenes_mat(mat_ind).time = begin_event_time(k);
+        %       10: 1 if this event is the start of a new scene, else 0. 
+        
         for j = 1:scene_data_len
             if scene_data{j,10}==1 % if this is begin
                 for k = j+1:scene_data_len

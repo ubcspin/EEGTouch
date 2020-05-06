@@ -19,13 +19,13 @@ for i = 1:size(all_data,1)
         joy{i,8} = q_joy(1,3);
         
         joy{i,9} = max(pfile.joystick.joystick);
-        joy{i,10} = max(pfile.joystick.joystick) - min(pfile.joystick.joystick);
+        joy{i,10} = joy{i,8} - joy{i,6};
         joy{i,11} = pfile.joystick.timestamp_ms(joy{i,2}) - pfile.joystick.timestamp_ms(1);
     end
 end
 
 result = cell2table(joy, 'VariableNames', {'pnum', 'n', 'mean', 'std', 'min', 'q1', 'median', 'q3' ...
-    'max', 'range', 'duration_ms'});
+    'max', 'iqr', 'duration_ms'});
 writetable(result, './tableau/joystick.csv')
 
 clearvars -except all_data result
