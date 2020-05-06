@@ -7,10 +7,12 @@ for i = 1:size(all_data,1)
         fprintf('Extracting event {x} joystick data from participant %d...\n', i);
         
         if i == 2
-            x = pfile.processed_data.feeltrace.timestamp_ms;
-            y = pfile.processed_data.feeltrace.joystick;
+            x = pfile.joystick.timestamp_ms;
+            y = pfile.joystick.joystick;
             
-            xe = pfile.processed_data.events.game.timestamp_ms;
+            xe = pfile.events.game_controlled_visual.timestamp_ms;
+            
+            % NEED TO INSTALL CURVE FITTING TOOLBOX FOR "fit" function. 
             
             % 1e-16 is more smooth. closer to 1 is less smooth. 
             [curve, goodness, output] = fit(x, y,'smoothingspline', 'SmoothingParam', 1e-8);

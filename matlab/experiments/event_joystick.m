@@ -136,7 +136,6 @@ d_res{1,15} = 'n-var';
 d_res{1,16} = 'kurt-var';
 d_res{1,17} = 'skew-var';
 
-
 d_res{1,18} = 'iqr-abs';
 d_res{1,19} = 'iqr-var';
 d_res{1,20} = 'scene';
@@ -245,10 +244,14 @@ for i = 1:size(fe,1)
 %         d_res{i+1,3} = 'high';
 %     end
     
+    % fitting a curve to the histogram, right now just hard coded to show
+    % the joystick value distribution for "road-end" event label below. 
     if strcmp(ce, 'road-end')==1
         histfit(ce_rows.w1abs, 15, 'kernel');
     end
 end
+
+clearvars -except all_data result
 
 %% HELPER FUNCTIONS 
 
