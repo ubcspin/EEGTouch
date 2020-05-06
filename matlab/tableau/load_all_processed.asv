@@ -47,12 +47,12 @@ end
 %change p22 game_controlled_sound truck shot(44,45)  => road shots start,
 %road shot
 if strcmp(all_data{22, 1}.events.game_controlled_sound{44,2}, "truck shot")
-    all_data{22,1}.events.game_controlled_sound{44, 2} = "road shots start";
-    all_data{22,1}.events.game_controlled_sound{44, 3} = 1;
+    all_data{22,1}.events.game_controlled_sound{44, 2} = "road shots s";
+    all_data{17,1}.events.player_controlled{75, 3} = 1;
 end
-if strcmp(all_data{22, 1}.events.game_controlled_sound{45,2}, "truck shot")
-    all_data{22,1}.events.game_controlled_sound{45, 2} = "road shot";
-    all_data{22,1}.events.game_controlled_sound{45, 3} = 1;
+if strcmp(all_data{17, 1}.events.player_controlled{82,2}, "death")
+    all_data{17,1}.events.player_controlled{82, 2} = "catch";
+    all_data{17,1}.events.player_controlled{82, 3} = 1;
 end
 
 clearvars str_i i ptotal pfile ex
