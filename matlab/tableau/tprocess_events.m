@@ -2,9 +2,9 @@
 
 load_all_processed;
 
-game = table('Size', [0 3], 'VariableTypes', {'double', 'string', 'double'}, 'VariableNames', {'timestamp_ms', 'label', 'pnum'});
-char = table('Size', [0 3], 'VariableTypes', {'double', 'string', 'double'}, 'VariableNames', {'timestamp_ms', 'label', 'pnum'});
-sound = table('Size', [0 3], 'VariableTypes', {'double', 'string', 'double'}, 'VariableNames', {'timestamp_ms', 'label', 'pnum'});
+game = table('Size', [0 4], 'VariableTypes', {'double', 'string', 'double', 'double'}, 'VariableNames', {'timestamp_ms', 'label', 'Var3', 'pnum'});
+char = table('Size', [0 4], 'VariableTypes', {'double', 'string', 'double', 'double'}, 'VariableNames', {'timestamp_ms', 'label', 'Var3', 'pnum'});
+sound = table('Size', [0 4], 'VariableTypes', {'double', 'string', 'double', 'double'}, 'VariableNames', {'timestamp_ms', 'label', 'Var3', 'pnum'});
 
 for i = 1:size(all_data,1)
     pfile = all_data{i,1};

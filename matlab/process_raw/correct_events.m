@@ -8,6 +8,8 @@ function [trial_data, labelfile] = correct_events(trial_data, labelfile)
     
    for i = 1:gameeventcount
         
+        trial_data.events.game_controlled_visual{i, 3} = 0;
+
         gamelabel = trial_data.events.game_controlled_visual{i, 2};
    
         for j = 1:labelcount
@@ -16,7 +18,6 @@ function [trial_data, labelfile] = correct_events(trial_data, labelfile)
             gamenew = labelfile{j,2};
             
             if strcmp(gamenew,'')
-                
                 continue
                 
             end
@@ -37,7 +38,7 @@ function [trial_data, labelfile] = correct_events(trial_data, labelfile)
    end
     
    for k = 1:charactereventcount
-        
+        trial_data.events.player_controlled{i, 3} = 0;
         characterlabel = trial_data.events.player_controlled{k, 2};
         
         for l = 1:labelcount
@@ -67,7 +68,7 @@ function [trial_data, labelfile] = correct_events(trial_data, labelfile)
    end
     
    for m = 1:soundeventcount
-        
+        trial_data.events.game_controlled_sound{i, 3} = 0;
         soundlabel = trial_data.events.game_controlled_sound{m, 2};
         
         for n = 1:labelcount
