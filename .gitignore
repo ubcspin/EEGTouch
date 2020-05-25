@@ -6,3 +6,4 @@ matlab/tableau/processed_data_pxx
 matlab/tableau/*.csv
 matlab/experiments/results
 matlab/util/load_all_data.m
+**/*.ipynb
