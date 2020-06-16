@@ -68,6 +68,9 @@ for i = 1:size(all_data,1)
         [gs_events.w4abs, gs_events.w4var, gs_events.w4slp, gs_events.w4slp2] = ...
             extract_joystick(pfile.joystick, gs_events(:, 'timestamp_ms'), 750, 5000);
         
+        gs_events.Var3 = [];
+        gs_events = gs_events(~ismissing(gs_events.label), :);
+        
         result = vertcat(result, gs_events);
     end
 end
@@ -116,28 +119,31 @@ writetable(spread, './experiments/results/ej_spread_5500_9500.csv');
 % from such a distribution, using the one-sample Kolmogorov-Smirnov test. The result h is 1 if 
 % the test rejects the null hypothesis at the 5% significance level, or 0 otherwise.
 
+% Here we use Shapiro-Wilk test for normality testing (h = swtest(x, alpha)). It works similarly 
+% but has the best power for a given significance compared to other normality tests.
+
 d_res = {};
 d_res{1,1} = 'label';
-d_res{1,2} = 'spread-abs';
-d_res{1,3} = 'spread-var';
-d_res{1,4} = 'mean-abs';
-d_res{1,5} = 'sd-abs';
-d_res{1,6} = 'h-abs';
-d_res{1,7} = 'p-abs';
-d_res{1,8} = 'n-abs';
-d_res{1,9} = 'kurt-abs';
-d_res{1,10} = 'skew-abs';
+d_res{1,2} = 'spread_abs';
+d_res{1,3} = 'spread_var';
+d_res{1,4} = 'mean_abs';
+d_res{1,5} = 'sd_abs';
+d_res{1,6} = 'h_abs';
+d_res{1,7} = 'p_abs';
+d_res{1,8} = 'n_abs';
+d_res{1,9} = 'kurt_abs';
+d_res{1,10} = 'skew_abs';
 
-d_res{1,11} = 'mean-var';
-d_res{1,12} = 'sd-var';
-d_res{1,13} = 'h-var';
-d_res{1,14} = 'p-var';
-d_res{1,15} = 'n-var';
-d_res{1,16} = 'kurt-var';
-d_res{1,17} = 'skew-var';
+d_res{1,11} = 'mean_var';
+d_res{1,12} = 'sd_var';
+d_res{1,13} = 'h_var';
+d_res{1,14} = 'p_var';
+d_res{1,15} = 'n_var';
+d_res{1,16} = 'kurt_var';
+d_res{1,17} = 'skew_var';
 
-d_res{1,18} = 'iqr-abs';
-d_res{1,19} = 'iqr-var';
+d_res{1,18} = 'iqr_abs';
+d_res{1,19} = 'iqr_var';
 d_res{1,20} = 'scene';
 
 for i = 1:size(fe,1)
@@ -251,6 +257,8 @@ for i = 1:size(fe,1)
     end
 end
 
+event_x_joystick = cell2table(d_res(2:end,:),'VariableNames',d_res(1,:));
+writetable(event_x_joystick, './experiments/results/event_x_joystick.csv');
 clearvars -except all_data result
 
 %% HELPER FUNCTIONS 
@@ -261,6 +269,10 @@ function events = clean_up_events(events)
     events.label = lower(events.label);
 end 
 
+% abs: max value of joystick data in time window
+% variance: variance of joystick data in time window
+% slp: end - start / time in a time window
+% slp2: average of slopes of every 2 adjacent points in time window
 function [abs, variance, slp, slp2] = extract_joystick(timeseries, timestamps, low_off, high_off) 
     abs = zeros(height(timestamps), 1);
     variance = zeros(height(timestamps), 1);

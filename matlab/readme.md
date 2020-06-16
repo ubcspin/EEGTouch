@@ -1,5 +1,5 @@
 
-Data Pre-Processing Scripts:
+## Data Pre-Processing Scripts:
 
 These are used with matlab to pre-process raw data from the EEG study.
 To use:
@@ -86,4 +86,57 @@ Then, note a start time and second duration that will contain the frame for the 
 Matlab will then process the video with frame numbers so that you can get the precise frame number for the sync.
   
 -
+
+
+## tableau
+
+scripts created to prepare csv for tableau
+
+***
+
+Before you start
+
+***
+- Add `processed_data_pxx` to path (right click Add to Path, selected folders and subfolders, icon solidifies to indicate added to path)
+- Directory structure (for folders related to tableau)
+```
+-- matlab
+	 |-- tableau
+	 | 		|-- xxx.m
+	 | 		|-- xxx.csv
+	 |-- experiments
+	 		|-- xxx.m
+	 	  	|-- results
+     				|-- xxx.csv
+```
+***
+
+Event x joystick analysis
+
+***
+
+`matlab/experiments/event_joystick.m`
+
+1. Extracting joystick data
+	- For every event of each participant, extract joystick data around the event timestamp
+	- Compare four time windows (250ms, 500ms, 750ms, 1000ms before and 5000ms after the event timestamp)
+	- `abs`: max value of joystick data in time window
+	- `variance`: variance of joystick data in time window
+	- `slp`: end - start / time in a time window
+	- `slp2`: average of slopes of every 2 adjacent points in time window
+	- Output saved in `event_joystick_asym.csv`
+2. Spread in time window
+	- Calculate spread of joystick data for events that have been experienced by at least 16 participants
+	- Record abs, var, slp for each of four time windows
+	- Output saved in `ej_spread_5500_9500.csv`
+3. Normality testing
+	- [Shapiro-Wilk test](https://www.mathworks.com/matlabcentral/mlc-downloads/downloads/submissions/13964/versions/2/previews/swtest.m/index.html) at alpha = 0.05. It has the best power for a given significance compared to other normality tests.
+	- Perform normality testing on value (`abs`) and variance (`var`) with time window 1s before and 5s after
+	- Output saved in `event_x_joystick.csv`
+	- Interpretation:
+		- "h-abs/h-var" refers to the results of the normality hypothesis testing - 0 means the null hypothesis is NOT rejected and p>0.05, and hence the distribution is NORMAL. "p-abs/p-var" are p-values.
+		- "kurt-abs/kurt-var" is kurtosis - kurt > 3 means the distribution is more outlier-prone than standard normal distribution (aka the distribution is heavier tailed than standard normal) and vice versa.
+		- "skew-abs/skew-var" is skewness of the distribution - negative means skewed to the left, positive means skewed to the right
+		- "spread-abs/spread-var" is based on the results of the normality testing
+
 
