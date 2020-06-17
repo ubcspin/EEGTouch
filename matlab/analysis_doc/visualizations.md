@@ -4,9 +4,13 @@ This document contains different kinds of visualization we've tried and the scri
 ### June 17, 2020
 Updates on fsr related plots
 Now show scene in event x fsr plots. Scenes and events are sorted in chronological order.
+
 [Box plot](visualizations/Event_x_fsr_box_sorted.pdf) of fsr streams around each event timestamp
+
 [Filtered events with fsr data that are high intensity and low spread](visualizations/Event_x_fsr_box_sorted.pdf)
+
 [Max fsr breakdown by key presses](visualizations/Event_x_fsr_maxfsr.pdf)
+
 Generated with [`event_fsr.m`](experiments/event_fsr.m) in Tableau
 
 ### June 16, 2020
