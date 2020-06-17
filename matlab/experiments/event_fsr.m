@@ -8,7 +8,7 @@ resultVarTypes = {'double', 'string', 'double', 'string', 'string', 'double', 'd
 resultVarNames = {'timestamp_ms', 'label', 'pnum', 'type', 'scene', 'A0abs', 'A0var', ...
     'A0slp', 'A0slp2', 'A1abs', 'A1var', 'A1slp', 'A1slp2', 'A2abs', 'A2var', 'A2slp', 'A2slp2', ...
     'A3abs', 'A3var', 'A3slp', 'A3slp2', 'A4abs', 'A4var', 'A4slp', 'A4slp2', 'maxabs', 'maxvar', ...
-    'maxslp', 'maxslp2' };
+    'maxslp', 'maxslp2'};
 result = table('Size', [0 29], 'VariableTypes', resultVarTypes, ... 
     'VariableNames', resultVarNames);
 
@@ -70,6 +70,7 @@ for i = 1:size(all_data,1)
                  pfile.fsr.A2, ...
                  pfile.fsr.A3, ...
                  pfile.fsr.A4], [], 2);
+        
                  
         new_timestamp_ms = 0:2:pfile.fsr.timestamp_ms(length(pfile.fsr.timestamp_ms));
         fsr_A0 = interp1(pfile.fsr.timestamp_ms, pfile.fsr.A0, new_timestamp_ms);
@@ -113,7 +114,72 @@ for i = 1:size(all_data,1)
     end
 end
 
+to_compute = result{:, {'A0abs', 'A1abs', 'A2abs', 'A3abs', 'A4abs'}};
+[m, result.maxkey] = max(to_compute, [], 2);
+result.maxkey = result.maxkey - 1;
+
 writetable(result, './experiments/results/event_fsr_asym.csv')
+clearvars -except all_data result
+
+%% filter event based on spread of fsr intensity in all channels
+eventVarTypes = {'string', 'double', 'double', 'double', 'double', 'double', 'double'};
+eventVarNames = {'label', 'A0', 'A1', 'A2', 'A3', 'A4', 'max'};
+event_aggregated = table('Size', [0 7], 'VariableTypes', eventVarTypes, ... 
+    'VariableNames', eventVarNames);
+uniq_events = unique(result.label);
+for i = 3:size(uniq_events)
+    event_label = uniq_events{i};
+    event_rows = result(result.label == event_label, {'A0abs', 'A1abs', 'A2abs', 'A3abs', 'A4abs', 'maxabs'});
+    event_avg = mean(event_rows{:, :}, 1);
+    event_var = iqr(event_rows{:, :}, 1);
+    hi_f_lo_s = (event_avg > 700) & (event_var < 200);
+    hi_s = (event_var > 700) * 2;
+    md_f_lo_s = (event_avg < 700) & (event_avg > 300) & (event_var < 200) * 3;
+    event_r = hi_f_lo_s + hi_s + md_f_lo_s;
+    event_row = {event_label, event_r(1), event_r(2), event_r(3), event_r(4), event_r(5), event_r(6)};
+    event_aggregated = [event_aggregated; event_row];
+end
+
+writetable(event_aggregated, './experiments/results/event_fsr_spread.csv');
+
+%% Extract fsr data with high intensity and low spread
+resultVarTypes = {'double', 'string', 'double', 'string', 'string', 'double', 'double' ...
+    'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', ...
+    'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', ...
+    'double', 'double', 'double'};
+resultVarNames = {'timestamp_ms', 'label', 'pnum', 'type', 'scene', 'A0abs', 'A0var', ...
+    'A0slp', 'A0slp2', 'A1abs', 'A1var', 'A1slp', 'A1slp2', 'A2abs', 'A2var', 'A2slp', 'A2slp2', ...
+    'A3abs', 'A3var', 'A3slp', 'A3slp2', 'A4abs', 'A4var', 'A4slp', 'A4slp2', 'maxabs', 'maxvar', ...
+    'maxslp', 'maxslp2', 'maxkey'};
+hi_f_lo_s = table('Size', [0 30], 'VariableTypes', resultVarTypes, ... 
+    'VariableNames', resultVarNames);
+    
+for i = 3:size(uniq_events)
+    event_label = uniq_events{i};
+    filter = event_aggregated(i-2, :);
+    event_rows = result(result.label == event_label, :);
+    if filter.A0 ~= 1
+        event_rows.A0abs = zeros(height(event_rows), 1);
+    end
+    if filter.A1 ~= 1
+        event_rows.A1abs = zeros(height(event_rows), 1);
+    end
+    if filter.A2 ~= 1
+        event_rows.A2abs = zeros(height(event_rows), 1);
+    end
+    if filter.A3 ~= 1
+        event_rows.A3abs = zeros(height(event_rows), 1);
+    end
+    if filter.A4 ~= 1
+        event_rows.A4abs = zeros(height(event_rows), 1);
+    end
+    if filter.max ~= 1
+        event_rows.maxabs = zeros(height(event_rows), 1);
+    end
+    hi_f_lo_s = [hi_f_lo_s; event_rows];
+end
+writetable(hi_f_lo_s, './experiments/results/hi_f_lo_s.csv')
+
 
 function events = clean_up_events(events) 
     events.label = strtrim(events.label);
