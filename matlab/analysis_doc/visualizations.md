@@ -2,7 +2,8 @@
 This document contains different kinds of visualization we've tried and the scripts we used to generate them
 
 ### June 18, 2020
-Clean up misaligned scenes and events.
+Clean up misaligned scenes and events for event x joystick and event x fsr
+Updated [Event x joystick plot](visualizations/Event_x_joystick_all_par_sorted.pdf)
 
 ### June 17, 2020
 Updates on fsr related plots

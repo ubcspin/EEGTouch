@@ -157,7 +157,7 @@ for i = 3:size(uniq_events)
         end
     end
     if strcmp(event_label, 'experimenter-in') | strcmp(event_label, 'experimenter-out')
-        correct_scene = 'none'
+        correct_scene = 'none';
     end
     result(result.label == event_label, {'scene'}) = {correct_scene};
 end
