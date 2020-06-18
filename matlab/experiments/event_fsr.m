@@ -114,9 +114,53 @@ for i = 1:size(all_data,1)
     end
 end
 
+%% populate max key
 to_compute = result{:, {'A0abs', 'A1abs', 'A2abs', 'A3abs', 'A4abs'}};
 [m, result.maxkey] = max(to_compute, [], 2);
 result.maxkey = result.maxkey - 1;
+
+%% clean up event-scene misalignment
+uniq_events = unique(result.label);
+for i = 3:size(uniq_events)
+    event_label = uniq_events{i};
+    scene_rows = result(result.label == event_label, {'scene'});
+    uniq_scenes = unique(scene_rows.scene);
+    correct_scene = 'none';
+    if length(uniq_scenes) > 2
+        if strcmp(event_label, 'truck-start-2')
+            correct_scene = 'Fridge';
+        elseif strcmp(event_label, 'resurface') | strcmp(event_label, 'lights-water')
+            correct_scene = 'Water';
+        elseif strcmp(event_label, 'sharp-breath-2')
+            correct_scene = 'Road';
+        end
+    elseif length(uniq_scenes) <= 2
+        if strcmp(event_label, 'bank-land') | strcmp(event_label, 'crate-bark') | strcmp(event_label, 'fall-land-crate')
+            correct_scene = 'Crate';
+        elseif strcmp(event_label, 'black-death-water') | strcmp(event_label, 'lights-track') ...
+            | strcmp(event_label, 'water-dart') | strcmp(event_label, 'water-shot-sound')
+            correct_scene = 'Water';
+        elseif strcmp(event_label, 'dog-nonjump') | strcmp(event_label, 'dog-turns')
+            correct_scene = 'River';
+        elseif strcmp(event_label, 'loud-steps') | strcmp(event_label, 'road-end') | strcmp(event_label, 'tree-road-2')
+            correct_scene = 'Road';
+        elseif strcmp(event_label, 'dogs-loud')
+            correct_scene = 'Dogs';
+        elseif strcmp(event_label, 'ground-die')
+            correct_scene = 'River';
+        elseif strcmp(event_label, 'fall-land-start')
+            correct_scene = 'none';
+        elseif strcmp(event_label, 'wet-steps-end') | strcmp(event_label, 'wet-steps-start')
+            correct_scene = 'Pond';
+        else
+            correct_scene = uniq_scenes(uniq_scenes ~= 'none');
+        end
+    end
+    if strcmp(event_label, 'experimenter-in') | strcmp(event_label, 'experimenter-out')
+        correct_scene = 'none'
+    end
+    result(result.label == event_label, {'scene'}) = {correct_scene};
+end
 
 writetable(result, './experiments/results/event_fsr_asym.csv')
 clearvars -except all_data result
