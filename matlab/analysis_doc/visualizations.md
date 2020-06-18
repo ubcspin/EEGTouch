@@ -1,6 +1,9 @@
 # Visualization log
 This document contains different kinds of visualization we've tried and the scripts we used to generate them
 
+### June 18, 2020
+Clean up misaligned scenes and events.
+
 ### June 17, 2020
 Updates on fsr related plots
 Now show scene in event x fsr plots. Scenes and events are sorted in chronological order.
