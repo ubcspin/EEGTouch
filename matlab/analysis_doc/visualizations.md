@@ -4,6 +4,7 @@ This document contains different kinds of visualization we've tried and the scri
 ### June 22, 2020
 Normalized feeltrace to calibrated word range
 [Box plot](visualizations/calibrated_words_interview_box_1.pdf) of aggregated feeltrace around (0.5s before 0.5s after) interview markers that mentioned calibrated words and their synonyms. The calibrated value of the words are shown in grey line.
+[Same plot](visualizations/calibrated_words_interview_all.pdf) with all participants and averaged calibrated word values
 Generated with [`interview_joystick.m`](experiments/interview_joystick.m)
 
 ### June 18, 2020
