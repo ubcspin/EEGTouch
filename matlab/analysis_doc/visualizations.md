@@ -1,6 +1,11 @@
 # Visualization log
 This document contains different kinds of visualization we've tried and the scripts we used to generate them
 
+### June 22, 2020
+Normalized feeltrace to calibrated word range
+[Box plot](visualizations/calibrated_words_interview_box_1.pdf) of aggregated feeltrace around (0.5s before 0.5s after) interview markers that mentioned calibrated words and their synonyms. The calibrated value of the words are shown in grey line.
+Generated with [`interview_joystick.m`](experiments/interview_joystick.m)
+
 ### June 18, 2020
 Clean up misaligned scenes and events for event x joystick and event x fsr
 Updated [Event x joystick plot](visualizations/Event_x_joystick_all_par_sorted.pdf)
