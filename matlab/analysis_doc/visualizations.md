@@ -1,6 +1,12 @@
 # Visualization log
 This document contains different kinds of visualization we've tried and the scripts we used to generate them
 
+### June 29, 2020
+Compare feeltrace slope breakdown by scenes and events. Two different methods of computing slopes don't have a significant impact on the resulting plot.
+[Feeltrace slope box plot](visualizations/Event_x_joystick_value_slope.pdf) side by side with feeltrace value breakdown by events.
+[Average slope plot](visualizations/Event_x_joystick_avg_slope.pdf) comparing 2 methods of computing slopes.
+Generated with [`event_joystick.m`](experiments/event_joystick.m) in Tableau
+
 ### June 22, 2020
 Normalized feeltrace to calibrated word range
 [Box plot](visualizations/calibrated_words_interview_box_1.pdf) of aggregated feeltrace around (0.5s before 0.5s after) interview markers that mentioned calibrated words and their synonyms. The calibrated value of the words are shown in grey line.
