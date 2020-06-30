@@ -2,12 +2,13 @@ load_all_processed;
 tprocess_scenes;
 
 resultVarTypes = {'double', 'string', 'double', 'string', 'string', 'double', 'double' ...
-    'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double'};
+    'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double'};
 resultVarNames = {'timestamp_ms', 'label', 'pnum', 'type', 'scene', 'w1abs', 'w1var', ...
-    'w1slp', 'w1slp2', 'w2abs', 'w2var', 'w2slp', 'w2slp2', 'w3abs', 'w3var', 'w3slp', 'w3slp2', 'w4abs', 'w4var', 'w4slp', 'w4slp2' };
-result = table('Size', [0 21], 'VariableTypes', resultVarTypes, ... 
+    'w1slp', 'w1slp2', 'w2abs', 'w2var', 'w2slp', 'w2slp2', 'w3abs', 'w3var', 'w3slp', 'w3slp2', 'w4abs', 'w4var', 'w4slp', 'w4slp2', 'w5abs', 'w5var', 'w5slp', 'w5slp2'};
+result = table('Size', [0 25], 'VariableTypes', resultVarTypes, ... 
     'VariableNames', resultVarNames);
 
+calibration = readtable('calibration.csv');
 for i = 1:size(all_data,1)
     pfile = all_data{i,1};
     
@@ -58,6 +59,24 @@ for i = 1:size(all_data,1)
         gs_events = sortrows(gs_events, [1,2]);
         gs_events = clean_up_events(gs_events);
         
+        interviews = pfile.calibrated_words;
+        rows = size(interviews, 1);
+        interviews.pnum = ones(rows, 1) * str2num(pfile.scalars.trial_number);
+        calibrated_words = calibration{calibration.Participant_ == str2double(pfile.scalars.trial_number), 2:29};
+        
+        %% normalize joystick to [-10 10] scale
+        joystick_10 = pfile.joystick(:, :);
+        calibrated_word_range = max(interviews.calibrated_values) - min(interviews.calibrated_values);
+        joystick_10.joystick = (joystick_10.joystick * 20 / ...
+                               (max(joystick_10.joystick) - min(joystick_10.joystick))) - 10;
+                               
+        %% normalize joystick to max and min calibrated word value of all calibrated words of one participant
+        joystick_all_words = pfile.joystick(:, :);
+        calibrated_word_range = max(calibrated_words) - min(calibrated_words);
+        joystick_all_words.joystick = (joystick_all_words.joystick * calibrated_word_range / ...
+                                        (max(joystick_all_words.joystick) - min(joystick_all_words.joystick))) - ...
+                                        (calibrated_word_range / 2);
+                                        
         %% Extract joystick data based on window around event timestamp
         [gs_events.w1abs, gs_events.w1var, gs_events.w1slp, gs_events.w1slp2] = ...
             extract_joystick(pfile.joystick, gs_events(:, 'timestamp_ms'), 1000, 5000);
@@ -66,7 +85,9 @@ for i = 1:size(all_data,1)
         [gs_events.w3abs, gs_events.w3var, gs_events.w3slp, gs_events.w3slp2] = ...
             extract_joystick(pfile.joystick, gs_events(:, 'timestamp_ms'), 500, 5000);
         [gs_events.w4abs, gs_events.w4var, gs_events.w4slp, gs_events.w4slp2] = ...
-            extract_joystick(pfile.joystick, gs_events(:, 'timestamp_ms'), 750, 5000);
+            extract_joystick(joystick_10, gs_events(:, 'timestamp_ms'), 750, 5000);
+        [gs_events.w5abs, gs_events.w5var, gs_events.w5slp, gs_events.w5slp2] = ...
+            extract_joystick(joystick_all_words, gs_events(:, 'timestamp_ms'), 1000, 5000);
         
         gs_events.Var3 = [];
         gs_events = gs_events(~ismissing(gs_events.label), :);
