@@ -12,6 +12,16 @@ resultVarNames = {'timestamp_ms', 'label', 'pnum', 'type', 'scene', 'A0abs', 'A0
 result = table('Size', [0 29], 'VariableTypes', resultVarTypes, ... 
     'VariableNames', resultVarNames);
 
+[values, names] = catch22_all([0.0]);
+fsr_var_names = {};
+for k = 0:4
+    for n = names
+        fsr_var_names{end+1} = genvarname(['A' int2str(k) '_' n{1}]);
+    end
+end
+
+result{:, fsr_var_names} = 0;
+
 for i = 1:size(all_data,1)
     pfile = all_data{i,1};
     
@@ -107,8 +117,30 @@ for i = 1:size(all_data,1)
             extract_fsr(array2table([new_timestamp_ms', fsr_max'], 'VariableNames', {'timestamp_ms', 'fsr'}), ...
             gs_events(:, 'timestamp_ms'), 1000, 5000);
         
-        gs_events.Var3 = [];
+        % gs_events.Var3 = [];
         gs_events = gs_events(~ismissing(gs_events.label), :);
+        
+        processed_fsr = {fsr_A0 fsr_A1 fsr_A2 fsr_A3 fsr_A4 fsr_max};
+        
+        timestamps = gs_events(:, 'timestamp_ms');
+        for j = 1:height(timestamps)
+            ts = timestamps{j,1};
+            rows = new_timestamp_ms <= ts + 5000 & ...
+                new_timestamp_ms >= ts - 1000;
+            for k = 0:4
+                fsr_in_window = processed_fsr{k+1};
+                fsr_in_window = fsr_in_window(rows);
+                if size(fsr_in_window, 1) > 0
+                    [values, names] = catch22_all(transpose(fsr_in_window));
+                    fsr_var_names = {};
+                    for n = names
+                        fsr_var_names{end+1} = genvarname(['A' int2str(k) '_' n{1}]);
+                    end
+                    gs_events{j, fsr_var_names} = transpose(values);
+                    
+                end
+            end 
+        end
         
         result = vertcat(result, gs_events);
     end
@@ -152,11 +184,16 @@ for i = 3:size(uniq_events)
             correct_scene = 'none';
         elseif strcmp(event_label, 'wet-steps-end') | strcmp(event_label, 'wet-steps-start')
             correct_scene = 'Pond';
+        elseif strcmp(event_label, 'sharp-breath-2')
+            correct_scene = 'Road';
         else
             correct_scene = uniq_scenes(uniq_scenes ~= 'none');
         end
     end
     if strcmp(event_label, 'experimenter-in') | strcmp(event_label, 'experimenter-out')
+        correct_scene = 'none';
+    end
+    if isempty(correct_scene)
         correct_scene = 'none';
     end
     result(result.label == event_label, {'scene'}) = {correct_scene};
