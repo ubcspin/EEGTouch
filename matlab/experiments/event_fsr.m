@@ -24,7 +24,6 @@ result{:, fsr_var_names} = 0;
 
 for i = 1:size(all_data,1)
     pfile = all_data{i,1};
-    
     if ~isempty(pfile)
         fprintf('Extracting event {x} fsr data from participant %d...\n', i);
         
@@ -117,7 +116,7 @@ for i = 1:size(all_data,1)
             extract_fsr(array2table([new_timestamp_ms', fsr_max'], 'VariableNames', {'timestamp_ms', 'fsr'}), ...
             gs_events(:, 'timestamp_ms'), 1000, 5000);
         
-        % gs_events.Var3 = [];
+        gs_events.Var3 = [];
         gs_events = gs_events(~ismissing(gs_events.label), :);
         
         processed_fsr = {fsr_A0 fsr_A1 fsr_A2 fsr_A3 fsr_A4 fsr_max};
@@ -141,7 +140,6 @@ for i = 1:size(all_data,1)
                 end
             end 
         end
-        
         result = vertcat(result, gs_events);
     end
 end
