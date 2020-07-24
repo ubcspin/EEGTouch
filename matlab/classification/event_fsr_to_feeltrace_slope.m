@@ -1,6 +1,6 @@
-if ~isfile('./experiments/results/event_joystick_asym.csv')
+if ~isfile('../experiments/results/event_joystick_asym.csv')
     event_joystick;
-elif ~isfile('./experiments/results/event_fsr_asym.csv')
+elif ~isfile('../experiments/results/event_fsr_asym.csv')
     event_fsr;
 end
 
@@ -24,7 +24,7 @@ result.slope_bin = arrayfun(@(x) x > 0, result{:, {'slope_zscore'}});
 result.slope_tri = arrayfun(@categorize_val, result{:, {'slope_zscore'}});
 result = [result e_fsr(:, 30:128)];
 
-writetable(result, './classification/train/event_fsr_to_feeltrace_train.csv');
+writetable(result, './train/event_fsr_to_feeltrace_train.csv');
 
 function [b] = categorize_val(z)
     if abs(z) < 0.25
