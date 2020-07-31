@@ -66,7 +66,6 @@ for i = 1:size(all_data,1)
         
         %% normalize joystick to [-10 10] scale
         joystick_10 = pfile.joystick(:, :);
-        calibrated_word_range = max(interviews.calibrated_values) - min(interviews.calibrated_values);
         joystick_10.joystick = (joystick_10.joystick * 20 / ...
                                (max(joystick_10.joystick) - min(joystick_10.joystick))) - 10;
                                

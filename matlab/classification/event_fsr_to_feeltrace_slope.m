@@ -18,6 +18,7 @@ e_fsr = readtable('event_fsr_asym.csv');
 result = e_joystick(:, {'timestamp_ms', 'label', 'pnum', 'type', 'scene'});
 result(:, {'key_hold', 'key_left', 'key_down', 'key_right', 'key_jump'}) = e_fsr(:, {'A0abs', 'A1abs', 'A2abs', 'A3abs', 'A4abs'});
 result(:, {'feeltrace', 'feeltrace_slope', 'feeltrace_calibrated'}) = e_joystick(:, {'w1abs', 'w1slp', 'w5abs'});
+result.feeltrace_10 = e_joystick.w4abs;
 result.feeltrace_slope(isnan(result.feeltrace_slope)) = 0;
 result.slope_zscore = zscore(result{:, {'feeltrace_slope'}});
 result.slope_bin = arrayfun(@(x) x > 0, result{:, {'slope_zscore'}});
