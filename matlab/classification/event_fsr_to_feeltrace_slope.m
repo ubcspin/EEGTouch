@@ -26,14 +26,3 @@ result.slope_tri = arrayfun(@categorize_val, result{:, {'slope_zscore'}});
 result = [result e_fsr(:, 30:128)];
 
 writetable(result, './train/event_fsr_to_feeltrace_train.csv');
-
-function [b] = categorize_val(z)
-    if abs(z) < 0.25
-        b = 0;
-    elseif z >= 0.25
-        b = 1;
-    else
-        b = -1;
-    end
-    return
-end
