@@ -1,5 +1,4 @@
 load_all_processed;
-tprocess_scenes;
 
 resultVarTypes = {'double', 'double', 'string', 'string', 'double', 'double', 'double' ...
     'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double'};
@@ -42,12 +41,14 @@ for i = 1:size(all_data,1)
         
         
         %% Extract joystick data based on window around event timestamp
+        
         [interviews.w1abs, interviews.w1var, interviews.w1slp, interviews.w1slp2] = ...
-            extract_joystick(joystick_10, interviews(:, 'timestamp_ms'), 500, 500);
+            extract_joystick(joystick_10, interviews(:, 'timestamp_ms'), 2000, 2000);
         [interviews.w2abs, interviews.w2var, interviews.w2slp, interviews.w2slp2] = ...
-            extract_joystick(joystick_calibrated, interviews(:, 'timestamp_ms'), 500, 500);
+            extract_joystick(joystick_10, interviews(:, 'timestamp_ms'), 500, 1500);
         [interviews.w3abs, interviews.w3var, interviews.w3slp, interviews.w3slp2] = ...
-            extract_joystick(joystick_all_words, interviews(:, 'timestamp_ms'), 500, 500);
+            extract_joystick(joystick_all_words, interviews(:, 'timestamp_ms'), 2000, 2000);
+          
         
         result = vertcat(result, interviews);
     end
