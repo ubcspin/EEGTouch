@@ -26,6 +26,8 @@ dependencies:
 - spyder-kernels
 - pip:
   - mne
+  - mne-features
+  - catch22
   - imageio-ffmpeg>=0.4.1
   - vtk>=9.0.1
   - pyvista>=0.24
