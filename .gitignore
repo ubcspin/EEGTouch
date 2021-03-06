@@ -7,4 +7,4 @@ matlab/tableau/*.csv
 matlab/experiments/results
 matlab/util/load_all_data.m
 matlab/classification/train
-eeg_python/data/
+eeg_python/figure
