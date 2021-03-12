@@ -66,7 +66,8 @@ pull / fetch to ensure updated code
 		[In channels]: setting channels for band features, gamma, beta, first difference
 		
 		[In main feature calc block]:
-			*bicoherence calc ln 131 denom may have multiple implementations; this is just one - consider testing another. ref linked at ln 112 (img linked also acts as ref)
+			*bicoherence calc ln 131 denom may have multiple implementations; this is just one - consider testing another. ref linked at ln 112 (img linked also acts as ref) 
+			*another ref: https://github.com/synergetics/spectrum
 			
 			hjorth (pkg calcs)
 			
