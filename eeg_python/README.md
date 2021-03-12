@@ -30,3 +30,55 @@ to point to the correct path to the `converted_data` saved in your machine. Crea
 4. Note: The bad channels specified in `bad_channels.txt` are not removed by this programmatic pass. The channels in `bad_channels.txt` are identified based on the detected EOG figures. More refined method might be required to reject these channels manually along the time axis.
 
 ### Prepare feature matrix and labels
+- install python version 3.9.2
+https://www.python.org/downloads/
+- install miniconda version 4.9.2 (uses python version 3.8.5)
+https://docs.conda.io/en/latest/miniconda.html
+- ***move filtered-eeg folder; converted_data from server to C:\Users\Documents\Github (same level as EEGTouch)
+filter(converted_data) -> filtered-eeg
+ubc/cs/research/imager/project/spin/proj/eeg
+- clone ubcspin\EEGTouch repository and change to ongoing-analysis branch
+https://github.com/ubcspin/EEGTouch/tree/ongoing-analysis/eeg_python
+pull / fetch to ensure updated code
+- open conda shell (start menu -> Anaconda3(64-bit) -> Anaconda Powershell Prompt (Miniconda3)
+	- in the shell: 
+	- navigate to ..\GitHub\EEGTouch\eeg_python 
+	- command: conda env create -n <give-a-name-to-the-env> -f environment.yml
+		- note: you used 'qian' as the environment name
+- activate conda
+	activate <environment name> ("qian" in example)
+- open jupyter
+	jupyter notebook
+	-> Preoprocess_filter+artifact_removal
+	-> run
+	-> Ctrl-C in terminal to quit run
+	-> .png saved in C:\Users\SPIN-admin\Documents\GitHub\EEGTouch\eeg_python\figures\eog
+
+	-> Preprocess_feature_extraction
+		-> feature file: data_features.npy; data_label.npy is feeltrace-slope values (not yet binned-rename to data_slope.npy?) and data_state.npy is feeltrace-value (not yet binned) saved in C:\Users\SPIN-admin\Documents\GitHub\EEGTouch\eeg_python\data\processed_features_and_labels\2
+		-> current version samples feeltrace every second; fine for end-start/t for slope calculation but if we wanted finer slope-vals, will need to change linear interpolation process [In setting feeltrace block]
+			*new_timestamp = np.arange(p2_feeltrace[0,0], p2_feeltrace[-1,0], 1000)
+			p2_feeltrace_even = np.interp(new_timestamp, p2_feeltrace[:,0], p2_feeltrace[:,1])
+			
+		[In reshaping block]: 
+			sets 2D array to 3D array [num_seconds X 1000 samples X 64 channels] (1s data instances has 1000 samples per channel)
+			
+		[In channels]: setting channels for band features, gamma, beta, first difference
+		
+		[In main feature calc block]:
+			*bicoherence calc ln 131 denom may have multiple implementations; this is just one - consider testing another. ref linked at ln 112 (img linked also acts as ref) 
+			*another ref: https://github.com/synergetics/spectrum
+			
+			hjorth (pkg calcs)
+			
+			fractal dim (pkg calcs)
+		
+			HOC - higher order crossing (based on pkg on zero-crossing)
+			
+		[In feature construction block]
+			apply all calcs and outputting as [feature_name, result]
+			
+		runs per participant
+		
+		
+		
