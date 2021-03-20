@@ -49,12 +49,12 @@ pull / fetch to ensure updated code
 	activate <environment name> ("qian" in example)
 - open jupyter
 	jupyter notebook
-	-> Preoprocess_filter+artifact_removal
-	-> run
-	-> Ctrl-C in terminal to quit run
-	-> .png saved in C:\Users\SPIN-admin\Documents\GitHub\EEGTouch\eeg_python\figures\eog
+	-> Preoprocess_filter+artifact_removal [identifies and removes EOG events via ICA]
+		-> run
+		-> Ctrl-C in terminal to quit run
+		-> .png saved in C:\Users\SPIN-admin\Documents\GitHub\EEGTouch\eeg_python\figures\eog
 
-	-> Preprocess_feature_extraction
+	-> Preprocess_feature_extraction [calculates features and labels; writes to npy and csv]
 		-> feature file: data_features.npy; data_label.npy is feeltrace-slope values (not yet binned-rename to data_slope.npy?) and data_state.npy is feeltrace-value (not yet binned) saved in C:\Users\SPIN-admin\Documents\GitHub\EEGTouch\eeg_python\data\processed_features_and_labels\2
 		-> current version samples feeltrace every second; fine for end-start/t for slope calculation but if we wanted finer slope-vals, will need to change linear interpolation process [In setting feeltrace block]
 			*new_timestamp = np.arange(p2_feeltrace[0,0], p2_feeltrace[-1,0], 1000)
@@ -79,6 +79,20 @@ pull / fetch to ensure updated code
 			apply all calcs and outputting as [feature_name, result]
 			
 		runs per participant
+	
+	-> EEG_benchmark [build model for classification and regression]
+		-> todo: *have not run leave one participant out on label sets
+		-> todo: *have run 2-s fsr instances around game events only - is NOT comparable to EEG classification here which is 1-s consecutive windows along entire gameplay
+		-> load feature set; load label set
+		-> identified highly correlated features, removed one
+		-> decomposition using tSNE to n-comp = 2 (down to 2 dimensions)
+		-> squeeze from matrix to vector
+		-> visualize decomposition
+		-> extract dog scene to use as test set (scene.csv file may have scene timestamps)
+		-> build test / train sets
+		-> boosted tree regression hyperparameters set [small, med, large]
+		-> picks tree with highest CV score
+		-> lasso cv (5 fold default)
 		
 		
 		
