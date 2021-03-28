@@ -78,21 +78,74 @@ pull / fetch to ensure updated code
 		[In feature construction block]
 			apply all calcs and outputting as [feature_name, result]
 			
-		runs per participant
+		runs per participant (P2 and P5 have been run -> similar results)
 	
 	-> EEG_benchmark [build model for classification and regression]
 		-> todo: *have not run leave one participant out on label sets
 		-> todo: *have run 2-s fsr instances around game events only - is NOT comparable to EEG classification here which is 1-s consecutive windows along entire gameplay
-		-> load feature set; load label set
-		-> identified highly correlated features, removed one
-		-> decomposition using tSNE to n-comp = 2 (down to 2 dimensions)
-		-> squeeze from matrix to vector
-		-> visualize decomposition
-		-> extract dog scene to use as test set (scene.csv file may have scene timestamps)
-		-> build test / train sets
-		-> boosted tree regression hyperparameters set [small, med, large]
-		-> picks tree with highest CV score
-		-> lasso cv (5 fold default)
+		-> Load data: load feature set; load label set
+		-> Inspect if there are colinearities: identified highly correlated features, removed one
+		-> Separate training and testing set: extract dog scene to use as test set (scene.csv file may have scene timestamps)
+			-> build test / train sets
+			TODO: try *random* test/train sets rather than middle scene
+				- lesser: only before scene rather than before and after
+		-> LGBM: boosted tree regression hyperparameters set [small, med, large]
+			-> picks tree with highest CV score
+		-> Lasso: lasso cv (5 fold default)
+		-> Slope classification with multiple models: load slope data and process into 3 bins: [-1, 0, 1]
+			viz of class distribution
+			todo: note class imbalance - models that can handle imbalance OR balance classes
+			- these models assume iid; may need to look at models that are designed to predict from timeseries 
+			- anecdote: Schmidt was working on EEG data from kinesiology using EEG to predict neuroabnormalities (seizure? concussion?) but splitting data into consecutive time windows and treated as independent samples for classification was not effective ** exactly us **
 		
+		-> Visualize feature and label space with tSNE: decomposition using tSNE to n-comp = 2 (down to 2 dimensions)
+			-> squeeze from matrix to vector
+			-> visualize decomposition *note blob of things - classes are entangled
+			-> test and train set to bin labels (was slope val before for reg)
+			
+		-> Feature selection with RFECV):
+			-> removes lowest performing features (bottom 50% bc step=0.5) based on CV (RF assigns importance to features) 
+			-> note result in [57], all 93 features assigned a rank of 1 
+			-> in [58] support_ shows TRUE for all therefore, keep all is recommended
+			
+		-> Classification with RF
+			-> combinations of param_grid vals = 18 candidates
+			-> check best fit - output: gini - 10 - 10
+			-> prediction only 0 <-
+			
+		-> Classification with logistic regression
+			-> Out[65]: array([ [  9,  41,  12],
+								[ 53, 172,  38],
+								[ 10,  43,  15]]) is CV training results
+			-> dog scene test gets ~50%
+		
+		-> Classification with KNN
+			-> similar output to log reg
+			
+		-> Inspecting distances between training examples
+			-> compare distance between each pair of data instances
+			-> histogram x-axis distance vals; y-axis freq
+			
+		-> Classification with support vector machine
+			-> predict 0 (acts more like RF)
+			-> note out[89]: param_C is inverse of L2-reg val so in row 6, very low reg or high param_C shows high train-score (model working evidence)
+			
+		-> Classification with simple neural network
+			-> predicts 0 
+			
+		*** end of classification on emotion traj slope bins	
+		
+		-> Regression on emotion state (feeltrace value)
+			-> StandardScaler() transforms labels into z-score to 10 bins (specify bin vals)
+			-> best one is negative using R-squared 0_o
+			
+		-> Classification on emotion state
+			-> out plt.hist(y): distribution of feeltrace val
+			-> out plt.bar...: binned based on 1/3 of vals
+			-> use SVM, predicts -1
+			
+			
+			
+			
 		
 		
