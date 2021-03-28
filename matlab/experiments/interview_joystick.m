@@ -1,13 +1,13 @@
 load_all_processed;
-tprocess_scenes;
 
 resultVarTypes = {'double', 'double', 'string', 'string', 'double', 'double', 'double' ...
-    'double', 'double', 'double', 'double', 'double', 'double'};
+    'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double'};
 resultVarNames = {'pnum', 'timestamp_ms', 'emotion_words', 'calibrated_words', 'calibrated_values', 'w1abs', 'w1var', ...
-    'w1slp', 'w1slp2', 'w2abs', 'w2var', 'w2slp', 'w2slp2'};
-result = table('Size', [0 13], 'VariableTypes', resultVarTypes, ... 
+    'w1slp', 'w1slp2', 'w2abs', 'w2var', 'w2slp', 'w2slp2', 'w3abs', 'w3var', 'w3slp', 'w3slp2'};
+result = table('Size', [0 17], 'VariableTypes', resultVarTypes, ... 
     'VariableNames', resultVarNames);
 
+calibration = readtable('calibration.csv');
 for i = 1:size(all_data,1)
     pfile = all_data{i,1};
     
@@ -17,15 +17,38 @@ for i = 1:size(all_data,1)
         interviews = pfile.calibrated_words;
         rows = size(interviews, 1);
         interviews.pnum = ones(rows, 1) * str2num(pfile.scalars.trial_number);
+        calibrated_words = calibration{calibration.Participant_ == str2double(pfile.scalars.trial_number), 2:29};
         
         %% normalize joystick to [-10 10] scale
-        pfile.joystick.joystick = (pfile.joystick.joystick * 20 / max(pfile.joystick.joystick)) - 10;
+        joystick_10 = pfile.joystick(:, :);
+        calibrated_word_range = max(interviews.calibrated_values) - min(interviews.calibrated_values);
+        joystick_10.joystick = (joystick_10.joystick * 20 / ...
+                               (max(joystick_10.joystick) - min(joystick_10.joystick))) - 10;
+                               
+        %% normalize joystick to the max and min calibrated word value mentioned in interview
+        joystick_calibrated = pfile.joystick(:, :);
+        calibrated_word_range = max(interviews.calibrated_values) - min(interviews.calibrated_values);
+        joystick_calibrated.joystick = (joystick_calibrated.joystick * calibrated_word_range / ...
+                                        (max(joystick_calibrated.joystick) - min(joystick_calibrated.joystick))) - ...
+                                        (calibrated_word_range / 2);
+                                        
+        %% normalize joystick to max and min calibrated word value of all calibrated words of one participant
+        joystick_all_words = pfile.joystick(:, :);
+        calibrated_word_range = max(calibrated_words) - min(calibrated_words);
+        joystick_all_words.joystick = (joystick_all_words.joystick * calibrated_word_range / ...
+                                        (max(joystick_all_words.joystick) - min(joystick_all_words.joystick))) - ...
+                                        (calibrated_word_range / 2);
+        
         
         %% Extract joystick data based on window around event timestamp
+        
         [interviews.w1abs, interviews.w1var, interviews.w1slp, interviews.w1slp2] = ...
-            extract_joystick(pfile.joystick, interviews(:, 'timestamp_ms'), 1000, 1000);
+            extract_joystick(joystick_10, interviews(:, 'timestamp_ms'), 2000, 2000);
         [interviews.w2abs, interviews.w2var, interviews.w2slp, interviews.w2slp2] = ...
-            extract_joystick(pfile.joystick, interviews(:, 'timestamp_ms'), 2000, 2000);
+            extract_joystick(joystick_10, interviews(:, 'timestamp_ms'), 500, 1500);
+        [interviews.w3abs, interviews.w3var, interviews.w3slp, interviews.w3slp2] = ...
+            extract_joystick(joystick_all_words, interviews(:, 'timestamp_ms'), 2000, 2000);
+          
         
         result = vertcat(result, interviews);
     end

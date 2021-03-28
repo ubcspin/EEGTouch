@@ -1,0 +1,29 @@
+p2 - good
+p4 - filter+spdens check - remove bad channel
+	E23 (looks reasonable after removing)
+p5 - filter+spdens check - remove bad channel
+	E58 (E58 at certain timestamp is definitely bad, maybe we should reject those timestamps instead of rejecting the entire channel cuz it doesn't change the log detection)
+p6 - filter+spdens check - remove bad channel
+	E33 (did not fix after removing, should consider removing bad segments)
+p7 - good
+p8 - watch video [LC]
+p9 - filter+spdens check - remove bad channel
+	watch video
+p10 - good
+p13 - filter+spdens check - remove bad channel
+	E36-37, E34 (looks reasonable after removing)
+p14 - filter+spdens check - remove bad channel
+	E34, 36, 63 (did not fix after removing, should consider removing bad segments)
+p15 - watch video [LC]
+p16 - filter+spdens check - remove bad channel
+	E36-40, E34 (did not fix after removing, should consider removing bad segments)
+p18 - filter+spdens check - remove bad channel
+	p18 looks fine, just extra noisy, did not improve after changing filtering to be (60, 120, 180, 240, 300)
+p19 - good
+p20 - good
+p21 - filter+spdens check - remove bad channel
+	E36, 37, 34 (did not fix after removing, should consider removing bad segments)
+p22 - filter+spdens check - remove bad channel
+	E34, 36, 63 (did not fix after removing, should consider removing bad segments)
+p23 - filter+spdens check - remove bad channel 
+	extra noisy, did not improve after changing filtering to be (60, 120, 180, 240, 300)
